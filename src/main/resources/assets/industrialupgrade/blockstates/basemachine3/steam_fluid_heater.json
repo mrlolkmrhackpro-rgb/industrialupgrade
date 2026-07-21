@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=steam_fluid_heater": {
+      "model": "industrialupgrade:block/basemachine/steam_fluid_heater"
+    },
+    "facing=south,type=steam_fluid_heater": {
+      "model": "industrialupgrade:block/basemachine/steam_fluid_heater",
+      "y": 180
+    },
+    "facing=west,type=steam_fluid_heater": {
+      "model": "industrialupgrade:block/basemachine/steam_fluid_heater",
+      "y": 270
+    },
+    "facing=east,type=steam_fluid_heater": {
+      "model": "industrialupgrade:block/basemachine/steam_fluid_heater",
+      "y": 90
+    },
+    "facing=north,type=steam_fluid_heater_active": {
+      "model": "industrialupgrade:block/basemachine/steam_fluid_heater_active"
+    },
+    "facing=south,type=steam_fluid_heater_active": {
+      "model": "industrialupgrade:block/basemachine/steam_fluid_heater_active",
+      "y": 180
+    },
+    "facing=west,type=steam_fluid_heater_active": {
+      "model": "industrialupgrade:block/basemachine/steam_fluid_heater_active",
+      "y": 270
+    },
+    "facing=east,type=steam_fluid_heater_active": {
+      "model": "industrialupgrade:block/basemachine/steam_fluid_heater_active",
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north,type=kinetic_generator_assembler_active": {
+      "model": "industrialupgrade:block/basemachine/kinetic_generator_assembler_active"
+    },
+    "facing=south,type=kinetic_generator_assembler_active": {
+      "model": "industrialupgrade:block/basemachine/kinetic_generator_assembler_active",
+      "y": 180
+    },
+    "facing=west,type=kinetic_generator_assembler_active": {
+      "model": "industrialupgrade:block/basemachine/kinetic_generator_assembler_active",
+      "y": 270
+    },
+    "facing=east,type=kinetic_generator_assembler_active": {
+      "model": "industrialupgrade:block/basemachine/kinetic_generator_assembler_active",
+      "y": 90
+    }
+  }
+}

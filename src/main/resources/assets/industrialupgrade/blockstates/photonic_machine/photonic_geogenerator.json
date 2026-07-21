@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=photonic_geogenerator": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_geogenerator"
+    },
+    "facing=south,type=photonic_geogenerator": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_geogenerator",
+      "y": 180
+    },
+    "facing=west,type=photonic_geogenerator": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_geogenerator",
+      "y": 270
+    },
+    "facing=east,type=photonic_geogenerator": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_geogenerator",
+      "y": 90
+    },
+    "facing=north,type=photonic_geogenerator_active": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_geogenerator_active"
+    },
+    "facing=south,type=photonic_geogenerator_active": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_geogenerator_active",
+      "y": 180
+    },
+    "facing=west,type=photonic_geogenerator_active": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_geogenerator_active",
+      "y": 270
+    },
+    "facing=east,type=photonic_geogenerator_active": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_geogenerator_active",
+      "y": 90
+    }
+  }
+}

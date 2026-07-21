@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=crop_harvester_iu": {
+      "model": "industrialupgrade:block/basemachine/crop_harvester"
+    },
+    "facing=south,type=crop_harvester_iu": {
+      "model": "industrialupgrade:block/basemachine/crop_harvester",
+      "y": 180
+    },
+    "facing=west,type=crop_harvester_iu": {
+      "model": "industrialupgrade:block/basemachine/crop_harvester",
+      "y": 270
+    },
+    "facing=east,type=crop_harvester_iu": {
+      "model": "industrialupgrade:block/basemachine/crop_harvester",
+      "y": 90
+    },
+    "facing=north,type=crop_harvester_iu_active": {
+      "model": "industrialupgrade:block/basemachine/crop_harvester"
+    },
+    "facing=south,type=crop_harvester_iu_active": {
+      "model": "industrialupgrade:block/basemachine/crop_harvester",
+      "y": 180
+    },
+    "facing=west,type=crop_harvester_iu_active": {
+      "model": "industrialupgrade:block/basemachine/crop_harvester",
+      "y": 270
+    },
+    "facing=east,type=crop_harvester_iu_active": {
+      "model": "industrialupgrade:block/basemachine/crop_harvester",
+      "y": 90
+    }
+  }
+}

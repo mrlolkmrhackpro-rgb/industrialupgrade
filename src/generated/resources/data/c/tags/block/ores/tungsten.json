@@ -1,0 +1,8 @@
+{
+  "values": [
+    "industrialupgrade:baseore/tungsten",
+    "industrialupgrade:blockspace2/ganymede_tungsten_ore",
+    "industrialupgrade:asteroidore2/asteroid_tungsten_ore",
+    "industrialupgrade:deepore/deep_tungsten_ore"
+  ]
+}

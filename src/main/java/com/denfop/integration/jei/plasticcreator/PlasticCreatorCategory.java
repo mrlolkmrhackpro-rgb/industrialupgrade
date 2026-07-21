@@ -1,88 +1,86 @@
 package com.denfop.integration.jei.plasticcreator;
 
+import com.denfop.integration.jei.JeiIngredientHelper;
 import com.denfop.Constants;
 import com.denfop.IUItem;
-import com.denfop.Localization;
-import com.denfop.api.gui.Component;
-import com.denfop.api.gui.EnumTypeComponent;
-import com.denfop.api.gui.GuiComponent;
-import com.denfop.api.gui.GuiElement;
-import com.denfop.api.gui.TankGauge;
 import com.denfop.api.recipe.InventoryOutput;
 import com.denfop.api.recipe.InventoryRecipes;
-import com.denfop.blocks.mechanism.BlockBaseMachine2;
-import com.denfop.blocks.mechanism.BlockBaseMachine3;
+import com.denfop.api.widget.EnumTypeComponent;
+import com.denfop.api.widget.ScreenWidget;
+import com.denfop.api.widget.TankWidget;
+import com.denfop.api.widget.WidgetDefault;
+import com.denfop.blockentity.mechanism.BlockEntityEnchanterBooks;
+import com.denfop.blockentity.mechanism.BlockEntityPlasticCreator;
+import com.denfop.blocks.mechanism.BlockBaseMachine2Entity;
+import com.denfop.blocks.mechanism.BlockBaseMachine3Entity;
 import com.denfop.componets.ComponentRenderInventory;
 import com.denfop.componets.EnumTypeComponentSlot;
-import com.denfop.container.ContainerEnchanterBooks;
-import com.denfop.container.SlotInvSlot;
-import com.denfop.gui.GuiIU;
-import com.denfop.tiles.mechanism.TileEntityEnchanterBooks;
-import com.denfop.tiles.mechanism.TilePlasticCreator;
-import mezz.jei.api.IGuiHelper;
-import mezz.jei.api.gui.IDrawable;
-import mezz.jei.api.gui.IDrawableStatic;
-import mezz.jei.api.gui.IGuiFluidStackGroup;
-import mezz.jei.api.gui.IGuiItemStackGroup;
-import mezz.jei.api.gui.IRecipeLayout;
-import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.IRecipeCategory;
+import com.denfop.containermenu.ContainerMenuEnchanterBooks;
+import com.denfop.containermenu.SlotInvSlot;
+import com.denfop.integration.jei.IRecipeCategory;
+import com.denfop.integration.jei.JeiInform;
+import com.denfop.recipes.ItemStackHelper;
+import com.denfop.screen.ScreenMain;
+import com.denfop.utils.Localization;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableStatic;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
 import java.util.List;
 
-public class PlasticCreatorCategory extends GuiIU implements IRecipeCategory<PlasticCreatorWrapper> {
+public class PlasticCreatorCategory extends ScreenMain implements IRecipeCategory<PlasticCreatorHandler> {
 
     private final IDrawableStatic bg;
-    private final ContainerEnchanterBooks container1;
-    private final GuiComponent progress_bar;
+    private final ContainerMenuEnchanterBooks container1;
+    private final ScreenWidget progress_bar;
+    private final JeiInform jeiInform;
     private int progress = 0;
     private int energy = 0;
 
     public PlasticCreatorCategory(
-            final IGuiHelper guiHelper
+            IGuiHelper guiHelper, JeiInform jeiInform
     ) {
-        super(((TileEntityEnchanterBooks) BlockBaseMachine3.enchanter_books.getDummyTe()).getGuiContainer(Minecraft.getMinecraft().player));
-        bg = guiHelper.createDrawable(new ResourceLocation(Constants.MOD_ID, "textures/gui/guimachine" +
+        super(((BlockEntityEnchanterBooks) BlockBaseMachine3Entity.enchanter_books.getDummyTe()).getGuiContainer(Minecraft.getInstance().player));
+        bg = guiHelper.createDrawable(ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/guimachine" +
                         ".png"), 3, 3, 140,
                 77
         );
+        this.jeiInform = jeiInform;
+        this.title = net.minecraft.network.chat.Component.literal(getTitles());
         this.componentList.clear();
-        this.slots = new GuiComponent(this, 3, 3, getComponent(),
-                new Component<>(new ComponentRenderInventory(EnumTypeComponentSlot.SLOTS__JEI))
+        this.slots = new ScreenWidget(this, 3, 3, getComponent(),
+                new WidgetDefault<>(new ComponentRenderInventory(EnumTypeComponentSlot.SLOTS__JEI))
         );
-        this.container1 = (ContainerEnchanterBooks) this.getContainer();
+        this.container1 = (ContainerMenuEnchanterBooks) this.getContainer();
         this.componentList.add(slots);
-        progress_bar = new GuiComponent(this, 70, 35, EnumTypeComponent.PROCESS,
-                new Component<>(this.container1.base.componentProgress)
+        progress_bar = new ScreenWidget(this, 70, 35, EnumTypeComponent.PROCESS,
+                new WidgetDefault<>(this.container1.base.componentProgress)
         );
         this.componentList.add(progress_bar);
-        this.addElement(TankGauge.createNormal(this, 0, 4,
-                ((TilePlasticCreator) BlockBaseMachine2.plastic_creator.getDummyTe()).fluidTank
+        this.addWidget(TankWidget.createNormal(this, 0, 4,
+                ((BlockEntityPlasticCreator) BlockBaseMachine2Entity.plastic_creator.getDummyTe()).fluidTank
         ));
 
     }
 
-    @Nonnull
-    @Override
-    public String getUid() {
-        return BlockBaseMachine2.plastic_creator.getName();
-    }
 
     @Nonnull
     @Override
-    public String getTitle() {
-        return Localization.translate(new ItemStack(IUItem.basemachine1, 1, 11).getUnlocalizedName());
+    public String getTitles() {
+        return Localization.translate(ItemStackHelper.fromData(IUItem.basemachine1, 1, 11).getDescriptionId());
     }
 
-    @Nonnull
-    @Override
-    public String getModName() {
-        return Constants.MOD_NAME;
-    }
 
     @Nonnull
     @Override
@@ -90,9 +88,8 @@ public class PlasticCreatorCategory extends GuiIU implements IRecipeCategory<Pla
         return bg;
     }
 
-
     @Override
-    public void drawExtras(@Nonnull final Minecraft mc) {
+    public void draw(PlasticCreatorHandler recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics stack, double mouseX, double mouseY) {
         progress++;
         if (this.energy < 100) {
             energy++;
@@ -102,43 +99,40 @@ public class PlasticCreatorCategory extends GuiIU implements IRecipeCategory<Pla
         if (xScale >= 1) {
             progress = 0;
         }
-        this.slots.drawBackground(0, 0);
+        this.slots.drawBackground(stack, 0, 0);
 
-        progress_bar.renderBar(0, 0, xScale);
-        mc.getTextureManager().bindTexture(getTexture());
-        for (final GuiElement element : ((List<GuiElement>) this.elements)) {
-            element.drawBackground(this.guiLeft, this.guiTop - 5);
+        progress_bar.renderBar(stack, 0, 0, xScale);
+        bindTexture(getTexture());
+        for (final ScreenWidget element : ((List<ScreenWidget>) this.elements)) {
+            element.drawBackground(stack, this.guiLeft, this.guiTop - 5);
         }
+    }
 
+
+    @Override
+    public RecipeType<PlasticCreatorHandler> getRecipeType() {
+        return jeiInform.recipeType;
     }
 
     @Override
-    public void setRecipe(
-            final IRecipeLayout layout,
-            final PlasticCreatorWrapper recipes,
-            @Nonnull final IIngredients ingredients
-    ) {
-        IGuiItemStackGroup isg = layout.getItemStacks();
+    public void setRecipe(IRecipeLayoutBuilder builder, PlasticCreatorHandler recipe, IFocusGroup focuses) {
+        builder.addSlot(RecipeIngredientRole.INPUT, 9 - 5, 8 - 5).setFluidRenderer(10000, true, 12, 47).addFluidStack(recipe.getInput2().getFluid(), recipe.getInput2().getAmount());
         final List<SlotInvSlot> slots1 = container1.findClassSlots(InventoryRecipes.class);
-        final List<ItemStack> inputs = recipes.getInputs().get(0);
+        final List<ItemStack> inputs = Arrays.asList(recipe.getInput(), recipe.getInput1());
         int i = 0;
         for (; i < inputs.size(); i++) {
-            isg.init(i, true, slots1.get(i).getJeiX(), slots1.get(i).getJeiY());
-            isg.set(i, inputs.get(i));
+            JeiIngredientHelper.addInputSlot(builder, RecipeIngredientRole.INPUT, slots1.get(i).getJeiX(), slots1.get(i).getJeiY(), recipe, i, inputs.get(i));
+
 
         }
-
         final SlotInvSlot outputSlot = container1.findClassSlot(InventoryOutput.class);
-        isg.init(i, false, outputSlot.getJeiX(), outputSlot.getJeiY());
-        isg.set(i, recipes.getOutput());
-// 5 4
-        IGuiFluidStackGroup fff = layout.getFluidStacks();
-        fff.init(i + 1, true, 4, 8, 12, 47, 12000, true, null);
-        fff.set(i + 1, recipes.getInput2());
+
+        builder.addSlot(RecipeIngredientRole.OUTPUT, outputSlot.getJeiX(), outputSlot.getJeiY()).addItemStack(recipe.getOutput());
     }
 
+
     protected ResourceLocation getTexture() {
-        return new ResourceLocation(Constants.MOD_ID, "textures/gui/GUIPlastic.png");
+        return ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/GUIPlastic.png".toLowerCase());
     }
 
 

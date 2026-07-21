@@ -1,0 +1,25 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:polonium_palladium_composite"
+    },
+    "B": {
+      "item": "industrialupgrade:module_schedule"
+    },
+    "C": {
+      "item": "industrialupgrade:alloyplate/beryllium_bronze"
+    }
+  },
+  "pattern": [
+    "CCC",
+    "ABA",
+    "   "
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:antisoilpollution"
+  },
+  "show_notification": false
+}

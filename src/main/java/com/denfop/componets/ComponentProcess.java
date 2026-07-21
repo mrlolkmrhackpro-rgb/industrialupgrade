@@ -1,24 +1,24 @@
 package com.denfop.componets;
 
 import com.denfop.IUItem;
-import com.denfop.Localization;
-import com.denfop.api.audio.IAudioFixer;
+import com.denfop.api.otherenergies.common.IDual;
+import com.denfop.api.otherenergies.common.ISource;
 import com.denfop.api.recipe.IUpdateTick;
 import com.denfop.api.recipe.InventoryOutput;
 import com.denfop.api.recipe.InventoryRecipes;
 import com.denfop.api.recipe.MachineRecipe;
-import com.denfop.api.sytem.IDual;
-import com.denfop.api.sytem.ISource;
+import com.denfop.api.sound.AudioFixer;
+import com.denfop.blockentity.base.BlockEntityInventory;
 import com.denfop.blocks.FluidName;
-import com.denfop.invslot.InventoryUpgrade;
-import com.denfop.tiles.base.TileEntityInventory;
+import com.denfop.inventory.InventoryUpgrade;
 import com.denfop.utils.Timer;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 
 import java.util.List;
 
@@ -52,7 +52,7 @@ public class ComponentProcess extends AbstractComponent {
     private Timer timer = null;
 
     public ComponentProcess(
-            final TileEntityInventory parent,
+            final BlockEntityInventory parent,
             int operationLength,
             double energyConsume
     ) {
@@ -87,19 +87,19 @@ public class ComponentProcess extends AbstractComponent {
         if (this.exp) {
             this.componentExp = this.getParent().getComp("com.denfop.componets.ComponentBaseEnergyexperience");
         }
-        this.audoFix = this.getParent() instanceof IAudioFixer;
+        this.audoFix = this.getParent() instanceof AudioFixer;
         this.componentUpgrade = this.getParent().getComp(ComponentUpgrade.class);
     }
 
     @Override
-    public boolean onBlockActivated(final EntityPlayer player, final EnumHand hand) {
-        ItemStack stack = player.getHeldItem(hand);
-        if (stack.getItem().equals(IUItem.canister)) {
-            FluidStack fluid = FluidUtil.getFluidContained(stack);
-            if (fluid != null && fluid.getFluid() == FluidName.fluidmotoroil.getInstance() && fluid.amount >= 125 && (!timer1.canWork() || timer1.getBar() == 0) && (timer == null || !timer.canWork())) {
+    public boolean onBlockActivated(final Player player, final InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (stack.getItem().equals(IUItem.canister.getItem())) {
+            IFluidHandlerItem handler = stack.getCapability(Capabilities.FluidHandler.ITEM, null);
+            FluidStack fluid = handler.getFluidInTank(0);
+            if (!fluid.isEmpty() && fluid.getFluid() == FluidName.fluidmotoroil.getInstance().get() && fluid.getAmount() >= 125 && (!timer1.canWork() || timer1.getBar() == 0) && (timer == null || !timer.canWork())) {
                 this.timer = new Timer(0, 0, 35);
-                final IFluidHandlerItem handler = FluidUtil.getFluidHandler(stack);
-                handler.drain(125, true);
+                handler.drain(125, IFluidHandler.FluidAction.EXECUTE);
                 return true;
             }
         }
@@ -119,7 +119,7 @@ public class ComponentProcess extends AbstractComponent {
     }
 
     public int getOperationsPerTick() {
-        return operationLength;
+        return operationsPerTick;
     }
 
     public int getDefaultOperationLength() {
@@ -159,9 +159,9 @@ public class ComponentProcess extends AbstractComponent {
     }
 
     public boolean checkFluidRecipe() {
-        return (!hasTank || this.updateTick.getRecipeOutput().getRecipe().input.getFluid() == null || (this.invSlotRecipes
+        return (!hasTank || this.updateTick.getRecipeOutput().getRecipe().input.getFluid() == null || (!this.invSlotRecipes
                 .getTank()
-                .getFluid() != null && this.updateTick.getRecipeOutput()
+                .getFluid().isEmpty() && this.updateTick.getRecipeOutput()
                 .getRecipe().input
                 .getFluid() != null && this.invSlotRecipes.getTank()
                 .getFluid()
@@ -171,7 +171,7 @@ public class ComponentProcess extends AbstractComponent {
                         .getFluid()
                         .getFluid()) && this.invSlotRecipes.getTank().getFluidAmount() >= this.updateTick.getRecipeOutput()
                 .getRecipe().input
-                .getFluid().amount));
+                .getFluid().getAmount()));
     }
 
     public boolean checkRadiation(boolean consume) {
@@ -179,12 +179,12 @@ public class ComponentProcess extends AbstractComponent {
             return true;
         }
         if (componentRad.getDelegate() instanceof ISource && !(componentRad.getDelegate() instanceof IDual)) {
-            return this.componentRad.getCapacity() - this.componentRad.getEnergy() >= 150;
+            return this.componentRad.getCapacity() - this.componentRad.getEnergy() >= 350;
         } else {
             if (this.updateTick.getRecipeOutput() == null) {
                 return false;
             } else {
-                final int amount = this.updateTick.getRecipeOutput().getRecipe().output.metadata.getInteger("rad_amount");
+                final int amount = this.updateTick.getRecipeOutput().getRecipe().output.metadata.getInt("rad_amount");
                 if (consume) {
                     this.componentRad.useEnergy(amount);
                 }
@@ -200,7 +200,7 @@ public class ComponentProcess extends AbstractComponent {
         if (this.updateTick.getRecipeOutput() == null) {
             return false;
         } else {
-            final int amount = this.updateTick.getRecipeOutput().getRecipe().output.metadata.getInteger("exp");
+            final int amount = this.updateTick.getRecipeOutput().getRecipe().output.metadata.getInt("exp");
             if (consume) {
                 this.componentExp.useEnergy(amount);
             }
@@ -216,8 +216,8 @@ public class ComponentProcess extends AbstractComponent {
                 "temperature") <= this.heatComponent.getEnergy()) {
             return true;
         } else {
-            if (!this.heatComponent.need) {
-                this.heatComponent.need = true;
+            if (!this.heatComponent.buffer.need) {
+                this.heatComponent.buffer.need = true;
             }
         }
         return false;
@@ -225,14 +225,6 @@ public class ComponentProcess extends AbstractComponent {
 
     public void updateRecipe() {
 
-    }
-
-    @Override
-    public void addInformation(final ItemStack stack, final List<String> tooltip) {
-        super.addInformation(stack, tooltip);
-        if (parent.getWorld() == null) {
-            tooltip.add(Localization.translate("iu.speed_canister.info"));
-        }
     }
 
     public boolean checkRecipe() {
@@ -254,6 +246,7 @@ public class ComponentProcess extends AbstractComponent {
         if (this.instant) {
             energyConsume *= this.operationLength;
         }
+
         if (this.stack) {
             if (this.updateTick.getRecipeOutput() != null) {
                 final List<Integer> list = this.updateTick.getRecipeOutput().getList();
@@ -263,12 +256,12 @@ public class ComponentProcess extends AbstractComponent {
                             this.invSlotRecipes.get(i).getCount() / list.get(i)
                     );
                 }
-                int count = this.outputSlot.get().isEmpty() ? this.updateTick
+                int count = this.outputSlot.get(0).isEmpty() ? this.updateTick
                         .getRecipeOutput()
                         .getRecipe().output.items
                         .get(0)
                         .getMaxStackSize() :
-                        this.outputSlot.get().getMaxStackSize() - this.outputSlot.get().getCount();
+                        this.outputSlot.get(0).getMaxStackSize() - this.outputSlot.get(0).getCount();
                 ItemStack outputStack = this.updateTick.getRecipeOutput().getRecipe().output.items.get(0);
                 count = count / Math.max(outputStack.getCount(), 1);
                 size = Math.min(size, count);
@@ -279,20 +272,24 @@ public class ComponentProcess extends AbstractComponent {
                 if (this.updateTick.getRecipeOutput().getRecipe().input.getFluid() != null) {
                     final int size1 = this.invSlotRecipes.getTank().getFluidAmount() / this.updateTick
                             .getRecipeOutput()
-                            .getRecipe().input.getFluid().amount;
+                            .getRecipe().input.getFluid().getAmount();
                     size = Math.min(size, size1);
                 }
             }
         } else {
             size = 1;
         }
+        if (this.parent.getLevel().getGameTime() % 20 == 0)
+            if (this.updateTick.getRecipeOutput() != null && this.hasTank && this.updateTick.getRecipeOutput().getRecipe().input.getFluid() != null && !this.invSlotRecipes.getTank().isEmpty() && !FluidStack.isSameFluid(this.invSlotRecipes.getTank().getFluid(), this.updateTick.getRecipeOutput().getRecipe().input.getFluid())) {
+                getOutput();
+            }
         updateRecipe();
         energyConsume *= size;
         if (this.updateTick.getRecipeOutput() != null && this.energy.canUseEnergy(energyConsume) && !this.invSlotRecipes.isEmpty() && canAddItemStack() && checkRecipe() && checkExp(
                 false) && checkFluidRecipe() && checkHeatRecipe() && checkSE() && checkRadiation(
                 false) && this.invSlotRecipes.continue_process(this.updateTick.getRecipeOutput())) {
             if (this.heatComponent != null) {
-                this.heatComponent.need = true;
+                this.heatComponent.buffer.need = true;
             }
             if (!this.parent.getActive()) {
                 this.parent.setActive(true);
@@ -300,7 +297,7 @@ public class ComponentProcess extends AbstractComponent {
             if (this.componentProgress.getProgress() == 0 && this.hasAudio) {
                 if (this.operationLength > this.defaultOperationLength * 0.1) {
                     if (this.audoFix) {
-                        ((IAudioFixer) this.getParent()).initiate(0);
+                        ((AudioFixer) this.getParent()).initiate(0);
                     }
                 }
             }
@@ -322,7 +319,6 @@ public class ComponentProcess extends AbstractComponent {
                 }
                 this.componentSE.useEnergy(energy);
             }
-
             this.consumeEnergy();
             this.energy.useEnergy(energyConsume);
             if (this.instant) {
@@ -341,14 +337,14 @@ public class ComponentProcess extends AbstractComponent {
                 }
                 if (this.hasAudio) {
                     if (this.audoFix) {
-                        ((IAudioFixer) this.getParent()).initiate(2);
+                        ((AudioFixer) this.getParent()).initiate(2);
                     }
                 }
 
             }
         } else {
             if (this.heatComponent != null && this.updateTick.getRecipeOutput() == null) {
-                this.heatComponent.need = false;
+                this.heatComponent.buffer.need = false;
             }
             onFailedProcess();
             if (componentProgress == null) {
@@ -357,13 +353,13 @@ public class ComponentProcess extends AbstractComponent {
                 this.heatComponent = this.getParent().getComp(HeatComponent.class);
                 this.coldComponent = this.getParent().getComp(CoolComponent.class);
                 this.componentSE = this.getParent().getComp("com.denfop.componets.ComponentBaseEnergysolarium");
-                this.audoFix = this.getParent() instanceof IAudioFixer;
+                this.audoFix = this.getParent() instanceof AudioFixer;
                 this.componentUpgrade = this.getParent().getComp(ComponentUpgrade.class);
 
             }
             if (this.componentProgress.getProgress() != 0 && this.getParent().getActive() && this.hasAudio) {
                 if (this.audoFix) {
-                    ((IAudioFixer) this.getParent()).initiate(1);
+                    ((AudioFixer) this.getParent()).initiate(1);
                 }
             }
             if (this.updateTick.getRecipeOutput() == null) {
@@ -395,7 +391,7 @@ public class ComponentProcess extends AbstractComponent {
             this.getOperationDefaultLength();
         }
         if (this.parent.getActive()) {
-            if (this.parent.getWorld().provider.getWorldTime() % 20 == 0) {
+            if (this.parent.getWorld().getGameTime() % 20 == 0) {
                 if (this.timer != null && this.timer.canWork()) {
                     this.timer.work();
                     if (!this.timer.canWork()) {
@@ -420,10 +416,7 @@ public class ComponentProcess extends AbstractComponent {
                 this.updateTick
                         .getRecipeOutput()
                         .getRecipe()
-                        .getOutput().items) : outputSlot.addWithoutIgnoring(
-                updateTick.getRecipeOutput().getRecipe().output.items,
-                true
-        );
+                        .getOutput().items) : outputSlot.addWithoutIgnoring(updateTick.getRecipeOutput().getRecipe().output.items, true);
     }
 
     public void consumeEnergy() {
@@ -464,7 +457,7 @@ public class ComponentProcess extends AbstractComponent {
 
     public void operateOnce(List<ItemStack> processResult) {
         this.invSlotRecipes.consume();
-        this.outputSlot.addAll(processResult);
+        this.outputSlot.add(processResult);
         checkRadiation(true);
         checkExp(true);
     }
@@ -483,7 +476,7 @@ public class ComponentProcess extends AbstractComponent {
         }
         size = Math.min(this.getSESize(size), this.getRadiationSize(size));
         this.invSlotRecipes.consume(size, output);
-        this.outputSlot.addAll(output.getRecipe().getOutput().items, size);
+        this.outputSlot.add(output.getRecipe().getOutput().items, size);
         this.consumeSE(size);
         this.consumeRadiation(size);
         if (maxSize == size) {
@@ -510,22 +503,22 @@ public class ComponentProcess extends AbstractComponent {
             }
         }
         int maxSize = size;
-        int count = this.outputSlot.get().isEmpty() ? output.getRecipe().output.items.get(0).getMaxStackSize() :
-                this.outputSlot.get().getMaxStackSize() - this.outputSlot.get().getCount();
+        int count = this.outputSlot.get(0).isEmpty() ? output.getRecipe().output.items.get(0).getMaxStackSize() :
+                this.outputSlot.get(0).getMaxStackSize() - this.outputSlot.get(0).getCount();
         ItemStack outputStack = this.updateTick.getRecipeOutput().getRecipe().output.items.get(0);
         count = count / Math.max(outputStack.getCount(), 1);
         size = Math.min(size, count);
-        size = Math.min(size, this.updateTick.getRecipeOutput().getRecipe().output.items.get(0).getItem().getItemStackLimit());
+        size = Math.min(size, this.updateTick.getRecipeOutput().getRecipe().output.items.get(0).getMaxStackSize());
         if (this.updateTick.getRecipeOutput().getRecipe().input.getFluid() != null) {
             final int size1 = this.invSlotRecipes.getTank().getFluidAmount() / this.updateTick
                     .getRecipeOutput()
-                    .getRecipe().input.getFluid().amount;
+                    .getRecipe().input.getFluid().getAmount();
             size = Math.min(size, size1);
         }
         size = Math.min(size, this.operationsPerTick);
         size = Math.min(this.getSESize(size), this.getRadiationSize(size));
         this.invSlotRecipes.consume(size, output);
-        this.outputSlot.addAll(output.getRecipe().getOutput().items, size);
+        this.outputSlot.add(output.getRecipe().getOutput().items, size);
         this.consumeSE(size);
         this.consumeRadiation(size);
         if (maxSize == size) {
@@ -546,10 +539,10 @@ public class ComponentProcess extends AbstractComponent {
             return;
         }
         if (this.componentRad.delegate instanceof ISource) {
-            this.componentRad.addEnergy(150 * size);
+            this.componentRad.addEnergy(350 * size);
             return;
         }
-        final int amount = this.updateTick.getRecipeOutput().getRecipe().output.metadata.getInteger("rad_amount");
+        final int amount = this.updateTick.getRecipeOutput().getRecipe().output.metadata.getInt("rad_amount");
 
         this.componentRad.useEnergy(amount * size);
     }
@@ -559,9 +552,9 @@ public class ComponentProcess extends AbstractComponent {
             return size;
         }
         if (this.componentRad.delegate instanceof ISource) {
-            return (int) ((this.componentRad.getCapacity() - this.componentRad.getEnergy()) / 150);
+            return (int) ((this.componentRad.getCapacity() - this.componentRad.getEnergy()) / 350);
         }
-        final int amount = this.updateTick.getRecipeOutput().getRecipe().output.metadata.getInteger("rad_amount");
+        final int amount = this.updateTick.getRecipeOutput().getRecipe().output.metadata.getInt("rad_amount");
 
         return (int) Math.min(size, this.componentRad.getEnergy() / amount);
     }

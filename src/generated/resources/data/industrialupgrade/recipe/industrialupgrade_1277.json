@@ -1,0 +1,25 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "industrialupgrade:basemachine3/steamboiler"
+    },
+    "C": {
+      "item": "industrialupgrade:crafting_elements/crafting_63_element"
+    },
+    "D": {
+      "item": "industrialupgrade:crafting_elements/crafting_123_element"
+    }
+  },
+  "pattern": [
+    "   ",
+    "DBC",
+    "   "
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:basemachine3/steampressureconverter"
+  },
+  "show_notification": false
+}

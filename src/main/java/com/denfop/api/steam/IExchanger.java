@@ -1,8 +1,8 @@
 package com.denfop.api.steam;
 
 import com.denfop.api.multiblock.IMultiElement;
-import com.denfop.invslot.Inventory;
-import com.denfop.tiles.reactors.graphite.IExchangerItem;
+import com.denfop.blockentity.reactors.graphite.IExchangerItem;
+import com.denfop.inventory.Inventory;
 
 public interface IExchanger extends IMultiElement {
 
@@ -11,5 +11,4 @@ public interface IExchanger extends IMultiElement {
     double getPower();
 
     IExchangerItem getExchanger();
-
 }

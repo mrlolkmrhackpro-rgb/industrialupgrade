@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=antimagnet": {
+      "model": "industrialupgrade:block/basemachine/antimagnet"
+    },
+    "facing=south,type=antimagnet": {
+      "model": "industrialupgrade:block/basemachine/antimagnet",
+      "y": 180
+    },
+    "facing=west,type=antimagnet": {
+      "model": "industrialupgrade:block/basemachine/antimagnet",
+      "y": 270
+    },
+    "facing=east,type=antimagnet": {
+      "model": "industrialupgrade:block/basemachine/antimagnet",
+      "y": 90
+    },
+    "facing=north,type=antimagnet_active": {
+      "model": "industrialupgrade:block/basemachine/antimagnet"
+    },
+    "facing=south,type=antimagnet_active": {
+      "model": "industrialupgrade:block/basemachine/antimagnet",
+      "y": 180
+    },
+    "facing=west,type=antimagnet_active": {
+      "model": "industrialupgrade:block/basemachine/antimagnet",
+      "y": 270
+    },
+    "facing=east,type=antimagnet_active": {
+      "model": "industrialupgrade:block/basemachine/antimagnet",
+      "y": 90
+    }
+  }
+}

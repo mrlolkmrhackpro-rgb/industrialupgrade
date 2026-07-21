@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=quadgearing": {
+      "model": "industrialupgrade:block/moremachine3/quadgearing"
+    },
+    "facing=south,type=quadgearing": {
+      "model": "industrialupgrade:block/moremachine3/quadgearing",
+      "y": 180
+    },
+    "facing=west,type=quadgearing": {
+      "model": "industrialupgrade:block/moremachine3/quadgearing",
+      "y": 270
+    },
+    "facing=east,type=quadgearing": {
+      "model": "industrialupgrade:block/moremachine3/quadgearing",
+      "y": 90
+    },
+    "facing=north,type=quadgearing_active": {
+      "model": "industrialupgrade:block/moremachine3/quadgearing_active"
+    },
+    "facing=south,type=quadgearing_active": {
+      "model": "industrialupgrade:block/moremachine3/quadgearing_active",
+      "y": 180
+    },
+    "facing=west,type=quadgearing_active": {
+      "model": "industrialupgrade:block/moremachine3/quadgearing_active",
+      "y": 270
+    },
+    "facing=east,type=quadgearing_active": {
+      "model": "industrialupgrade:block/moremachine3/quadgearing_active",
+      "y": 90
+    }
+  }
+}

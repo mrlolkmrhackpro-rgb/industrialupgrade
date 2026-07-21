@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=winter_hive": {
+      "model": "industrialupgrade:block/hive/winter_hive"
+    },
+    "facing=south,type=winter_hive": {
+      "model": "industrialupgrade:block/hive/winter_hive",
+      "y": 180
+    },
+    "facing=west,type=winter_hive": {
+      "model": "industrialupgrade:block/hive/winter_hive",
+      "y": 270
+    },
+    "facing=east,type=winter_hive": {
+      "model": "industrialupgrade:block/hive/winter_hive",
+      "y": 90
+    },
+    "facing=north,type=winter_hive_active": {
+      "model": "industrialupgrade:block/hive/winter_hive"
+    },
+    "facing=south,type=winter_hive_active": {
+      "model": "industrialupgrade:block/hive/winter_hive",
+      "y": 180
+    },
+    "facing=west,type=winter_hive_active": {
+      "model": "industrialupgrade:block/hive/winter_hive",
+      "y": 270
+    },
+    "facing=east,type=winter_hive_active": {
+      "model": "industrialupgrade:block/hive/winter_hive",
+      "y": 90
+    }
+  }
+}

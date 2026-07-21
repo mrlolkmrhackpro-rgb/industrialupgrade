@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=collector_product_bee": {
+      "model": "industrialupgrade:block/basemachine/collector_product_bee"
+    },
+    "facing=south,type=collector_product_bee": {
+      "model": "industrialupgrade:block/basemachine/collector_product_bee",
+      "y": 180
+    },
+    "facing=west,type=collector_product_bee": {
+      "model": "industrialupgrade:block/basemachine/collector_product_bee",
+      "y": 270
+    },
+    "facing=east,type=collector_product_bee": {
+      "model": "industrialupgrade:block/basemachine/collector_product_bee",
+      "y": 90
+    },
+    "facing=north,type=collector_product_bee_active": {
+      "model": "industrialupgrade:block/basemachine/collector_product_bee"
+    },
+    "facing=south,type=collector_product_bee_active": {
+      "model": "industrialupgrade:block/basemachine/collector_product_bee",
+      "y": 180
+    },
+    "facing=west,type=collector_product_bee_active": {
+      "model": "industrialupgrade:block/basemachine/collector_product_bee",
+      "y": 270
+    },
+    "facing=east,type=collector_product_bee_active": {
+      "model": "industrialupgrade:block/basemachine/collector_product_bee",
+      "y": 90
+    }
+  }
+}

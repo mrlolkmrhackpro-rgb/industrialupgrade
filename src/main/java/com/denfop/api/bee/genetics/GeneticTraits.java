@@ -1,28 +1,12 @@
 package com.denfop.api.bee.genetics;
 
-import com.denfop.api.pollution.LevelPollution;
-import com.denfop.api.radiationsystem.EnumLevelRadiation;
+import com.denfop.api.pollution.component.LevelPollution;
+import com.denfop.api.pollution.radiation.EnumLevelRadiation;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.denfop.api.bee.genetics.EnumGenetic.AIR;
-import static com.denfop.api.bee.genetics.EnumGenetic.BIRTH;
-import static com.denfop.api.bee.genetics.EnumGenetic.COEF_BIOME;
-import static com.denfop.api.bee.genetics.EnumGenetic.FOOD;
-import static com.denfop.api.bee.genetics.EnumGenetic.GENOME_ADAPTIVE;
-import static com.denfop.api.bee.genetics.EnumGenetic.GENOME_RESISTANCE;
-import static com.denfop.api.bee.genetics.EnumGenetic.HARDENING;
-import static com.denfop.api.bee.genetics.EnumGenetic.JELLY;
-import static com.denfop.api.bee.genetics.EnumGenetic.MORTALITY_RATE;
-import static com.denfop.api.bee.genetics.EnumGenetic.PEST;
-import static com.denfop.api.bee.genetics.EnumGenetic.POPULATION;
-import static com.denfop.api.bee.genetics.EnumGenetic.PRODUCT;
-import static com.denfop.api.bee.genetics.EnumGenetic.RADIATION;
-import static com.denfop.api.bee.genetics.EnumGenetic.RADIUS;
-import static com.denfop.api.bee.genetics.EnumGenetic.SOIL;
-import static com.denfop.api.bee.genetics.EnumGenetic.SWARM;
-import static com.denfop.api.bee.genetics.EnumGenetic.WEATHER;
+import static com.denfop.api.bee.genetics.EnumGenetic.*;
 import static com.denfop.api.bee.genetics.GeneticsManager.enumGeneticListMap;
 import static com.denfop.api.bee.genetics.GeneticsManager.geneticTraitsMap;
 
@@ -99,6 +83,22 @@ public enum GeneticTraits {
             enumGeneticListMap.put(genetic, geneticTraits);
         } else {
             geneticTraits.add(this);
+        }
+    }
+
+    public static void init() {
+        for (GeneticTraits genetic : values()) {
+            if (genetic.prev != null) {
+                geneticTraitsMap.put(genetic.prev, genetic);
+            }
+            List<GeneticTraits> geneticTraits = enumGeneticListMap.get(genetic.genetic);
+            if (geneticTraits == null) {
+                geneticTraits = new ArrayList<>();
+                geneticTraits.add(genetic);
+                enumGeneticListMap.put(genetic.genetic, geneticTraits);
+            } else {
+                geneticTraits.add(genetic);
+            }
         }
     }
 

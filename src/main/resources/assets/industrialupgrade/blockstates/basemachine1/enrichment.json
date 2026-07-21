@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=enrichment": {
+      "model": "industrialupgrade:block/basemachine/enrichment"
+    },
+    "facing=south,type=enrichment": {
+      "model": "industrialupgrade:block/basemachine/enrichment",
+      "y": 180
+    },
+    "facing=west,type=enrichment": {
+      "model": "industrialupgrade:block/basemachine/enrichment",
+      "y": 270
+    },
+    "facing=east,type=enrichment": {
+      "model": "industrialupgrade:block/basemachine/enrichment",
+      "y": 90
+    },
+    "facing=north,type=enrichment_active": {
+      "model": "industrialupgrade:block/basemachine/enrichment_active"
+    },
+    "facing=south,type=enrichment_active": {
+      "model": "industrialupgrade:block/basemachine/enrichment_active",
+      "y": 180
+    },
+    "facing=west,type=enrichment_active": {
+      "model": "industrialupgrade:block/basemachine/enrichment_active",
+      "y": 270
+    },
+    "facing=east,type=enrichment_active": {
+      "model": "industrialupgrade:block/basemachine/enrichment_active",
+      "y": 90
+    }
+  }
+}

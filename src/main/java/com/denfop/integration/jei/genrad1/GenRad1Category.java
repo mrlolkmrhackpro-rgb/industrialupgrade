@@ -1,53 +1,56 @@
 package com.denfop.integration.jei.genrad1;
 
 import com.denfop.Constants;
-import com.denfop.Localization;
-import com.denfop.blocks.mechanism.BlockBaseMachine3;
+import com.denfop.blockentity.mechanism.BlockEntitySingleFluidAdapter;
+import com.denfop.blocks.mechanism.BlockBaseMachine3Entity;
+import com.denfop.integration.jei.IRecipeCategory;
 import com.denfop.integration.jei.JEICompat;
-import mezz.jei.api.IGuiHelper;
-import mezz.jei.api.gui.IDrawable;
-import mezz.jei.api.gui.IDrawableStatic;
-import mezz.jei.api.gui.IGuiItemStackGroup;
-import mezz.jei.api.gui.IRecipeLayout;
-import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.IRecipeCategory;
+import com.denfop.integration.jei.JeiInform;
+import com.denfop.screen.ScreenMain;
+import com.denfop.utils.Localization;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableStatic;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nonnull;
 
-public class GenRad1Category extends Gui implements IRecipeCategory<GenRad1Wrapper> {
+public class GenRad1Category extends ScreenMain implements IRecipeCategory<GenRad1Handler> {
+
+    private final JeiInform jeiInform;
 
     private final IDrawableStatic bg;
 
     public GenRad1Category(
-            final IGuiHelper guiHelper
+            IGuiHelper guiHelper, JeiInform jeiInform
     ) {
-        bg = guiHelper.createDrawable(new ResourceLocation(Constants.MOD_ID, "textures/gui/guipurifier" +
+        super(((BlockEntitySingleFluidAdapter) BlockBaseMachine3Entity.single_fluid_adapter.getDummyTe()).getGuiContainer(Minecraft.getInstance().player));
+        this.jeiInform = jeiInform;
+        this.title = net.minecraft.network.chat.Component.literal(getTitles());
+        bg = guiHelper.createDrawable(ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/guipurifier" +
                         ".png"), 5, 4, 165,
                 77
         );
 
     }
 
-    @Nonnull
     @Override
-    public String getUid() {
-        return BlockBaseMachine3.radiation_purifier.getName();
+    public RecipeType<GenRad1Handler> getRecipeType() {
+        return jeiInform.recipeType;
     }
+
 
     @Nonnull
     @Override
-    public String getTitle() {
-        return Localization.translate(JEICompat.getBlockStack(BlockBaseMachine3.radiation_purifier).getUnlocalizedName());
+    public String getTitles() {
+        return Localization.translate(JEICompat.getBlockStack(BlockBaseMachine3Entity.radiation_purifier).getDescriptionId());
     }
 
-    @Nonnull
-    @Override
-    public String getModName() {
-        return Constants.MOD_NAME;
-    }
 
     @Nonnull
     @Override
@@ -55,36 +58,14 @@ public class GenRad1Category extends Gui implements IRecipeCategory<GenRad1Wrapp
         return bg;
     }
 
-
     @Override
-    public void drawExtras(final Minecraft mc) {
-
-
-        mc.getTextureManager().bindTexture(getTexture());
-
-
+    public void setRecipe(IRecipeLayoutBuilder builder, GenRad1Handler recipe, IFocusGroup focuses) {
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 78 - 4, 35 - 2).addItemStack(recipe.getOutput());
     }
 
-    @Override
-    public void setRecipe(
-            final IRecipeLayout layout,
-            final GenRad1Wrapper recipes,
-            @Nonnull final IIngredients ingredients
-    ) {
-
-
-        IGuiItemStackGroup isg = layout.getItemStacks();
-        isg.init(0, false, 78 - 5, 35 - 3);
-        isg.set(0, recipes.getInput2());
-      /*  fff.init(0, false, 95, 21, 12, 47, 10000, true, null);
-        fff.set(0, new FluidStack(FluidName.fluiduu_matter.getInstance(), (int) Math.max(1,recipes.getEnergy())));
-        IGuiItemStackGroup isg = layout.getItemStacks();
-        isg.init(0, true, 30,10);
-        isg.set(0, recipes.getInput2());*/
-    }
 
     protected ResourceLocation getTexture() {
-        return new ResourceLocation(Constants.MOD_ID, "textures/gui/guipurifier.png");
+        return ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/guipurifier.png");
     }
 
 

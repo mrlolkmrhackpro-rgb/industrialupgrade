@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=inoculator": {
+      "model": "industrialupgrade:block/basemachine/inoculator"
+    },
+    "facing=south,type=inoculator": {
+      "model": "industrialupgrade:block/basemachine/inoculator",
+      "y": 180
+    },
+    "facing=west,type=inoculator": {
+      "model": "industrialupgrade:block/basemachine/inoculator",
+      "y": 270
+    },
+    "facing=east,type=inoculator": {
+      "model": "industrialupgrade:block/basemachine/inoculator",
+      "y": 90
+    },
+    "facing=north,type=inoculator_active": {
+      "model": "industrialupgrade:block/basemachine/inoculator_active"
+    },
+    "facing=south,type=inoculator_active": {
+      "model": "industrialupgrade:block/basemachine/inoculator_active",
+      "y": 180
+    },
+    "facing=west,type=inoculator_active": {
+      "model": "industrialupgrade:block/basemachine/inoculator_active",
+      "y": 270
+    },
+    "facing=east,type=inoculator_active": {
+      "model": "industrialupgrade:block/basemachine/inoculator_active",
+      "y": 90
+    }
+  }
+}

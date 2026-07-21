@@ -3,8 +3,8 @@ package com.denfop.integration.jei.advrefiner;
 
 import com.denfop.api.Recipes;
 import com.denfop.api.recipe.BaseFluidMachineRecipe;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,14 +57,14 @@ public class AdvRefinerHandler {
             FluidStack fluidStack = machineRecipe.getInput().getInputs().get(0);
             FluidStack fluidStack1 = machineRecipe.getOutput_fluid().get(0);
             FluidStack fluidStack2 = machineRecipe.getOutput_fluid().get(1);
-            double m = 1000D / fluidStack.amount;
-            addRecipe(new FluidStack(fluidStack.getFluid(), (int) (m * fluidStack.amount)), new FluidStack(
+            double m = 1000D / fluidStack.getAmount();
+            addRecipe(new FluidStack(fluidStack.getFluid(), (int) (m * fluidStack.getAmount())), new FluidStack(
                             fluidStack1.getFluid(),
-                            (int) (m * fluidStack1.amount)
+                            (int) (m * fluidStack1.getAmount())
                     ),
                     new FluidStack(
                             fluidStack2.getFluid(),
-                            (int) (m * fluidStack2.amount)
+                            (int) (m * fluidStack2.getAmount())
                     )
             );
         }

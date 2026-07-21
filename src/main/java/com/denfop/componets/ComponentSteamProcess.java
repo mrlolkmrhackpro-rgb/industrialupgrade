@@ -1,20 +1,21 @@
 package com.denfop.componets;
 
 import com.denfop.IUItem;
-import com.denfop.api.audio.IAudioFixer;
 import com.denfop.api.recipe.IUpdateTick;
 import com.denfop.api.recipe.InventoryOutput;
 import com.denfop.api.recipe.InventoryRecipes;
 import com.denfop.api.recipe.MachineRecipe;
+import com.denfop.api.sound.AudioFixer;
+import com.denfop.blockentity.base.BlockEntityInventory;
 import com.denfop.blocks.FluidName;
-import com.denfop.tiles.base.TileEntityInventory;
 import com.denfop.utils.Timer;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class ComponentSteamProcess extends AbstractComponent {
     private Timer timer = null;
 
     public ComponentSteamProcess(
-            final TileEntityInventory parent,
+            final BlockEntityInventory parent,
             int operationLength,
             double energyConsume, int pressure
     ) {
@@ -62,26 +63,11 @@ public class ComponentSteamProcess extends AbstractComponent {
                 "temperature") <= this.heatComponent.getEnergy()) {
             return true;
         } else {
-            if (!this.heatComponent.need) {
-                this.heatComponent.need = true;
+            if (!this.heatComponent.buffer.need) {
+                this.heatComponent.buffer.need = true;
             }
         }
         return false;
-    }
-
-    @Override
-    public boolean onBlockActivated(final EntityPlayer player, final EnumHand hand) {
-        ItemStack stack = player.getHeldItem(hand);
-        if (stack.getItem().equals(IUItem.canister)) {
-            FluidStack fluid = FluidUtil.getFluidContained(stack);
-            if (fluid != null && fluid.getFluid() == FluidName.fluidsteam_oil.getInstance() && fluid.amount >= 250 && (!timer1.canWork() || timer1.getBar() == 0) && (timer == null || !timer.canWork())) {
-                this.timer = new Timer(0, 0, 40);
-                final IFluidHandlerItem handler = FluidUtil.getFluidHandler(stack);
-                handler.drain(250, true);
-                return true;
-            }
-        }
-        return super.onBlockActivated(player, hand);
     }
 
     @Override
@@ -90,9 +76,24 @@ public class ComponentSteamProcess extends AbstractComponent {
         this.componentProgress = this.getParent().getComp("com.denfop.componets.ComponentProgress");
         this.advEnergy = this.getParent().getComp(ComponentSteamEnergy.class);
         this.pressureComponent = this.getParent().getComp(PressureComponent.class);
-        this.audoFix = this.getParent() instanceof IAudioFixer;
+        this.audoFix = this.getParent() instanceof AudioFixer;
         this.heatComponent = this.getParent().getComp(HeatComponent.class);
 
+    }
+
+    @Override
+    public boolean onBlockActivated(final Player player, final InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (stack.getItem().equals(IUItem.canister.getItem())) {
+            IFluidHandlerItem handler = stack.getCapability(Capabilities.FluidHandler.ITEM, null);
+            FluidStack fluid = handler.getFluidInTank(0);
+            if (fluid != FluidStack.EMPTY && fluid.getFluid() == FluidName.fluidsteam_oil.getInstance().get() && fluid.getAmount() >= 250 && (!timer1.canWork() || timer1.getBar() == 0) && (timer == null || !timer.canWork())) {
+                this.timer = new Timer(0, 0, 40);
+                handler.drain(250, IFluidHandler.FluidAction.EXECUTE);
+                return true;
+            }
+        }
+        return super.onBlockActivated(player, hand);
     }
 
     public void setSlotOutput(final InventoryOutput slotOutput) {
@@ -143,7 +144,7 @@ public class ComponentSteamProcess extends AbstractComponent {
     public boolean checkFluidRecipe() {
         return (!hasTank || this.updateTick.getRecipeOutput().getRecipe().input.getFluid() == null || (this.invSlotRecipes
                 .getTank()
-                .getFluid() != null && this.updateTick.getRecipeOutput()
+                .getFluid() != FluidStack.EMPTY && this.updateTick.getRecipeOutput()
                 .getRecipe().input
                 .getFluid() != null && this.invSlotRecipes.getTank()
                 .getFluid()
@@ -153,7 +154,7 @@ public class ComponentSteamProcess extends AbstractComponent {
                         .getFluid()
                         .getFluid()) && this.invSlotRecipes.getTank().getFluidAmount() >= this.updateTick.getRecipeOutput()
                 .getRecipe().input
-                .getFluid().amount));
+                .getFluid().getAmount()));
     }
 
 
@@ -180,7 +181,7 @@ public class ComponentSteamProcess extends AbstractComponent {
                         .getOutput().items) && checkHeatRecipe() && checkRecipe() && pressureComponent.getEnergy() == pressure && checkFluidRecipe() && this.invSlotRecipes.continue_process(
                 this.updateTick.getRecipeOutput())) {
             if (this.heatComponent != null) {
-                this.heatComponent.need = true;
+                this.heatComponent.buffer.need = true;
             }
             if (!this.parent.getActive()) {
                 this.parent.setActive(true);
@@ -188,20 +189,20 @@ public class ComponentSteamProcess extends AbstractComponent {
             if (this.componentProgress.getProgress() == 0 && this.hasAudio) {
                 if (this.operationLength > this.defaultOperationLength * 0.1) {
                     if (this.audoFix) {
-                        ((IAudioFixer) this.getParent()).initiate(0);
+                        ((AudioFixer) this.getParent()).initiate(0);
                     }
                 }
             }
             this.componentProgress.addProgress();
-            if (timer != null && timer.canWork()) {
-                this.componentProgress.addProgress();
-
-            }
             if (action != null && action.needAction(TypeLoad.PROGRESS)) {
                 action.doAction();
             }
             if (this.componentProgress.getMaxValue() != this.operationLength) {
                 this.componentProgress.setMaxValue((short) this.operationLength);
+            }
+            if (timer != null && timer.canWork()) {
+                this.componentProgress.addProgress();
+
             }
             this.consumeEnergy();
             this.advEnergy.useEnergy(energyConsume);
@@ -213,14 +214,14 @@ public class ComponentSteamProcess extends AbstractComponent {
                 }
                 if (this.hasAudio) {
                     if (this.audoFix) {
-                        ((IAudioFixer) this.getParent()).initiate(2);
+                        ((AudioFixer) this.getParent()).initiate(2);
                     }
                 }
 
             }
         } else {
             if (this.heatComponent != null && this.updateTick.getRecipeOutput() == null) {
-                this.heatComponent.need = false;
+                this.heatComponent.buffer.need = false;
             }
             if (componentProgress == null) {
                 this.heatComponent = this.getParent().getComp(HeatComponent.class);
@@ -228,12 +229,12 @@ public class ComponentSteamProcess extends AbstractComponent {
                 this.componentProgress = this.getParent().getComp("com.denfop.componets.ComponentProgress");
                 this.advEnergy = this.getParent().getComp(ComponentSteamEnergy.class);
                 this.pressureComponent = this.getParent().getComp(PressureComponent.class);
-                this.audoFix = this.getParent() instanceof IAudioFixer;
+                this.audoFix = this.getParent() instanceof AudioFixer;
 
             }
             if (this.componentProgress.getProgress() != 0 && this.getParent().getActive() && this.hasAudio) {
                 if (this.audoFix) {
-                    ((IAudioFixer) this.getParent()).initiate(1);
+                    ((AudioFixer) this.getParent()).initiate(1);
                 }
             }
             if (this.updateTick.getRecipeOutput() == null) {
@@ -247,7 +248,7 @@ public class ComponentSteamProcess extends AbstractComponent {
             action.doAction();
         }
         if (this.parent.getActive()) {
-            if (this.parent.getWorld().getWorldTime() % 20 == 0) {
+            if (this.parent.getWorld().getGameTime() % 20 == 0) {
                 if (this.timer != null && this.timer.canWork()) {
                     this.timer.work();
                     if (!this.timer.canWork()) {
@@ -267,7 +268,7 @@ public class ComponentSteamProcess extends AbstractComponent {
 
     public void operateOnce(List<ItemStack> processResult) {
         this.invSlotRecipes.consume();
-        this.outputSlot.addAll(processResult);
+        this.outputSlot.add(processResult);
     }
 
 
@@ -289,21 +290,21 @@ public class ComponentSteamProcess extends AbstractComponent {
             }
         }
         int maxSize = size;
-        int count = this.outputSlot.get().isEmpty() ? output.getRecipe().output.items.get(0).getMaxStackSize() :
-                this.outputSlot.get().getMaxStackSize() - this.outputSlot.get().getCount();
+        int count = this.outputSlot.get(0).isEmpty() ? output.getRecipe().output.items.get(0).getMaxStackSize() :
+                this.outputSlot.get(0).getMaxStackSize() - this.outputSlot.get(0).getCount();
         ItemStack outputStack = this.updateTick.getRecipeOutput().getRecipe().output.items.get(0);
         count = count / Math.max(outputStack.getCount(), 1);
         size = Math.min(size, count);
-        size = Math.min(size, this.updateTick.getRecipeOutput().getRecipe().output.items.get(0).getItem().getItemStackLimit());
+        size = Math.min(size, this.updateTick.getRecipeOutput().getRecipe().output.items.get(0).getMaxStackSize());
         if (this.updateTick.getRecipeOutput().getRecipe().input.getFluid() != null) {
             final int size1 = this.invSlotRecipes.getTank().getFluidAmount() / this.updateTick
                     .getRecipeOutput()
-                    .getRecipe().input.getFluid().amount;
+                    .getRecipe().input.getFluid().getAmount();
             size = Math.min(size, size1);
         }
         size = Math.min(size, this.operationsPerTick);
         this.invSlotRecipes.consume(size, output);
-        this.outputSlot.addAll(output.getRecipe().getOutput().items, size);
+        this.outputSlot.add(output.getRecipe().getOutput().items, size);
         if (maxSize == size) {
             this.updateTick.setRecipeOutput(null);
         }

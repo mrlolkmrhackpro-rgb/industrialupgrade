@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=apiary": {
+      "model": "industrialupgrade:block/apiary/apiary"
+    },
+    "facing=south,type=apiary": {
+      "model": "industrialupgrade:block/apiary/apiary",
+      "y": 180
+    },
+    "facing=west,type=apiary": {
+      "model": "industrialupgrade:block/apiary/apiary",
+      "y": 270
+    },
+    "facing=east,type=apiary": {
+      "model": "industrialupgrade:block/apiary/apiary",
+      "y": 90
+    },
+    "facing=north,type=apiary_active": {
+      "model": "industrialupgrade:block/apiary/apiary"
+    },
+    "facing=south,type=apiary_active": {
+      "model": "industrialupgrade:block/apiary/apiary",
+      "y": 180
+    },
+    "facing=west,type=apiary_active": {
+      "model": "industrialupgrade:block/apiary/apiary",
+      "y": 270
+    },
+    "facing=east,type=apiary_active": {
+      "model": "industrialupgrade:block/apiary/apiary",
+      "y": 90
+    }
+  }
+}

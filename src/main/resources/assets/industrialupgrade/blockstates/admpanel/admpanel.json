@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=admpanel": {
+      "model": "industrialupgrade:block/basemachine/admpanel"
+    },
+    "facing=south,type=admpanel": {
+      "model": "industrialupgrade:block/basemachine/admpanel",
+      "y": 180
+    },
+    "facing=west,type=admpanel": {
+      "model": "industrialupgrade:block/basemachine/admpanel",
+      "y": 270
+    },
+    "facing=east,type=admpanel": {
+      "model": "industrialupgrade:block/basemachine/admpanel",
+      "y": 90
+    },
+    "facing=north,type=admpanel_active": {
+      "model": "industrialupgrade:block/basemachine/admpanel"
+    },
+    "facing=south,type=admpanel_active": {
+      "model": "industrialupgrade:block/basemachine/admpanel",
+      "y": 180
+    },
+    "facing=west,type=admpanel_active": {
+      "model": "industrialupgrade:block/basemachine/admpanel",
+      "y": 270
+    },
+    "facing=east,type=admpanel_active": {
+      "model": "industrialupgrade:block/basemachine/admpanel",
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=sheep_farm": {
+      "model": "industrialupgrade:block/basemachine/sheep_farm"
+    },
+    "facing=south,type=sheep_farm": {
+      "model": "industrialupgrade:block/basemachine/sheep_farm",
+      "y": 180
+    },
+    "facing=west,type=sheep_farm": {
+      "model": "industrialupgrade:block/basemachine/sheep_farm",
+      "y": 270
+    },
+    "facing=east,type=sheep_farm": {
+      "model": "industrialupgrade:block/basemachine/sheep_farm",
+      "y": 90
+    },
+    "facing=north,type=sheep_farm_active": {
+      "model": "industrialupgrade:block/basemachine/sheep_farm"
+    },
+    "facing=south,type=sheep_farm_active": {
+      "model": "industrialupgrade:block/basemachine/sheep_farm",
+      "y": 180
+    },
+    "facing=west,type=sheep_farm_active": {
+      "model": "industrialupgrade:block/basemachine/sheep_farm",
+      "y": 270
+    },
+    "facing=east,type=sheep_farm_active": {
+      "model": "industrialupgrade:block/basemachine/sheep_farm",
+      "y": 90
+    }
+  }
+}

@@ -1,40 +1,59 @@
 package com.denfop.items.energy;
 
-import com.denfop.Constants;
 import com.denfop.IUCore;
-import com.denfop.api.IModelRegister;
-import com.denfop.register.Register;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.item.Item;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.denfop.datagen.itemtag.IItemTag;
+import com.denfop.datagen.itemtag.ItemTagProvider;
+import com.denfop.tabs.IItemTab;
+import net.minecraft.Util;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.DiggerItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.PickaxeItem;
 
-public class ItemPickaxe extends net.minecraft.item.ItemPickaxe implements IModelRegister {
+import static net.minecraft.tags.ItemTags.PICKAXES;
 
+public class ItemPickaxe extends PickaxeItem implements IItemTab, IItemTag {
     private final String name;
+    private String nameItem;
 
     public ItemPickaxe(String name) {
-        super(ToolMaterial.DIAMOND);
-        setUnlocalizedName(name);
+        super(IUTiers.RUBY, new Properties().stacksTo(1).attributes(DiggerItem.createAttributes(IUTiers.RUBY, IUTiers.RUBY.getAttackDamageBonus(), IUTiers.RUBY.getSpeed())));
         this.name = name;
-        this.setMaxDamage((int) (ToolMaterial.IRON.getMaxUses() * 2.5));
-        setCreativeTab(IUCore.EnergyTab);
-        Register.registerItem((Item) this, IUCore.getIdentifier(name)).setUnlocalizedName(name);
-        IUCore.proxy.addIModelRegister(this);
+        ItemTagProvider.list.add(this);
     }
 
-    @SideOnly(Side.CLIENT)
-    public ModelResourceLocation getModelLocation(String name) {
-        final String loc = Constants.MOD_ID +
-                ':' + name;
+    protected String getOrCreateDescriptionId() {
+        if (this.nameItem == null) {
+            StringBuilder pathBuilder = new StringBuilder(Util.makeDescriptionId("iu", BuiltInRegistries.ITEM.getKey(this)));
+            String targetString = "industrialupgrade.";
+            String replacement = "";
+            if (replacement != null) {
+                int index = pathBuilder.indexOf(targetString);
+                while (index != -1) {
+                    pathBuilder.replace(index, index + targetString.length(), replacement);
+                    index = pathBuilder.indexOf(targetString, index + replacement.length());
+                }
+            }
+            this.nameItem = "item." + name;
+        }
 
-        return new ModelResourceLocation(loc, null);
+        return this.nameItem;
     }
 
-    @SideOnly(Side.CLIENT)
-    public void registerModels() {
-        ModelLoader.setCustomModelResourceLocation(this, 0, getModelLocation(name));
+    @Override
+    public CreativeModeTab getItemCategory() {
+        return IUCore.EnergyTab;
+    }
+
+    @Override
+    public Item getItem() {
+        return this;
+    }
+
+    @Override
+    public String[] getTags() {
+        return new String[]{PICKAXES.location().toString()};
     }
 
 }

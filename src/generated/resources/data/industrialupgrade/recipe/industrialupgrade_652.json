@@ -1,0 +1,31 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:energy_tools/nanopickaxe"
+    },
+    "C": {
+      "item": "industrialupgrade:energy_tools/nanoshovel"
+    },
+    "D": {
+      "item": "industrialupgrade:energy_tools/diamond_drill"
+    },
+    "E": {
+      "item": "industrialupgrade:nanobox"
+    },
+    "H": {
+      "item": "industrialupgrade:crafting_elements/crafting_517_element"
+    }
+  },
+  "pattern": [
+    "EHE",
+    "ADC",
+    "   "
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:energy_tools/nanodrill"
+  },
+  "show_notification": false
+}

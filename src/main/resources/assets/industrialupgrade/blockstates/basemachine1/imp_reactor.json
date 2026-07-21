@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=imp_reactor": {
+      "model": "industrialupgrade:block/basemachine/imp_reactor"
+    },
+    "facing=south,type=imp_reactor": {
+      "model": "industrialupgrade:block/basemachine/imp_reactor",
+      "y": 180
+    },
+    "facing=west,type=imp_reactor": {
+      "model": "industrialupgrade:block/basemachine/imp_reactor",
+      "y": 270
+    },
+    "facing=east,type=imp_reactor": {
+      "model": "industrialupgrade:block/basemachine/imp_reactor",
+      "y": 90
+    },
+    "facing=north,type=imp_reactor_active": {
+      "model": "industrialupgrade:block/basemachine/imp_reactor_active"
+    },
+    "facing=south,type=imp_reactor_active": {
+      "model": "industrialupgrade:block/basemachine/imp_reactor_active",
+      "y": 180
+    },
+    "facing=west,type=imp_reactor_active": {
+      "model": "industrialupgrade:block/basemachine/imp_reactor_active",
+      "y": 270
+    },
+    "facing=east,type=imp_reactor_active": {
+      "model": "industrialupgrade:block/basemachine/imp_reactor_active",
+      "y": 90
+    }
+  }
+}

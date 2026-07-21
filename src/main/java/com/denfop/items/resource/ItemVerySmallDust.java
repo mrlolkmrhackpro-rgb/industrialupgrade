@@ -1,54 +1,62 @@
 package com.denfop.items.resource;
 
-import com.denfop.Constants;
 import com.denfop.IUCore;
-import com.denfop.api.IModelRegister;
 import com.denfop.blocks.ISubEnum;
-import com.denfop.register.Register;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.item.Item;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.denfop.datagen.itemtag.IItemTag;
+import com.denfop.items.ItemMain;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 
 import java.util.Locale;
 
-public class ItemVerySmallDust extends ItemSubTypes<ItemVerySmallDust.Types> implements IModelRegister {
-
-    protected static final String NAME = "verysmalldust";
-
-    public ItemVerySmallDust() {
-        super(Types.class);
-        this.setCreativeTab(IUCore.RecourseTab);
-        Register.registerItem((Item) this, IUCore.getIdentifier(NAME)).setUnlocalizedName(NAME);
-        IUCore.proxy.addIModelRegister(this);
+public class ItemVerySmallDust<T extends Enum<T> & ISubEnum> extends ItemMain<T> implements IItemTag {
+    public ItemVerySmallDust(T element) {
+        super(new Item.Properties(), element);
     }
 
+    @Override
+    public Item getItem() {
+        return this;
+    }
 
-    @SideOnly(Side.CLIENT)
-    public void registerModel(Item stack, final int meta, final String extraName) {
-        ModelLoader.setCustomModelResourceLocation(
-                this,
-                meta,
-                new ModelResourceLocation(Constants.MOD_ID + ":" + NAME + "/" + Types.getFromID(meta).getName(), null)
-        );
+    @Override
+    public CreativeModeTab getItemCategory() {
+        return IUCore.RecourseTab;
+    }
+
+    @Override
+    public String[] getTags() {
+        String name = getElement().getName();
+        switch (this.getElement().getId()) {
+            case 3:
+                name = "tungsten";
+                break;
+            case 9:
+                name = "platinum";
+                break;
+            case 13:
+                name = "electrum";
+                break;
+
+        }
+        return new String[]{"c:verysmalldust/" + name, "c:verysmalldust"};
     }
 
     public enum Types implements ISubEnum {
         mikhail(0),
         aluminium(1),
-        vanady(2),
-        wolfram(3),
+        vanadium(2),
+        tungsten(3),
         invar(4),
         caravky(5),
         cobalt(6),
         magnesium(7),
         nickel(8),
-        platium(9),
+        platinum(9),
         titanium(10),
         chromium(11),
         spinel(12),
-        electrium(13),
+        electrum(13),
         silver(14),
         zinc(15),
         manganese(16),
@@ -71,8 +79,14 @@ public class ItemVerySmallDust extends ItemSubTypes<ItemVerySmallDust.Types> imp
             return values()[ID % values().length];
         }
 
+        @Override
         public String getName() {
-            return this.name;
+            return name;
+        }
+
+        @Override
+        public String getMainPath() {
+            return "verysmalldust";
         }
 
         public int getId() {

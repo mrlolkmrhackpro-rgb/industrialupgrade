@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=swamp_hive": {
+      "model": "industrialupgrade:block/hive/swamp_hive"
+    },
+    "facing=south,type=swamp_hive": {
+      "model": "industrialupgrade:block/hive/swamp_hive",
+      "y": 180
+    },
+    "facing=west,type=swamp_hive": {
+      "model": "industrialupgrade:block/hive/swamp_hive",
+      "y": 270
+    },
+    "facing=east,type=swamp_hive": {
+      "model": "industrialupgrade:block/hive/swamp_hive",
+      "y": 90
+    },
+    "facing=north,type=swamp_hive_active": {
+      "model": "industrialupgrade:block/hive/swamp_hive"
+    },
+    "facing=south,type=swamp_hive_active": {
+      "model": "industrialupgrade:block/hive/swamp_hive",
+      "y": 180
+    },
+    "facing=west,type=swamp_hive_active": {
+      "model": "industrialupgrade:block/hive/swamp_hive",
+      "y": 270
+    },
+    "facing=east,type=swamp_hive_active": {
+      "model": "industrialupgrade:block/hive/swamp_hive",
+      "y": 90
+    }
+  }
+}

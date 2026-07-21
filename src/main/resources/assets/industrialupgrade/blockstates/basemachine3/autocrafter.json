@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=autocrafter": {
+      "model": "industrialupgrade:block/basemachine/autocrafter"
+    },
+    "facing=south,type=autocrafter": {
+      "model": "industrialupgrade:block/basemachine/autocrafter",
+      "y": 180
+    },
+    "facing=west,type=autocrafter": {
+      "model": "industrialupgrade:block/basemachine/autocrafter",
+      "y": 270
+    },
+    "facing=east,type=autocrafter": {
+      "model": "industrialupgrade:block/basemachine/autocrafter",
+      "y": 90
+    },
+    "facing=north,type=autocrafter_active": {
+      "model": "industrialupgrade:block/basemachine/autocrafter_active"
+    },
+    "facing=south,type=autocrafter_active": {
+      "model": "industrialupgrade:block/basemachine/autocrafter_active",
+      "y": 180
+    },
+    "facing=west,type=autocrafter_active": {
+      "model": "industrialupgrade:block/basemachine/autocrafter_active",
+      "y": 270
+    },
+    "facing=east,type=autocrafter_active": {
+      "model": "industrialupgrade:block/basemachine/autocrafter_active",
+      "y": 90
+    }
+  }
+}

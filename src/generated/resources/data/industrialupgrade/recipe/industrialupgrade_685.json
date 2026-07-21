@@ -1,0 +1,34 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:upgrades/overclocker"
+    },
+    "B": {
+      "item": "industrialupgrade:module_schedule"
+    },
+    "C": {
+      "item": "industrialupgrade:crafting_elements/crafting_479_element"
+    },
+    "D": {
+      "item": "industrialupgrade:quantumitems7"
+    },
+    "E": {
+      "item": "industrialupgrade:wiring/glass_1"
+    },
+    "H": {
+      "item": "industrialupgrade:charged_quartz"
+    }
+  },
+  "pattern": [
+    "CDC",
+    "ABA",
+    "EHE"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:upgrade_speed_creation"
+  },
+  "show_notification": false
+}

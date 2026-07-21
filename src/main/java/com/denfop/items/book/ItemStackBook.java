@@ -1,50 +1,34 @@
 package com.denfop.items.book;
 
-import com.denfop.container.ContainerBase;
-import com.denfop.invslot.Inventory;
+import com.denfop.api.container.CustomWorldContainer;
+import com.denfop.containermenu.ContainerMenuBase;
 import com.denfop.items.ItemStackInventory;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import javax.annotation.Nonnull;
+import com.denfop.screen.ScreenIndustrialUpgrade;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 public class ItemStackBook extends ItemStackInventory {
 
 
     public final ItemStack itemStack1;
 
-    public ItemStackBook(EntityPlayer player, ItemStack stack) {
+    public ItemStackBook(Player player, ItemStack stack) {
         super(player, stack, 0);
         this.itemStack1 = stack;
     }
 
-    public ContainerBase<ItemStackBook> getGuiContainer(EntityPlayer player) {
-        return new ContainerBook(this);
+    public ContainerMenuBase<ItemStackBook> getGuiContainer(Player player) {
+        return new ContainerMenuBook(this);
     }
 
 
-    @SideOnly(Side.CLIENT)
-    public GuiScreen getGui(EntityPlayer player, boolean isAdmin) {
-        return new GUIBook(player, itemStack1, new ContainerBook(this));
+    @OnlyIn(Dist.CLIENT)
+    public ScreenIndustrialUpgrade<ContainerMenuBase<? extends CustomWorldContainer>> getGui(Player player, ContainerMenuBase<? extends CustomWorldContainer> isAdmin) {
+        return new ScreenBook(player, itemStack1, (ContainerMenuBook) isAdmin);
     }
 
-    @Override
-    public void addInventorySlot(final Inventory var1) {
-
-    }
-
-
-    @Nonnull
-    public String getName() {
-        return "book";
-    }
-
-    public boolean hasCustomName() {
-        return false;
-    }
 
     public boolean isItemValidForSlot(int i, ItemStack itemstack) {
         return false;

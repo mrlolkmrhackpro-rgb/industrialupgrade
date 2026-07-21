@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=gra_mfsu_chargepad": {
+      "model": "industrialupgrade:block/chargepad/gra_mfsu_chargepad"
+    },
+    "facing=south,type=gra_mfsu_chargepad": {
+      "model": "industrialupgrade:block/chargepad/gra_mfsu_chargepad",
+      "y": 180
+    },
+    "facing=west,type=gra_mfsu_chargepad": {
+      "model": "industrialupgrade:block/chargepad/gra_mfsu_chargepad",
+      "y": 270
+    },
+    "facing=east,type=gra_mfsu_chargepad": {
+      "model": "industrialupgrade:block/chargepad/gra_mfsu_chargepad",
+      "y": 90
+    },
+    "facing=north,type=gra_mfsu_chargepad_active": {
+      "model": "industrialupgrade:block/chargepad/gra_mfsu_chargepad_active"
+    },
+    "facing=south,type=gra_mfsu_chargepad_active": {
+      "model": "industrialupgrade:block/chargepad/gra_mfsu_chargepad_active",
+      "y": 180
+    },
+    "facing=west,type=gra_mfsu_chargepad_active": {
+      "model": "industrialupgrade:block/chargepad/gra_mfsu_chargepad_active",
+      "y": 270
+    },
+    "facing=east,type=gra_mfsu_chargepad_active": {
+      "model": "industrialupgrade:block/chargepad/gra_mfsu_chargepad_active",
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=doublecentrifuge": {
+      "model": "industrialupgrade:block/moremachine3/doublecentrifuge"
+    },
+    "facing=south,type=doublecentrifuge": {
+      "model": "industrialupgrade:block/moremachine3/doublecentrifuge",
+      "y": 180
+    },
+    "facing=west,type=doublecentrifuge": {
+      "model": "industrialupgrade:block/moremachine3/doublecentrifuge",
+      "y": 270
+    },
+    "facing=east,type=doublecentrifuge": {
+      "model": "industrialupgrade:block/moremachine3/doublecentrifuge",
+      "y": 90
+    },
+    "facing=north,type=doublecentrifuge_active": {
+      "model": "industrialupgrade:block/moremachine3/doublecentrifuge_active"
+    },
+    "facing=south,type=doublecentrifuge_active": {
+      "model": "industrialupgrade:block/moremachine3/doublecentrifuge_active",
+      "y": 180
+    },
+    "facing=west,type=doublecentrifuge_active": {
+      "model": "industrialupgrade:block/moremachine3/doublecentrifuge_active",
+      "y": 270
+    },
+    "facing=east,type=doublecentrifuge_active": {
+      "model": "industrialupgrade:block/moremachine3/doublecentrifuge_active",
+      "y": 90
+    }
+  }
+}

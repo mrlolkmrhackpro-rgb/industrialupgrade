@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=solardestiller": {
+      "model": "industrialupgrade:block/basemachine/solardestiller"
+    },
+    "facing=south,type=solardestiller": {
+      "model": "industrialupgrade:block/basemachine/solardestiller",
+      "y": 180
+    },
+    "facing=west,type=solardestiller": {
+      "model": "industrialupgrade:block/basemachine/solardestiller",
+      "y": 270
+    },
+    "facing=east,type=solardestiller": {
+      "model": "industrialupgrade:block/basemachine/solardestiller",
+      "y": 90
+    },
+    "facing=north,type=solardestiller_active": {
+      "model": "industrialupgrade:block/basemachine/solardestiller"
+    },
+    "facing=south,type=solardestiller_active": {
+      "model": "industrialupgrade:block/basemachine/solardestiller",
+      "y": 180
+    },
+    "facing=west,type=solardestiller_active": {
+      "model": "industrialupgrade:block/basemachine/solardestiller",
+      "y": 270
+    },
+    "facing=east,type=solardestiller_active": {
+      "model": "industrialupgrade:block/basemachine/solardestiller",
+      "y": 90
+    }
+  }
+}

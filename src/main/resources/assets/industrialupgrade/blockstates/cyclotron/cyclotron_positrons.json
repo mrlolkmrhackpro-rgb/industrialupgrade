@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=cyclotron_positrons": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_positrons"
+    },
+    "facing=south,type=cyclotron_positrons": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_positrons",
+      "y": 180
+    },
+    "facing=west,type=cyclotron_positrons": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_positrons",
+      "y": 270
+    },
+    "facing=east,type=cyclotron_positrons": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_positrons",
+      "y": 90
+    },
+    "facing=north,type=cyclotron_positrons_active": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_positrons"
+    },
+    "facing=south,type=cyclotron_positrons_active": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_positrons",
+      "y": 180
+    },
+    "facing=west,type=cyclotron_positrons_active": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_positrons",
+      "y": 270
+    },
+    "facing=east,type=cyclotron_positrons_active": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_positrons",
+      "y": 90
+    }
+  }
+}

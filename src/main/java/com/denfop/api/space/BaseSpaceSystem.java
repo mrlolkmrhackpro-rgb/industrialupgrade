@@ -6,7 +6,7 @@ import com.denfop.api.space.fakebody.FakeSpaceSystemBase;
 import com.denfop.api.space.fakebody.IFakeSpaceSystemBase;
 import com.denfop.api.space.research.BaseSpaceResearchSystem;
 import com.denfop.api.space.research.api.IResearchSystem;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraft.world.level.material.Fluid;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,10 +15,26 @@ import java.util.Map;
 
 public class BaseSpaceSystem implements ISpaceNet {
 
+    public static Map<Integer, Integer> rocketFuel = Map.of(
+            1, 10000,
+            2, 20000,
+            3, 30000,
+            4, 40000,
+            5, 60000,
+            6, 80000
+    );
+    public static Map<Integer, Double> rocketFuelCoef = Map.of(
+            1, 1D,
+            2, 3D,
+            3, 4.4D,
+            4, 7.5D,
+            5, 12.5D,
+            6, 18D
+    );
+    public static Map<Fluid, Integer> fluidToLevel = new HashMap<>();
     public IColonyNet colonienet;
     public IFakeSpaceSystemBase spaceSystemBase;
     public IResearchSystem spaceResearch;
-
     List<ISystem> systemList;
     Map<IBody, ISystem> systemIBodyMap;
     Map<ISystem, List<IStar>> starSystemMap;
@@ -47,7 +63,6 @@ public class BaseSpaceSystem implements ISpaceNet {
         this.starList = new ArrayList<>();
         this.bodyMap = new HashMap<>();
         this.bodies = new ArrayList<>();
-        MinecraftForge.EVENT_BUS.register(this);
         this.spaceSystemBase = new FakeSpaceSystemBase();
         this.spaceResearch = new BaseSpaceResearchSystem();
         this.asteroidList = new ArrayList<>();
@@ -88,6 +103,23 @@ public class BaseSpaceSystem implements ISpaceNet {
     @Override
     public IColonyNet getColonieNet() {
         return this.colonienet;
+    }
+
+    public void reset() {
+        systemList = new ArrayList<>();
+        systemIBodyMap = new HashMap<>();
+        starSystemMap = new HashMap<>();
+        planetISatelliteMap = new HashMap<>();
+        starListMap = new HashMap<>();
+        systemIPlanetMap = new HashMap<>();
+        systemIStarMap = new HashMap<>();
+        starAsteroidMap = new HashMap<>();
+        planetList = new ArrayList<>();
+        asteroidList = new ArrayList<>();
+        satelliteList = new ArrayList<>();
+        starList = new ArrayList<>();
+        bodyMap = new HashMap<>();
+        bodies = new ArrayList<>();
     }
 
     @Override

@@ -2,7 +2,9 @@ package com.denfop.integration.jei.deposits;
 
 
 import com.denfop.world.WorldBaseGen;
+import com.denfop.world.vein.ChanceOre;
 import com.denfop.world.vein.VeinType;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +42,18 @@ public class DepositsHandler {
 
 
         }
+    }
+
+    public List<ItemStack> getInputs() {
+
+        List<ItemStack> stack = new ArrayList<>();
+        if (veinType.getHeavyOre() != null) {
+            stack.add(new ItemStack(veinType.getHeavyOre().getBlock(), 1));
+        }
+        for (ChanceOre ore : veinType.getOres()) {
+            stack.add(new ItemStack(ore.getBlock().getBlock(), 1));
+        }
+        return stack;
     }
 
     public VeinType getVeinType() {

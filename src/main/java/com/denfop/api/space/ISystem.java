@@ -8,4 +8,5 @@ public interface ISystem {
 
     List<IStar> getStarList();
 
+    int getDistanceFromSolar();
 }

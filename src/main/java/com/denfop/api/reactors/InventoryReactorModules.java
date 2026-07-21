@@ -1,10 +1,10 @@
 package com.denfop.api.reactors;
 
-import com.denfop.api.inv.IAdvInventory;
-import com.denfop.invslot.Inventory;
-import net.minecraft.item.ItemStack;
+import com.denfop.api.container.CustomWorldContainer;
+import com.denfop.inventory.Inventory;
+import net.minecraft.world.item.ItemStack;
 
-public class InventoryReactorModules<T extends IAdvReactor & IAdvInventory> extends Inventory {
+public class InventoryReactorModules<T extends IAdvReactor & CustomWorldContainer> extends Inventory {
 
     private double stableHeat;
     private double radiation;
@@ -16,17 +16,17 @@ public class InventoryReactorModules<T extends IAdvReactor & IAdvInventory> exte
 
     public InventoryReactorModules(final T base) {
         super(base, TypeItemSlot.INPUT, 4);
-        this.setInventoryStackLimit(1);
+        this.setStackSizeLimit(1);
     }
 
     @Override
-    public boolean isItemValidForSlot(final int index, final ItemStack stack) {
+    public boolean canPlaceItem(final int index, final ItemStack stack) {
         return stack.getItem() instanceof IReactorModule;
     }
 
     @Override
-    public void put(int i, final ItemStack content) {
-        super.put(i, content);
+    public ItemStack set(int i, final ItemStack content) {
+        super.set(i, content);
         stableHeat = 1;
         radiation = 1;
         generation = 1;
@@ -51,6 +51,7 @@ public class InventoryReactorModules<T extends IAdvReactor & IAdvInventory> exte
             this.capacitor *= module.getCapacitor(stack);
         }
         ((IAdvReactor) this.base).setUpdate();
+        return content;
     }
 
     public void load() {

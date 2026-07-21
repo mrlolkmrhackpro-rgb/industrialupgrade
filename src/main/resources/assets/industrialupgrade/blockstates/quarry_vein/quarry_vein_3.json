@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north,type=quarry_vein_active_3": {
+      "model": "industrialupgrade:block/basemachine/quarry_vein_active_3"
+    },
+    "facing=south,type=quarry_vein_active_3": {
+      "model": "industrialupgrade:block/basemachine/quarry_vein_active_3",
+      "y": 180
+    },
+    "facing=west,type=quarry_vein_active_3": {
+      "model": "industrialupgrade:block/basemachine/quarry_vein_active_3",
+      "y": 270
+    },
+    "facing=east,type=quarry_vein_active_3": {
+      "model": "industrialupgrade:block/basemachine/quarry_vein_active_3",
+      "y": 90
+    }
+  }
+}

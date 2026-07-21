@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=laser_polisher": {
+      "model": "industrialupgrade:block/basemachine/laser_polisher"
+    },
+    "facing=south,type=laser_polisher": {
+      "model": "industrialupgrade:block/basemachine/laser_polisher",
+      "y": 180
+    },
+    "facing=west,type=laser_polisher": {
+      "model": "industrialupgrade:block/basemachine/laser_polisher",
+      "y": 270
+    },
+    "facing=east,type=laser_polisher": {
+      "model": "industrialupgrade:block/basemachine/laser_polisher",
+      "y": 90
+    },
+    "facing=north,type=laser_polisher_active": {
+      "model": "industrialupgrade:block/basemachine/laser_polisher_active"
+    },
+    "facing=south,type=laser_polisher_active": {
+      "model": "industrialupgrade:block/basemachine/laser_polisher_active",
+      "y": 180
+    },
+    "facing=west,type=laser_polisher_active": {
+      "model": "industrialupgrade:block/basemachine/laser_polisher_active",
+      "y": 270
+    },
+    "facing=east,type=laser_polisher_active": {
+      "model": "industrialupgrade:block/basemachine/laser_polisher_active",
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=quad_extractor": {
+      "model": "industrialupgrade:block/moremachine/quad_extractor"
+    },
+    "facing=south,type=quad_extractor": {
+      "model": "industrialupgrade:block/moremachine/quad_extractor",
+      "y": 180
+    },
+    "facing=west,type=quad_extractor": {
+      "model": "industrialupgrade:block/moremachine/quad_extractor",
+      "y": 270
+    },
+    "facing=east,type=quad_extractor": {
+      "model": "industrialupgrade:block/moremachine/quad_extractor",
+      "y": 90
+    },
+    "facing=north,type=quad_extractor_active": {
+      "model": "industrialupgrade:block/moremachine/quad_extractor_active"
+    },
+    "facing=south,type=quad_extractor_active": {
+      "model": "industrialupgrade:block/moremachine/quad_extractor_active",
+      "y": 180
+    },
+    "facing=west,type=quad_extractor_active": {
+      "model": "industrialupgrade:block/moremachine/quad_extractor_active",
+      "y": 270
+    },
+    "facing=east,type=quad_extractor_active": {
+      "model": "industrialupgrade:block/moremachine/quad_extractor_active",
+      "y": 90
+    }
+  }
+}

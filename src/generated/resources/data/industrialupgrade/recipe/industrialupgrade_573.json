@@ -1,0 +1,28 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "industrialupgrade:alloycasing/red_brass"
+    },
+    "C": {
+      "item": "industrialupgrade:module_schedule"
+    },
+    "D": {
+      "tag": "c:ingots/invar"
+    },
+    "E": {
+      "item": "industrialupgrade:alloycasing/nichrome"
+    }
+  },
+  "pattern": [
+    " B ",
+    "DCD",
+    "EBE"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:entitymodules/module_player"
+  },
+  "show_notification": false
+}

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=stamp_mechanism": {
+      "model": "industrialupgrade:block/basemachine/stamp_mechanism"
+    },
+    "facing=south,type=stamp_mechanism": {
+      "model": "industrialupgrade:block/basemachine/stamp_mechanism",
+      "y": 180
+    },
+    "facing=west,type=stamp_mechanism": {
+      "model": "industrialupgrade:block/basemachine/stamp_mechanism",
+      "y": 270
+    },
+    "facing=east,type=stamp_mechanism": {
+      "model": "industrialupgrade:block/basemachine/stamp_mechanism",
+      "y": 90
+    },
+    "facing=north,type=stamp_mechanism_active": {
+      "model": "industrialupgrade:block/basemachine/stamp_mechanism_active"
+    },
+    "facing=south,type=stamp_mechanism_active": {
+      "model": "industrialupgrade:block/basemachine/stamp_mechanism_active",
+      "y": 180
+    },
+    "facing=west,type=stamp_mechanism_active": {
+      "model": "industrialupgrade:block/basemachine/stamp_mechanism_active",
+      "y": 270
+    },
+    "facing=east,type=stamp_mechanism_active": {
+      "model": "industrialupgrade:block/basemachine/stamp_mechanism_active",
+      "y": 90
+    }
+  }
+}

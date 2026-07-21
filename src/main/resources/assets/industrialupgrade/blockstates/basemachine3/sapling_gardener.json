@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=sapling_gardener": {
+      "model": "industrialupgrade:block/basemachine/sapling_gardener"
+    },
+    "facing=south,type=sapling_gardener": {
+      "model": "industrialupgrade:block/basemachine/sapling_gardener",
+      "y": 180
+    },
+    "facing=west,type=sapling_gardener": {
+      "model": "industrialupgrade:block/basemachine/sapling_gardener",
+      "y": 270
+    },
+    "facing=east,type=sapling_gardener": {
+      "model": "industrialupgrade:block/basemachine/sapling_gardener",
+      "y": 90
+    },
+    "facing=north,type=sapling_gardener_active": {
+      "model": "industrialupgrade:block/basemachine/sapling_gardener"
+    },
+    "facing=south,type=sapling_gardener_active": {
+      "model": "industrialupgrade:block/basemachine/sapling_gardener",
+      "y": 180
+    },
+    "facing=west,type=sapling_gardener_active": {
+      "model": "industrialupgrade:block/basemachine/sapling_gardener",
+      "y": 270
+    },
+    "facing=east,type=sapling_gardener_active": {
+      "model": "industrialupgrade:block/basemachine/sapling_gardener",
+      "y": 90
+    }
+  }
+}

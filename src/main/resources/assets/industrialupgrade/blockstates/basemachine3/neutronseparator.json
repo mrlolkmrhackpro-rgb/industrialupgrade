@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=neutronseparator": {
+      "model": "industrialupgrade:block/basemachine/neutronseparator"
+    },
+    "facing=south,type=neutronseparator": {
+      "model": "industrialupgrade:block/basemachine/neutronseparator",
+      "y": 180
+    },
+    "facing=west,type=neutronseparator": {
+      "model": "industrialupgrade:block/basemachine/neutronseparator",
+      "y": 270
+    },
+    "facing=east,type=neutronseparator": {
+      "model": "industrialupgrade:block/basemachine/neutronseparator",
+      "y": 90
+    },
+    "facing=north,type=neutronseparator_active": {
+      "model": "industrialupgrade:block/basemachine/neutronseparator_active"
+    },
+    "facing=south,type=neutronseparator_active": {
+      "model": "industrialupgrade:block/basemachine/neutronseparator_active",
+      "y": 180
+    },
+    "facing=west,type=neutronseparator_active": {
+      "model": "industrialupgrade:block/basemachine/neutronseparator_active",
+      "y": 270
+    },
+    "facing=east,type=neutronseparator_active": {
+      "model": "industrialupgrade:block/basemachine/neutronseparator_active",
+      "y": 90
+    }
+  }
+}

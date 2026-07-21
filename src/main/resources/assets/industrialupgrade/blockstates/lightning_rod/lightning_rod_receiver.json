@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=lightning_rod_receiver": {
+      "model": "industrialupgrade:block/lightning_rod/lightning_rod_receiver"
+    },
+    "facing=south,type=lightning_rod_receiver": {
+      "model": "industrialupgrade:block/lightning_rod/lightning_rod_receiver",
+      "y": 180
+    },
+    "facing=west,type=lightning_rod_receiver": {
+      "model": "industrialupgrade:block/lightning_rod/lightning_rod_receiver",
+      "y": 270
+    },
+    "facing=east,type=lightning_rod_receiver": {
+      "model": "industrialupgrade:block/lightning_rod/lightning_rod_receiver",
+      "y": 90
+    },
+    "facing=north,type=lightning_rod_receiver_active": {
+      "model": "industrialupgrade:block/lightning_rod/lightning_rod_receiver"
+    },
+    "facing=south,type=lightning_rod_receiver_active": {
+      "model": "industrialupgrade:block/lightning_rod/lightning_rod_receiver",
+      "y": 180
+    },
+    "facing=west,type=lightning_rod_receiver_active": {
+      "model": "industrialupgrade:block/lightning_rod/lightning_rod_receiver",
+      "y": 270
+    },
+    "facing=east,type=lightning_rod_receiver_active": {
+      "model": "industrialupgrade:block/lightning_rod/lightning_rod_receiver",
+      "y": 90
+    }
+  }
+}

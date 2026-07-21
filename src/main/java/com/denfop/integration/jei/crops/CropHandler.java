@@ -1,9 +1,9 @@
 package com.denfop.integration.jei.crops;
 
 
-import com.denfop.api.agriculture.CropNetwork;
-import com.denfop.api.agriculture.ICrop;
-import net.minecraft.item.ItemStack;
+import com.denfop.api.crop.CropNetwork;
+import com.denfop.api.crop.ICrop;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +54,19 @@ public class CropHandler {
         });
 
 
+    }
+
+    public ItemStack getInputs() {
+
+        return output.getStack();
+    }
+
+    public ICrop getOutput() {
+        return output;
+    }
+
+    public ItemStack getOutputs() {
+        return output.getDrop().isEmpty() ? ItemStack.EMPTY : output.getDrop().get(0);
     }
 
 

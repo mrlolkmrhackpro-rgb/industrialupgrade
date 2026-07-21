@@ -1,80 +1,81 @@
 package com.denfop.integration.jei.rods_factory;
 
+import com.denfop.integration.jei.JeiIngredientHelper;
 import com.denfop.Constants;
-import com.denfop.Localization;
-import com.denfop.api.gui.Component;
-import com.denfop.api.gui.EnumTypeComponent;
-import com.denfop.api.gui.GuiComponent;
 import com.denfop.api.recipe.InventoryOutput;
 import com.denfop.api.recipe.InventoryRecipes;
-import com.denfop.blocks.mechanism.BlockBaseMachine3;
+import com.denfop.api.widget.EnumTypeComponent;
+import com.denfop.api.widget.ScreenWidget;
+import com.denfop.api.widget.WidgetDefault;
+import com.denfop.blockentity.mechanism.BlockEntityBatteryFactory;
+import com.denfop.blocks.mechanism.BlockBaseMachine3Entity;
 import com.denfop.componets.ComponentRenderInventory;
 import com.denfop.componets.EnumTypeComponentSlot;
-import com.denfop.container.ContainerBattery;
-import com.denfop.container.SlotInvSlot;
-import com.denfop.gui.GuiIU;
+import com.denfop.containermenu.ContainerMenuBattery;
+import com.denfop.containermenu.SlotInvSlot;
+import com.denfop.integration.jei.IRecipeCategory;
 import com.denfop.integration.jei.JEICompat;
-import com.denfop.tiles.mechanism.TileEntityBatteryFactory;
-import mezz.jei.api.IGuiHelper;
-import mezz.jei.api.gui.IDrawable;
-import mezz.jei.api.gui.IDrawableStatic;
-import mezz.jei.api.gui.IGuiItemStackGroup;
-import mezz.jei.api.gui.IRecipeLayout;
-import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.IRecipeCategory;
+import com.denfop.integration.jei.JeiInform;
+import com.denfop.screen.ScreenMain;
+import com.denfop.utils.Localization;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableStatic;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class RodFactoryCategory extends GuiIU implements IRecipeCategory<RodFactoryRecipeWrapper> {
+public class RodFactoryCategory extends ScreenMain implements IRecipeCategory<RodFactoryHandler> {
 
     private final IDrawableStatic bg;
-    private final ContainerBattery container1;
-    private final GuiComponent progress_bar;
+    private final ContainerMenuBattery container1;
+    private final ScreenWidget progress_bar;
+    JeiInform jeiInform;
     private int progress = 0;
     private int energy = 0;
 
     public RodFactoryCategory(
-            final IGuiHelper guiHelper
+            IGuiHelper guiHelper, JeiInform jeiInform
     ) {
-        super(((TileEntityBatteryFactory) BlockBaseMachine3.battery_factory.getDummyTe()).getGuiContainer(Minecraft.getMinecraft().player));
-        bg = guiHelper.createDrawable(new ResourceLocation(Constants.MOD_ID, "textures/gui/guimachine" +
+        super(((BlockEntityBatteryFactory) BlockBaseMachine3Entity.battery_factory.getDummyTe()).getGuiContainer(Minecraft.getInstance().player));
+        bg = guiHelper.createDrawable(ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/guimachine" +
                         ".png"), 3, 3, 140,
                 77
         );
+        this.jeiInform = jeiInform;
+        this.title = net.minecraft.network.chat.Component.literal(getTitles());
         this.componentList.clear();
-        this.slots = new GuiComponent(this, 3, 3, getComponent(),
-                new Component<>(new ComponentRenderInventory(EnumTypeComponentSlot.SLOTS__JEI))
+        this.slots = new ScreenWidget(this, 3, 3, getComponent(),
+                new WidgetDefault<>(new ComponentRenderInventory(EnumTypeComponentSlot.SLOTS__JEI))
         );
-        this.container1 = (ContainerBattery) this.getContainer();
+        this.container1 = (ContainerMenuBattery) this.getContainer();
         this.componentList.add(slots);
-        progress_bar = new GuiComponent(this, 70, 36, EnumTypeComponent.PROCESS,
-                new Component<>(this.container1.base.componentProgress)
+        progress_bar = new ScreenWidget(this, 70, 36, EnumTypeComponent.PROCESS,
+                new WidgetDefault<>(this.container1.base.componentProgress)
         );
         this.componentList.add(progress_bar);
     }
 
-    @Nonnull
     @Override
-    public String getUid() {
-        return BlockBaseMachine3.reactor_rod_factory.getName();
+    public RecipeType<RodFactoryHandler> getRecipeType() {
+        return jeiInform.recipeType;
     }
 
     @Nonnull
     @Override
-    public String getTitle() {
-        return Localization.translate(JEICompat.getBlockStack(BlockBaseMachine3.reactor_rod_factory).getUnlocalizedName());
+    public String getTitles() {
+        return Localization.translate(JEICompat.getBlockStack(BlockBaseMachine3Entity.reactor_rod_factory).getDescriptionId());
     }
 
-
-    @Nonnull
-    @Override
-    public String getModName() {
-        return Constants.MOD_NAME;
-    }
 
     @Nonnull
     @Override
@@ -82,9 +83,8 @@ public class RodFactoryCategory extends GuiIU implements IRecipeCategory<RodFact
         return bg;
     }
 
-
     @Override
-    public void drawExtras(@Nonnull final Minecraft mc) {
+    public void draw(RodFactoryHandler recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics stack, double mouseX, double mouseY) {
         progress++;
         if (this.energy < 100) {
             energy++;
@@ -95,24 +95,16 @@ public class RodFactoryCategory extends GuiIU implements IRecipeCategory<RodFact
             progress = 0;
         }
 
-        this.slots.drawBackground(0, 0);
+        this.slots.drawBackground(stack, 0, 0);
 
-        progress_bar.renderBar(0, 0, xScale);
-        mc.getTextureManager().bindTexture(getTexture());
-
-
+        progress_bar.renderBar(stack, 0, 0, xScale);
     }
 
-    @Override
-    public void setRecipe(
-            final IRecipeLayout layout,
-            final RodFactoryRecipeWrapper recipes,
-            @Nonnull final IIngredients ingredients
-    ) {
-        IGuiItemStackGroup isg = layout.getItemStacks();
 
+    @Override
+    public void setRecipe(IRecipeLayoutBuilder builder, RodFactoryHandler recipe, IFocusGroup focuses) {
         final List<SlotInvSlot> slots1 = container1.findClassSlots(InventoryRecipes.class);
-        final List<ItemStack> inputs = recipes.getInputs1();
+        final List<ItemStack> inputs = recipe.getInputs();
         if (inputs.size() == 3) {
             slots1.remove(8);
             slots1.remove(7);
@@ -131,18 +123,20 @@ public class RodFactoryCategory extends GuiIU implements IRecipeCategory<RodFact
         }
         int i = 0;
         for (; i < inputs.size(); i++) {
-            isg.init(i, true, slots1.get(i).getJeiX(), slots1.get(i).getJeiY());
-            isg.set(i, inputs.get(i));
+            JeiIngredientHelper.addInputSlot(builder, RecipeIngredientRole.INPUT, slots1.get(i).getJeiX(), slots1.get(i).getJeiY(), recipe, i, inputs.get(i));
+
+
 
         }
 
         final SlotInvSlot outputSlot = container1.findClassSlot(InventoryOutput.class);
-        isg.init(i, false, outputSlot.getJeiX(), outputSlot.getJeiY());
-        isg.set(i, recipes.getOutput());
+        builder.addSlot(RecipeIngredientRole.OUTPUT, outputSlot.getJeiX(), outputSlot.getJeiY()).addItemStack(recipe.getOutput());
+
     }
 
+
     protected ResourceLocation getTexture() {
-        return new ResourceLocation(Constants.MOD_ID, "textures/gui/guimachine.png");
+        return ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/guimachine.png");
     }
 
 

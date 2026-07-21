@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=bio_centrifuge": {
+      "model": "industrialupgrade:block/basemachine/bio_centrifuge"
+    },
+    "facing=south,type=bio_centrifuge": {
+      "model": "industrialupgrade:block/basemachine/bio_centrifuge",
+      "y": 180
+    },
+    "facing=west,type=bio_centrifuge": {
+      "model": "industrialupgrade:block/basemachine/bio_centrifuge",
+      "y": 270
+    },
+    "facing=east,type=bio_centrifuge": {
+      "model": "industrialupgrade:block/basemachine/bio_centrifuge",
+      "y": 90
+    },
+    "facing=north,type=bio_centrifuge_active": {
+      "model": "industrialupgrade:block/basemachine/bio_centrifuge_active"
+    },
+    "facing=south,type=bio_centrifuge_active": {
+      "model": "industrialupgrade:block/basemachine/bio_centrifuge_active",
+      "y": 180
+    },
+    "facing=west,type=bio_centrifuge_active": {
+      "model": "industrialupgrade:block/basemachine/bio_centrifuge_active",
+      "y": 270
+    },
+    "facing=east,type=bio_centrifuge_active": {
+      "model": "industrialupgrade:block/basemachine/bio_centrifuge_active",
+      "y": 90
+    }
+  }
+}

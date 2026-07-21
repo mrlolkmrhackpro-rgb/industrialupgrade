@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=electric_dryer": {
+      "model": "industrialupgrade:block/basemachine/electric_dryer"
+    },
+    "facing=south,type=electric_dryer": {
+      "model": "industrialupgrade:block/basemachine/electric_dryer",
+      "y": 180
+    },
+    "facing=west,type=electric_dryer": {
+      "model": "industrialupgrade:block/basemachine/electric_dryer",
+      "y": 270
+    },
+    "facing=east,type=electric_dryer": {
+      "model": "industrialupgrade:block/basemachine/electric_dryer",
+      "y": 90
+    },
+    "facing=north,type=electric_dryer_active": {
+      "model": "industrialupgrade:block/basemachine/electric_dryer_active"
+    },
+    "facing=south,type=electric_dryer_active": {
+      "model": "industrialupgrade:block/basemachine/electric_dryer_active",
+      "y": 180
+    },
+    "facing=west,type=electric_dryer_active": {
+      "model": "industrialupgrade:block/basemachine/electric_dryer_active",
+      "y": 270
+    },
+    "facing=east,type=electric_dryer_active": {
+      "model": "industrialupgrade:block/basemachine/electric_dryer_active",
+      "y": 90
+    }
+  }
+}

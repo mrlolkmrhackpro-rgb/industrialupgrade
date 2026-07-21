@@ -1,26 +1,41 @@
 package com.denfop.network.packet;
 
-import com.denfop.ElectricItem;
+
+import com.denfop.config.ModConfig;
 import com.denfop.IUCore;
 import com.denfop.items.relocator.Point;
 import com.denfop.items.relocator.RelocatorNetwork;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
+import com.denfop.utils.ElectricItem;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.UUID;
 
 public class PacketRelocatorTeleportPlayer implements IPacket {
 
+    private CustomPacketBuffer buffer;
+
     public PacketRelocatorTeleportPlayer() {
 
     }
 
-    public PacketRelocatorTeleportPlayer(EntityPlayer player, Point point) {
-        CustomPacketBuffer buffer = new CustomPacketBuffer(64);
+    public PacketRelocatorTeleportPlayer(Player player, Point point) {
+        CustomPacketBuffer buffer = new CustomPacketBuffer(64, player.registryAccess());
         buffer.writeByte(getId());
-        buffer.writeUniqueId(player.getUniqueID());
+        buffer.writeUUID(player.getUUID());
         point.writeToBuffer(buffer);
-        IUCore.network.getClient().sendPacket(buffer);
+        this.buffer = buffer;
+        IUCore.network.getClient().sendPacket(this, buffer);
+    }
+
+    @Override
+    public CustomPacketBuffer getPacketBuffer() {
+        return buffer;
+    }
+
+    @Override
+    public void setPacketBuffer(CustomPacketBuffer customPacketBuffer) {
+        buffer = customPacketBuffer;
     }
 
     @Override
@@ -29,14 +44,14 @@ public class PacketRelocatorTeleportPlayer implements IPacket {
     }
 
     @Override
-    public void readPacket(final CustomPacketBuffer customPacketBuffer, final EntityPlayer entityPlayer) {
-        UUID uuid = customPacketBuffer.readUniqueId();
-        if (entityPlayer.getUniqueID().equals(uuid)) {
+    public void readPacket(final CustomPacketBuffer customPacketBuffer, final Player entityPlayer) {
+        UUID uuid = customPacketBuffer.readUUID();
+        if (entityPlayer.getUUID().equals(uuid)) {
             Point point = new Point(customPacketBuffer);
-            ItemStack stack = entityPlayer.getHeldItemMainhand();
-            if (ElectricItem.manager.canUse(stack, 1000000)) {
-                ElectricItem.manager.discharge(stack, 1000000, 14, true, false, false);
-                entityPlayer.closeScreen();
+            ItemStack stack = entityPlayer.getMainHandItem();
+            if (ElectricItem.manager.canUse(stack, ModConfig.itemInt("relocator_teleport_energy_cost", 100000))) {
+                ElectricItem.manager.discharge(stack, ModConfig.itemInt("relocator_teleport_energy_cost", 100000), 14, true, false, false);
+                entityPlayer.closeContainer();
                 RelocatorNetwork.instance.teleportPlayer(entityPlayer, point);
             }
 

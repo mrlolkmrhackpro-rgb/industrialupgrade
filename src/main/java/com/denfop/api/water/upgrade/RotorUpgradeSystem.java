@@ -2,38 +2,26 @@ package com.denfop.api.water.upgrade;
 
 import com.denfop.IUItem;
 import com.denfop.api.water.upgrade.event.EventRotorItemLoad;
-import com.denfop.utils.ModUtils;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import com.denfop.datacomponent.DataComponentsInit;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.LevelEvent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RotorUpgradeSystem implements IRotorUpgradeSystem {
 
     public static IRotorUpgradeSystem instance;
 
-    Map<Integer, List<RotorUpgradeItemInform>> map;
-
-    Map<Integer, ItemStack> map_stack;
-
-    Map<Integer, Integer> map_col;
 
     int max;
 
     public RotorUpgradeSystem() {
-        this.map = new HashMap<>();
         this.max = 0;
-        this.map_col = new HashMap<>();
-        this.map_stack = new HashMap<>();
         instance = this;
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
@@ -43,29 +31,21 @@ public class RotorUpgradeSystem implements IRotorUpgradeSystem {
     }
 
     public int getRemaining(ItemStack item) {
-        NBTTagCompound nbt = ModUtils.nbt(item);
-        int id = nbt.getInteger("ID_Item");
-        return this.map_col.getOrDefault(id, 4);
+        List<RotorUpgradeItemInform> list = item.getOrDefault(DataComponentsInit.WATER_UPGRADE, Collections.emptyList());
+        int col = 0;
+        for (RotorUpgradeItemInform rotorUpgradeItemInform : list) {
+            col += rotorUpgradeItemInform.number;
+        }
+        return 4 - col;
     }
 
     public boolean hasInMap(ItemStack stack) {
-        NBTTagCompound nbt = ModUtils.nbt(stack);
-        int id = nbt.getInteger("ID_Item");
-        ItemStack item = this.map_stack.get(id);
-        if (item == null || item.isEmpty()) {
-            return false;
-        }
-        int id1 = ModUtils.nbt(item).getInteger("ID_Item");
-        return (item.isItemEqual(stack) && id1 == id && item.getTagCompound() != null && item
-                .getTagCompound()
-                .equals(stack.getTagCompound()));
+        return stack.has(DataComponentsInit.WATER_UPGRADE);
     }
 
     public List<RotorUpgradeItemInform> getInformation(ItemStack item) {
-        NBTTagCompound nbt = ModUtils.nbt(item);
-        int id = nbt.getInteger("ID_Item");
-        List<RotorUpgradeItemInform> list = this.map.get(id);
-        return (list != null) ? list : new ArrayList<>();
+
+        return item.getOrDefault(DataComponentsInit.WATER_UPGRADE, Collections.emptyList());
     }
 
     public RotorUpgradeItemInform getModules(EnumInfoRotorUpgradeModules module, ItemStack item) {
@@ -113,40 +93,10 @@ public class RotorUpgradeSystem implements IRotorUpgradeSystem {
     }
 
     public void updateListFromNBT(IRotorUpgradeItem item, ItemStack stack) {
-        NBTTagCompound nbt = ModUtils.nbt(stack);
-        boolean hasID = nbt.getBoolean("hasID");
-        int id = nbt.getInteger("ID_Item");
-        if (!hasID) {
-            id = this.max;
-            this.max++;
-            nbt.setInteger("ID_Item", id);
-            nbt.setBoolean("hasID", true);
+        if (!stack.has(DataComponentsInit.WATER_UPGRADE)) {
+            stack.set(DataComponentsInit.WATER_UPGRADE, new ArrayList<>());
         }
-        List<EnumInfoRotorUpgradeModules> lst = new ArrayList<>();
-        int empty = 0;
-        boolean canupgrade = false;
-        for (int i = 0; i < 4; i++) {
-            String name = nbt.getString("mode_module" + i);
-            if (name.equals("")) {
-                empty++;
-                canupgrade = true;
-            }
-            if (!name.equals("")) {
-                for (EnumInfoRotorUpgradeModules enumInfoRotorUpgradeModules : EnumInfoRotorUpgradeModules.values()) {
-                    if (enumInfoRotorUpgradeModules.name.equals(name)) {
-                        lst.add(enumInfoRotorUpgradeModules);
-                    }
-                }
-            }
-        }
-        int ost = empty;
-        nbt.setBoolean("canupgrade", canupgrade);
-        if (this.map_col.containsKey(id)) {
-            this.map_col.replace(id, ost);
-        } else {
-            this.map_col.put(id, ost);
-        }
-        setInformation(item, lst, stack);
+        setInformation(item, Collections.emptyList(), stack);
     }
 
     public void setInformation(IRotorUpgradeItem item, List<EnumInfoRotorUpgradeModules> lst, ItemStack stack) {
@@ -154,77 +104,72 @@ public class RotorUpgradeSystem implements IRotorUpgradeSystem {
     }
 
     @SubscribeEvent
-    public void onWorldUnload(WorldEvent.Unload event) {
-        this.map.clear();
+    public void onWorldUnload(LevelEvent.Unload event) {
         this.max = 0;
-        this.map_col.clear();
-        this.map_stack.clear();
+
     }
 
     public void write(IRotorUpgradeItem item, List<EnumInfoRotorUpgradeModules> lst, ItemStack stack) {
-        Map<EnumInfoRotorUpgradeModules, Integer> map = new HashMap<>();
-        for (EnumInfoRotorUpgradeModules upgrade : lst) {
-            if (map.containsKey(upgrade)) {
-                map.replace(upgrade, map.get(upgrade) + 1);
-                continue;
-            }
-            map.put(upgrade, 1);
-        }
-        List<RotorUpgradeItemInform> list = new ArrayList<>();
-        for (Map.Entry<EnumInfoRotorUpgradeModules, Integer> map1 : map.entrySet()) {
-            list.add(new RotorUpgradeItemInform(map1.getKey(), map1.getValue()));
-        }
-        NBTTagCompound nbt = ModUtils.nbt(stack);
-        int id = nbt.getInteger("ID_Item");
-        if (!this.map.containsKey(id)) {
-            this.map.put(id, list);
-            this.map_stack.put(id, stack);
-        } else {
-            this.map.replace(id, list);
-            this.map_stack.replace(id, stack);
-        }
     }
 
-    public void removeUpdate(ItemStack stack, World world, int index) {
-        NBTTagCompound nbt = ModUtils.nbt(stack);
-        nbt.setString("mode_module" + index, "");
-        MinecraftForge.EVENT_BUS.post(new EventRotorItemLoad(world, (IRotorUpgradeItem) stack.getItem(), stack));
+    public void removeUpdate(ItemStack stack, Level world, int index) {
+        stack.set(DataComponentsInit.WATER_UPGRADE, new ArrayList<>());
     }
 
     public List<ItemStack> getListStack(ItemStack stack) {
+        List<RotorUpgradeItemInform> listUpgrade = stack.getOrDefault(DataComponentsInit.WATER_UPGRADE, Collections.emptyList());
         List<ItemStack> list = new ArrayList<>();
-        NBTTagCompound nbt = ModUtils.nbt(stack);
-        for (int i = 0; i < 4; i++) {
-            String name = nbt.getString("mode_module" + i);
-            if (!name.equals("")) {
-                for (EnumInfoRotorUpgradeModules enumInfoRotorUpgradeModules : EnumInfoRotorUpgradeModules.values()) {
-                    if (enumInfoRotorUpgradeModules.name.equals(name)) {
-                        list.add(new ItemStack(IUItem.water_rotors_upgrade, 1, enumInfoRotorUpgradeModules.ordinal()));
-                    }
-                }
-            } else {
+        for (RotorUpgradeItemInform rotorUpgradeItemInform : listUpgrade) {
+            for (int i = 0; i < rotorUpgradeItemInform.number; i++)
+                list.add(new ItemStack(IUItem.water_rotors_upgrade.getStack(rotorUpgradeItemInform.upgrade.ordinal()), 1));
+
+        }
+        if (list.size() < 4) {
+            for (int i = list.size() - 1; i < list.size(); i++) {
                 list.add(ItemStack.EMPTY);
+                if (list.size() >= 4)
+                    break;
             }
         }
         return list;
     }
 
     public Map<Integer, ItemStack> getList(ItemStack stack) {
-        NBTTagCompound nbt = ModUtils.nbt(stack);
+        List<RotorUpgradeItemInform> listUpgrade = stack.getOrDefault(DataComponentsInit.WATER_UPGRADE, Collections.emptyList());
+
         Map<Integer, ItemStack> map = new HashMap<>();
-        for (int i = 0; i < 4; i++) {
-            String name = nbt.getString("mode_module" + i);
-            if (!name.equals("")) {
-                for (EnumInfoRotorUpgradeModules enumInfoRotorUpgradeModules : EnumInfoRotorUpgradeModules.values()) {
-                    if (enumInfoRotorUpgradeModules.name.equals(name)) {
-                        map.put(i, new ItemStack(IUItem.water_rotors_upgrade, 1, enumInfoRotorUpgradeModules.ordinal()));
-                    }
-                }
-            } else {
-                map.put(i, ItemStack.EMPTY);
+        int j = 0;
+        for (RotorUpgradeItemInform rotorUpgradeItemInform : listUpgrade) {
+            for (int i = 0; i < rotorUpgradeItemInform.number; i++) {
+                map.put(j, new ItemStack(IUItem.water_rotors_upgrade.getStack(rotorUpgradeItemInform.upgrade.ordinal()), 1));
+                j++;
+            }
+        }
+        j += 1;
+        if (j < 4) {
+            for (int i = j - 1; i < j; i++) {
+                map.put(j, ItemStack.EMPTY);
             }
         }
         return map;
+    }
+
+    @Override
+    public void addUpdate(ItemStack itemStack, Level world, EnumInfoRotorUpgradeModules fromID) {
+        List<RotorUpgradeItemInform> rotorUpgradeItemInforms = itemStack.getOrDefault(DataComponentsInit.WATER_UPGRADE, new ArrayList<>());
+        boolean find = false;
+        for (RotorUpgradeItemInform rotorUpgradeItemInform : rotorUpgradeItemInforms) {
+            if (rotorUpgradeItemInform.upgrade == fromID) {
+                rotorUpgradeItemInform.number++;
+                find = true;
+                break;
+            }
+        }
+        if (!find) {
+            rotorUpgradeItemInforms.add(new RotorUpgradeItemInform(fromID, 1));
+
+        }
+        itemStack.set(DataComponentsInit.WATER_UPGRADE, rotorUpgradeItemInforms);
     }
 
     public boolean shouldUpdate(EnumInfoRotorUpgradeModules type, ItemStack stack1) {

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=fisher": {
+      "model": "industrialupgrade:block/basemachine/fisher"
+    },
+    "facing=south,type=fisher": {
+      "model": "industrialupgrade:block/basemachine/fisher",
+      "y": 180
+    },
+    "facing=west,type=fisher": {
+      "model": "industrialupgrade:block/basemachine/fisher",
+      "y": 270
+    },
+    "facing=east,type=fisher": {
+      "model": "industrialupgrade:block/basemachine/fisher",
+      "y": 90
+    },
+    "facing=north,type=fisher_active": {
+      "model": "industrialupgrade:block/basemachine/fisher_active"
+    },
+    "facing=south,type=fisher_active": {
+      "model": "industrialupgrade:block/basemachine/fisher_active",
+      "y": 180
+    },
+    "facing=west,type=fisher_active": {
+      "model": "industrialupgrade:block/basemachine/fisher_active",
+      "y": 270
+    },
+    "facing=east,type=fisher_active": {
+      "model": "industrialupgrade:block/basemachine/fisher_active",
+      "y": 90
+    }
+  }
+}

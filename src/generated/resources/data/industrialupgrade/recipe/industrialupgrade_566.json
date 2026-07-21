@@ -1,0 +1,25 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "tag": "c:doubleplate/alumel"
+    },
+    "B": {
+      "tag": "c:doubleplate/aluminium"
+    },
+    "E": {
+      "item": "industrialupgrade:nanobox"
+    }
+  },
+  "pattern": [
+    "ABA",
+    " E ",
+    "   "
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:upgradekitmachine/upgradepanelkitmachine"
+  },
+  "show_notification": false
+}

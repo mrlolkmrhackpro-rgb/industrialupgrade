@@ -2,80 +2,75 @@ package com.denfop.events;
 
 import com.denfop.Constants;
 import com.denfop.IUCore;
-import com.denfop.Localization;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.event.ClickEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import com.denfop.config.ModConfig;
+import com.denfop.utils.Localization;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+
+import java.util.Collections;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EventUpdate {
 
-    private boolean playerNotified = false;
-    private int delay = 80;
+    private final Set<UUID> notifiedPlayers = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     public EventUpdate() {
     }
 
     @SubscribeEvent
-    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.START) {
-            return;
-        }
-        if (this.delay > 0) {
-            this.delay--;
+    public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
         }
 
-        EntityPlayer player = event.player;
-        if (!this.playerNotified) {
-            this.playerNotified = true;
-            MinecraftForge.EVENT_BUS.unregister(this);
-            sendModCheckMessage(player);
+        if (!this.notifiedPlayers.add(player.getUUID())) {
+            return;
         }
+
+        sendIntroMessage(player);
     }
 
-    private void sendModCheckMessage(EntityPlayer player) {
-        if (IUCore.proxy.isSimulating()) {
-            String modVersion = Constants.MOD_VERSION;
-
-            boolean hasPowerUtilities = Loader.isModLoaded("powerutils");
-            boolean hasSimplyQuarry = Loader.isModLoaded("simplyquarries");
-            boolean hasQuantumGenerators = Loader.isModLoaded("quantum_generators");
-            boolean hasJEI = Loader.isModLoaded("jei");
-            boolean hasTopAddons = Loader.isModLoaded("topaddons");
-
-
-            String message = TextFormatting.DARK_GRAY + "================" + "\n" +
-                    TextFormatting.GREEN + Localization.translate("iu.mod.name") + " " + modVersion + "\n" +
-                    TextFormatting.WHITE + Localization.translate("iu.addons.installed") + "\n" +
-                    formatAddonStatus("Power Utilities", hasPowerUtilities) + "\n" +
-                    formatAddonStatus("Simply Quarry", hasSimplyQuarry) + "\n" +
-                    formatAddonStatus("Quantum Generators", hasQuantumGenerators) + "\n\n" +
-                    TextFormatting.YELLOW + Localization.translate("iu.addons.required") + "\n" +
-                    formatAddonStatus("JEI", hasJEI) + "\n" +
-                    formatAddonStatus("Top Addons", hasTopAddons) + "\n" +
-                    TextFormatting.DARK_GRAY + "================";
-
-            IUCore.proxy.messagePlayer(player, message);
-            sendDiscordLink(player);
+    private void sendIntroMessage(Player player) {
+        if (player.level().isClientSide || !ModConfig.COMMON.informationText.get()) {
+            return;
         }
+
+        String modVersion = Constants.MOD_VERSION;
+
+        String message = ChatFormatting.DARK_GRAY + "================" + "\n" +
+                ChatFormatting.GREEN + Localization.translate("iu.mod.name") + " " + modVersion + "\n" +
+                ChatFormatting.WHITE + Localization.translate("iu.intro.chat.title") + "\n" +
+                ChatFormatting.GRAY + Localization.translate("iu.intro.chat.description") + "\n" +
+                ChatFormatting.YELLOW + Localization.translate("iu.intro.chat.open_hint") + "\n" +
+                ChatFormatting.DARK_GRAY + "================";
+
+        IUCore.proxy.messagePlayer(player, message);
+        sendDiscordLink(player);
     }
 
-    private String formatAddonStatus(String addonName, boolean isInstalled) {
-        return " " + addonName + ": " + (isInstalled
-                ? TextFormatting.GREEN + "[" + "\u2611" + "]"
-                : TextFormatting.RED + "[" + "\u274C" + "]");
-    }
+    private void sendDiscordLink(Player player) {
+        Component discordMessage = Component.literal("[" + Localization.translate("iu.discord.click") + "]")
+                .withStyle(Style.EMPTY
+                        .withColor(ChatFormatting.AQUA)
+                        .withUnderlined(true)
+                        .withClickEvent(new ClickEvent(
+                                ClickEvent.Action.OPEN_URL,
+                                "https://discord.gg/nFHcxqVx"
+                        )));
 
-    private void sendDiscordLink(EntityPlayer player) {
-        TextComponentString discordMessage = new TextComponentString(TextFormatting.AQUA + Localization.translate(
-                "iu.discord.question") + " " + TextFormatting.UNDERLINE + "[" + Localization.translate("iu.discord.click") + "]");
-        discordMessage.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/nFHcxqVx"));
-        player.sendMessage(discordMessage);
+        Component fullMessage = Component.literal(Localization.translate("iu.intro.chat.discord_question") + " ")
+                .withStyle(Style.EMPTY.withColor(ChatFormatting.AQUA))
+                .append(discordMessage);
+
+        player.sendSystemMessage(fullMessage);
     }
 
 }

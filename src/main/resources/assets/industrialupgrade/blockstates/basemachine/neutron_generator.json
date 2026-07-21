@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=neutron_generator": {
+      "model": "industrialupgrade:block/basemachine/neutron_generator"
+    },
+    "facing=south,type=neutron_generator": {
+      "model": "industrialupgrade:block/basemachine/neutron_generator",
+      "y": 180
+    },
+    "facing=west,type=neutron_generator": {
+      "model": "industrialupgrade:block/basemachine/neutron_generator",
+      "y": 270
+    },
+    "facing=east,type=neutron_generator": {
+      "model": "industrialupgrade:block/basemachine/neutron_generator",
+      "y": 90
+    },
+    "facing=north,type=neutron_generator_active": {
+      "model": "industrialupgrade:block/basemachine/neutron_generator_active"
+    },
+    "facing=south,type=neutron_generator_active": {
+      "model": "industrialupgrade:block/basemachine/neutron_generator_active",
+      "y": 180
+    },
+    "facing=west,type=neutron_generator_active": {
+      "model": "industrialupgrade:block/basemachine/neutron_generator_active",
+      "y": 270
+    },
+    "facing=east,type=neutron_generator_active": {
+      "model": "industrialupgrade:block/basemachine/neutron_generator_active",
+      "y": 90
+    }
+  }
+}

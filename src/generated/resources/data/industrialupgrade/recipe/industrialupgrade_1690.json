@@ -1,0 +1,28 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "minecraft:diamond_leggings"
+    },
+    "C": {
+      "item": "industrialupgrade:battery/energy_crystal"
+    },
+    "D": {
+      "item": "industrialupgrade:crafting_elements/crafting_282_element"
+    },
+    "E": {
+      "item": "industrialupgrade:nanobox"
+    }
+  },
+  "pattern": [
+    "DCD",
+    "DAD",
+    "E E"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:armour/nano_leggings"
+  },
+  "show_notification": false
+}

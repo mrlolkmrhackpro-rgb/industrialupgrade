@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=adv_gas_regenerator": {
+      "model": "industrialupgrade:block/gas_reactor/gas_adv_regenerator"
+    },
+    "facing=south,type=adv_gas_regenerator": {
+      "model": "industrialupgrade:block/gas_reactor/gas_adv_regenerator",
+      "y": 180
+    },
+    "facing=west,type=adv_gas_regenerator": {
+      "model": "industrialupgrade:block/gas_reactor/gas_adv_regenerator",
+      "y": 270
+    },
+    "facing=east,type=adv_gas_regenerator": {
+      "model": "industrialupgrade:block/gas_reactor/gas_adv_regenerator",
+      "y": 90
+    },
+    "facing=north,type=adv_gas_regenerator_active": {
+      "model": "industrialupgrade:block/gas_reactor/gas_adv_regenerator"
+    },
+    "facing=south,type=adv_gas_regenerator_active": {
+      "model": "industrialupgrade:block/gas_reactor/gas_adv_regenerator",
+      "y": 180
+    },
+    "facing=west,type=adv_gas_regenerator_active": {
+      "model": "industrialupgrade:block/gas_reactor/gas_adv_regenerator",
+      "y": 270
+    },
+    "facing=east,type=adv_gas_regenerator_active": {
+      "model": "industrialupgrade:block/gas_reactor/gas_adv_regenerator",
+      "y": 90
+    }
+  }
+}

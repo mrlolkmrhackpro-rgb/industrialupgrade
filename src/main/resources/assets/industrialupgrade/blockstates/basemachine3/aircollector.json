@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=aircollector": {
+      "model": "industrialupgrade:block/basemachine/aircollector"
+    },
+    "facing=south,type=aircollector": {
+      "model": "industrialupgrade:block/basemachine/aircollector",
+      "y": 180
+    },
+    "facing=west,type=aircollector": {
+      "model": "industrialupgrade:block/basemachine/aircollector",
+      "y": 270
+    },
+    "facing=east,type=aircollector": {
+      "model": "industrialupgrade:block/basemachine/aircollector",
+      "y": 90
+    },
+    "facing=north,type=aircollector_active": {
+      "model": "industrialupgrade:block/basemachine/aircollector_active"
+    },
+    "facing=south,type=aircollector_active": {
+      "model": "industrialupgrade:block/basemachine/aircollector_active",
+      "y": 180
+    },
+    "facing=west,type=aircollector_active": {
+      "model": "industrialupgrade:block/basemachine/aircollector_active",
+      "y": 270
+    },
+    "facing=east,type=aircollector_active": {
+      "model": "industrialupgrade:block/basemachine/aircollector_active",
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=hydro_turbine_casing_2": {
+      "model": "industrialupgrade:block/hydro_turbine/hydro_turbine_casing_2"
+    },
+    "facing=south,type=hydro_turbine_casing_2": {
+      "model": "industrialupgrade:block/hydro_turbine/hydro_turbine_casing_2",
+      "y": 180
+    },
+    "facing=west,type=hydro_turbine_casing_2": {
+      "model": "industrialupgrade:block/hydro_turbine/hydro_turbine_casing_2",
+      "y": 270
+    },
+    "facing=east,type=hydro_turbine_casing_2": {
+      "model": "industrialupgrade:block/hydro_turbine/hydro_turbine_casing_2",
+      "y": 90
+    },
+    "facing=north,type=hydro_turbine_casing_2_active": {
+      "model": "industrialupgrade:block/hydro_turbine/hydro_turbine_casing_2"
+    },
+    "facing=south,type=hydro_turbine_casing_2_active": {
+      "model": "industrialupgrade:block/hydro_turbine/hydro_turbine_casing_2",
+      "y": 180
+    },
+    "facing=west,type=hydro_turbine_casing_2_active": {
+      "model": "industrialupgrade:block/hydro_turbine/hydro_turbine_casing_2",
+      "y": 270
+    },
+    "facing=east,type=hydro_turbine_casing_2_active": {
+      "model": "industrialupgrade:block/hydro_turbine/hydro_turbine_casing_2",
+      "y": 90
+    }
+  }
+}

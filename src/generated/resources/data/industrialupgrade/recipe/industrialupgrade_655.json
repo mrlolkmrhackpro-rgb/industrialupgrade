@@ -1,0 +1,31 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "industrialupgrade:quantumitems3"
+    },
+    "D": {
+      "item": "industrialupgrade:energy_tools/nanodrill"
+    },
+    "F": {
+      "item": "industrialupgrade:crafting_elements/crafting_516_element"
+    },
+    "H": {
+      "item": "industrialupgrade:crafting_elements/crafting_509_element"
+    },
+    "T": {
+      "tag": "c:doubleplate/muntsa"
+    }
+  },
+  "pattern": [
+    "THT",
+    "TDT",
+    "BFB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:energy_tools/quantumdrill"
+  },
+  "show_notification": false
+}

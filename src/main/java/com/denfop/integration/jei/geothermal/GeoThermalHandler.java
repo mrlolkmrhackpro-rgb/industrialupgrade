@@ -2,7 +2,7 @@ package com.denfop.integration.jei.geothermal;
 
 
 import com.denfop.blocks.FluidName;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +43,8 @@ public class GeoThermalHandler {
 
     public static void initRecipes() {
         addRecipe(
-                new FluidStack(FluidName.fluidhot_coolant.getInstance(), 3),
-                new FluidStack(FluidName.fluidneft.getInstance(), 1)
+                new FluidStack(FluidName.fluidhot_coolant.getInstance().get(), 3),
+                new FluidStack(FluidName.fluidpetroleum.getInstance().get(), 1)
         );
     }
 

@@ -3,7 +3,8 @@ package com.denfop.api.space.colonies;
 import com.denfop.api.space.colonies.api.IColony;
 import com.denfop.api.space.colonies.api.IColonyBuilding;
 import com.denfop.network.packet.CustomPacketBuffer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 
 public abstract class Building implements IColonyBuilding {
 
@@ -26,8 +27,8 @@ public abstract class Building implements IColonyBuilding {
     }
 
     @Override
-    public NBTTagCompound writeTag(final NBTTagCompound tag) {
-        tag.setByte("type", this.getId());
+    public CompoundTag writeTag(final CompoundTag tag, HolderLookup.Provider p_323640_) {
+        tag.putByte("type", this.getId());
         return tag;
     }
 

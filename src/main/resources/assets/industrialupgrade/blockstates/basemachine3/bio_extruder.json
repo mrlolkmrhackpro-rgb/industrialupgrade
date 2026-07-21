@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=bio_extruder": {
+      "model": "industrialupgrade:block/basemachine/bio_extruder"
+    },
+    "facing=south,type=bio_extruder": {
+      "model": "industrialupgrade:block/basemachine/bio_extruder",
+      "y": 180
+    },
+    "facing=west,type=bio_extruder": {
+      "model": "industrialupgrade:block/basemachine/bio_extruder",
+      "y": 270
+    },
+    "facing=east,type=bio_extruder": {
+      "model": "industrialupgrade:block/basemachine/bio_extruder",
+      "y": 90
+    },
+    "facing=north,type=bio_extruder_active": {
+      "model": "industrialupgrade:block/basemachine/bio_extruder_active"
+    },
+    "facing=south,type=bio_extruder_active": {
+      "model": "industrialupgrade:block/basemachine/bio_extruder_active",
+      "y": 180
+    },
+    "facing=west,type=bio_extruder_active": {
+      "model": "industrialupgrade:block/basemachine/bio_extruder_active",
+      "y": 270
+    },
+    "facing=east,type=bio_extruder_active": {
+      "model": "industrialupgrade:block/basemachine/bio_extruder_active",
+      "y": 90
+    }
+  }
+}

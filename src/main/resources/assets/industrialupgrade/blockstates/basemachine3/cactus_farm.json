@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=cactus_farm": {
+      "model": "industrialupgrade:block/basemachine/cactus_farm"
+    },
+    "facing=south,type=cactus_farm": {
+      "model": "industrialupgrade:block/basemachine/cactus_farm",
+      "y": 180
+    },
+    "facing=west,type=cactus_farm": {
+      "model": "industrialupgrade:block/basemachine/cactus_farm",
+      "y": 270
+    },
+    "facing=east,type=cactus_farm": {
+      "model": "industrialupgrade:block/basemachine/cactus_farm",
+      "y": 90
+    },
+    "facing=north,type=cactus_farm_active": {
+      "model": "industrialupgrade:block/basemachine/cactus_farm"
+    },
+    "facing=south,type=cactus_farm_active": {
+      "model": "industrialupgrade:block/basemachine/cactus_farm",
+      "y": 180
+    },
+    "facing=west,type=cactus_farm_active": {
+      "model": "industrialupgrade:block/basemachine/cactus_farm",
+      "y": 270
+    },
+    "facing=east,type=cactus_farm_active": {
+      "model": "industrialupgrade:block/basemachine/cactus_farm",
+      "y": 90
+    }
+  }
+}

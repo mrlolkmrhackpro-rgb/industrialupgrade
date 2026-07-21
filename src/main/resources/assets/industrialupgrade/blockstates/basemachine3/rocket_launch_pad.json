@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=rocket_launch_pad": {
+      "model": "industrialupgrade:block/basemachine/rocket_launch_pad"
+    },
+    "facing=south,type=rocket_launch_pad": {
+      "model": "industrialupgrade:block/basemachine/rocket_launch_pad",
+      "y": 180
+    },
+    "facing=west,type=rocket_launch_pad": {
+      "model": "industrialupgrade:block/basemachine/rocket_launch_pad",
+      "y": 270
+    },
+    "facing=east,type=rocket_launch_pad": {
+      "model": "industrialupgrade:block/basemachine/rocket_launch_pad",
+      "y": 90
+    },
+    "facing=north,type=rocket_launch_pad_active": {
+      "model": "industrialupgrade:block/basemachine/rocket_launch_pad"
+    },
+    "facing=south,type=rocket_launch_pad_active": {
+      "model": "industrialupgrade:block/basemachine/rocket_launch_pad",
+      "y": 180
+    },
+    "facing=west,type=rocket_launch_pad_active": {
+      "model": "industrialupgrade:block/basemachine/rocket_launch_pad",
+      "y": 270
+    },
+    "facing=east,type=rocket_launch_pad_active": {
+      "model": "industrialupgrade:block/basemachine/rocket_launch_pad",
+      "y": 90
+    }
+  }
+}

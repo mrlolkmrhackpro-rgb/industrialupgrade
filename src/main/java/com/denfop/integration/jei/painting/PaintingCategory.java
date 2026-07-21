@@ -1,57 +1,61 @@
 package com.denfop.integration.jei.painting;
 
+import com.denfop.integration.jei.JeiIngredientHelper;
 import com.denfop.Constants;
 import com.denfop.IUItem;
-import com.denfop.Localization;
-import com.denfop.blocks.mechanism.BlockBaseMachine2;
+import com.denfop.blockentity.mechanism.multimechanism.simple.BlockEntityOreWashing;
+import com.denfop.blocks.mechanism.BlockMoreMachine3Entity;
+import com.denfop.containermenu.ContainerMenuMultiMachine;
+import com.denfop.datacomponent.DataComponentsInit;
+import com.denfop.integration.jei.IRecipeCategory;
+import com.denfop.integration.jei.JeiInform;
+import com.denfop.recipes.ItemStackHelper;
+import com.denfop.screen.ScreenMain;
+import com.denfop.utils.Localization;
 import com.denfop.utils.ModUtils;
-import mezz.jei.api.IGuiHelper;
-import mezz.jei.api.gui.IDrawable;
-import mezz.jei.api.gui.IDrawableStatic;
-import mezz.jei.api.gui.IGuiItemStackGroup;
-import mezz.jei.api.gui.IRecipeLayout;
-import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.IRecipeCategory;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableStatic;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
 
-public class PaintingCategory extends Gui implements IRecipeCategory<PaintingWrapper> {
+public class PaintingCategory extends ScreenMain implements IRecipeCategory<PaintingHandler> {
 
     private final IDrawableStatic bg;
+    private final JeiInform jeiInform;
     private int progress = 0;
     private int energy = 0;
 
     public PaintingCategory(
-            final IGuiHelper guiHelper
+            IGuiHelper guiHelper, JeiInform jeiInform
     ) {
-        bg = guiHelper.createDrawable(new ResourceLocation(Constants.MOD_ID, "textures/gui/GUIPainter" +
+        super(new ContainerMenuMultiMachine(Minecraft.getInstance().player,
+                ((BlockEntityOreWashing) BlockMoreMachine3Entity.orewashing.getDummyTe()), 1, true
+        ));
+        this.jeiInform = jeiInform;
+        this.title = net.minecraft.network.chat.Component.literal(getTitles());
+        bg = guiHelper.createDrawable(ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/GUIPainter".toLowerCase() +
                         ".png"), 3, 3, 140,
                 75
         );
     }
 
-    @Nonnull
-    @Override
-    public String getUid() {
-        return BlockBaseMachine2.painter.getName();
-    }
 
     @Nonnull
     @Override
-    public String getTitle() {
-        return Localization.translate(new ItemStack(IUItem.basemachine1, 1, 3).getUnlocalizedName());
+    public String getTitles() {
+        return Localization.translate(ItemStackHelper.fromData(IUItem.basemachine1, 1, 3).getDescriptionId());
     }
 
-    @Nonnull
-    @Override
-    public String getModName() {
-        return Constants.MOD_NAME;
-    }
 
     @Nonnull
     @Override
@@ -59,9 +63,8 @@ public class PaintingCategory extends Gui implements IRecipeCategory<PaintingWra
         return bg;
     }
 
-
     @Override
-    public void drawExtras(@Nonnull final Minecraft mc) {
+    public void draw(PaintingHandler recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics stack, double mouseX, double mouseY) {
         progress++;
 
 
@@ -69,35 +72,34 @@ public class PaintingCategory extends Gui implements IRecipeCategory<PaintingWra
         if (xScale >= 9) {
             progress = 0;
         }
+        ItemStack stack1 = recipe.getOutput().copy();
+        stack1.set(DataComponentsInit.SKIN, recipe.metadata.getString("mode"));
+        draw(stack, ModUtils.mode(stack1), 64, 59, 4210752);
+        bindTexture(getTexture());
 
-        mc.getTextureManager().bindTexture(getTexture());
 
-
-        drawTexturedModalRect(76, 35, 179, 34, xScale, 13);
-
-
+        drawTexturedModalRect(stack, 76, 35, 179, 34, xScale, 13);
     }
 
     @Override
-    public void setRecipe(
-            final IRecipeLayout layout,
-            final PaintingWrapper recipes,
-            @Nonnull final IIngredients ingredients
-    ) {
-        IGuiItemStackGroup isg = layout.getItemStacks();
-        isg.init(0, true, 25, 32);
-        isg.set(0, recipes.getInput());
-        isg.init(1, true, 47, 32);
-        isg.set(1, recipes.getInput1());
-        isg.init(2, false, 102, 32);
-        final ItemStack item = recipes.getOutput();
-        final NBTTagCompound nbt = ModUtils.nbt(item);
-        nbt.setString("mode", recipes.nbt.getString("mode"));
-        isg.set(2, item);
+    public void setRecipe(IRecipeLayoutBuilder builder, PaintingHandler recipe, IFocusGroup focuses) {
+        JeiIngredientHelper.addInputSlot(builder, RecipeIngredientRole.INPUT, 26, 33, recipe, 0, recipe.getInput());
+
+        JeiIngredientHelper.addInputSlot(builder, RecipeIngredientRole.INPUT, 48, 33, recipe, 1, recipe.getInput1());
+
+        ItemStack stack1 = recipe.getOutput().copy();
+        stack1.set(DataComponentsInit.SKIN, recipe.metadata.getString("mode"));
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 103, 33).addItemStack(stack1);
+        builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 103, 33).addItemStack(stack1);
+    }
+
+    @Override
+    public RecipeType<PaintingHandler> getRecipeType() {
+        return jeiInform.recipeType;
     }
 
     protected ResourceLocation getTexture() {
-        return new ResourceLocation(Constants.MOD_ID, "textures/gui/GUIPainter.png");
+        return ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/GUIPainter.png".toLowerCase());
     }
 
 

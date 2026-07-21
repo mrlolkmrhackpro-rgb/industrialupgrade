@@ -1,27 +1,34 @@
 package com.denfop.integration.jei.sunnarium;
 
 
+import com.denfop.integration.jei.IJeiVariantRecipe;
+import com.denfop.integration.jei.JeiIngredientHelper;
 import com.denfop.api.Recipes;
 import com.denfop.api.recipe.BaseMachineRecipe;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class SunnariumHandler {
+public class SunnariumHandler implements IJeiVariantRecipe {
 
     private static final List<SunnariumHandler> recipes = new ArrayList<>();
-    private final ItemStack input, input1, input2, input3, output;
+    
+    private List<List<ItemStack>> inputVariants = new ArrayList<>();
+private final ItemStack input, input1, input2, input3, output;
+    private final BaseMachineRecipe container;
 
     public SunnariumHandler(
             ItemStack input, ItemStack input1, ItemStack input2, ItemStack input3,
-            ItemStack output
-    ) {
+            ItemStack output,
+            BaseMachineRecipe container) {
         this.input = input;
         this.input1 = input1;
         this.input2 = input2;
         this.input3 = input3;
         this.output = output;
+        this.container = container;
     }
 
     public static List<SunnariumHandler> getRecipes() {
@@ -33,9 +40,9 @@ public class SunnariumHandler {
 
     public static SunnariumHandler addRecipe(
             ItemStack input, ItemStack input1, ItemStack input2, ItemStack input3,
-            ItemStack output
-    ) {
-        SunnariumHandler recipe = new SunnariumHandler(input, input1, input2, input3, output);
+            ItemStack output,
+            BaseMachineRecipe container) {
+        SunnariumHandler recipe = new SunnariumHandler(input, input1, input2, input3, output, container);
         if (recipes.contains(recipe)) {
             return null;
         }
@@ -57,18 +64,25 @@ public class SunnariumHandler {
 
     public static void initRecipes() {
         for (BaseMachineRecipe container : Recipes.recipes.getRecipeList("sunnurium")) {
-            addRecipe(
+            JeiIngredientHelper.attachInputVariants(addRecipe(
                     container.input.getInputs().get(0).getInputs().get(0),
                     container.input.getInputs().get(1).getInputs().get(0),
                     container.input.getInputs().get(2).getInputs().get(0),
                     container.input.getInputs().get(3).getInputs().get(0),
-                    container.getOutput().items.get(0)
-            );
+                    container.getOutput().items.get(0), container
+            ), container);
 
 
         }
     }
 
+    public BaseMachineRecipe getContainer() {
+        return container;
+    }
+
+    public List<ItemStack> getInputs() {
+        return Arrays.asList(input, input1, input2, input3);
+    }
 
     public ItemStack getInput() { // Получатель входного предмета рецепта.
         return input;
@@ -91,7 +105,18 @@ public class SunnariumHandler {
     }
 
     public boolean matchesInput(ItemStack is) {
-        return is.isItemEqual(input) || is.isItemEqual(input1) || is.isItemEqual(input2) || is.isItemEqual(input3);
+        return true;
     }
 
+
+
+    @Override
+    public void setInputVariants(final List<List<ItemStack>> inputVariants) {
+        this.inputVariants = inputVariants == null ? new ArrayList<>() : inputVariants;
+    }
+
+    @Override
+    public List<ItemStack> getInputVariants(final int slot, final ItemStack fallback) {
+        return JeiIngredientHelper.getInputVariants(this.inputVariants, slot, fallback);
+    }
 }

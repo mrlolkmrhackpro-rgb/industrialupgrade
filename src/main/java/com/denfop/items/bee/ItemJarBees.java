@@ -1,174 +1,146 @@
 package com.denfop.items.bee;
 
-import com.denfop.Constants;
 import com.denfop.IUCore;
 import com.denfop.IUItem;
-import com.denfop.Localization;
-import com.denfop.api.IModelRegister;
+import com.denfop.api.bee.Bee;
 import com.denfop.api.bee.BeeNetwork;
-import com.denfop.api.bee.IBee;
+import com.denfop.api.bee.genetics.Genome;
 import com.denfop.blocks.ISubEnum;
-import com.denfop.items.resource.ItemSubTypes;
-import com.denfop.register.Register;
-import com.denfop.utils.ModUtils;
-import net.minecraft.client.renderer.block.model.ModelBakery;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.NonNullList;
-import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.denfop.datacomponent.DataComponentsInit;
+import com.denfop.items.IProperties;
+import com.denfop.items.ItemMain;
+import com.denfop.utils.Localization;
+import com.denfop.world.WorldBaseGen;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Locale;
 
-public class ItemJarBees extends ItemSubTypes<ItemJarBees.Types> implements IModelRegister {
-
-    protected static final String NAME = "jar_bee";
-
-    public ItemJarBees() {
-        super(Types.class);
-        this.setCreativeTab(IUCore.BeesTab);
-        Register.registerItem((Item) this, IUCore.getIdentifier(NAME)).setUnlocalizedName(NAME);
-        IUCore.proxy.addIModelRegister(this);
+public class ItemJarBees<T extends Enum<T> & ISubEnum> extends ItemMain<T> implements IProperties {
+    public ItemJarBees(T element) {
+        super(new Item.Properties(), element);
+        IUCore.proxy.addProperties(this);
     }
 
-    public static IBee getBee(final ItemStack stack) {
-        final NBTTagCompound nbt = ModUtils.nbt(stack);
-        IBee bee = BeeNetwork.instance.getBee(nbt.getInteger("bee_id"));
+    public static Bee getBee(final ItemStack stack) {
+        Bee bee = BeeNetwork.instance.getBee(stack.getOrDefault(DataComponentsInit.BEE, 0));
         if (bee == null) {
             return null;
         }
         return bee.copy();
     }
 
-    @Override
-    public void onUpdate(
-            @Nonnull ItemStack itemStack,
-            @Nonnull World p_77663_2_,
-            @Nonnull Entity p_77663_3_,
-            int p_77663_4_,
-            boolean p_77663_5_
-    ) {
-        if (!(p_77663_3_ instanceof EntityPlayer)) {
-            return;
-        }
-
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void addInformation(
-            final ItemStack p_77624_1_,
-            @Nullable final World p_77624_2_,
-            final List<String> p_77624_3_,
-            final ITooltipFlag p_77624_4_
-    ) {
-        p_77624_3_.add(Localization.translate("iu.use_bee_analyzer") + Localization.translate(IUItem.bee_analyzer.getUnlocalizedName()));
-        super.addInformation(p_77624_1_, p_77624_2_, p_77624_3_, p_77624_4_);
-        p_77624_3_.add(Localization.translate("iu.bee_negative"));
-        IBee bee = getBee(p_77624_1_);
-        if (bee != null) {
-            List<IBee> unCompatibleBees = bee.getUnCompatibleBees();
-            for (IBee bee1 : unCompatibleBees) {
-                p_77624_3_.add(Localization.translate("bee_" + bee1.getName()));
-            }
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void registerModel(Item item, final int meta, final String extraName) {
-        ModelLoader.setCustomMeshDefinition(this, stack -> {
-            final NBTTagCompound nbt = ModUtils.nbt(stack);
-
-            int mode = nbt.getInteger("bee_id");
-            switch (mode) {
-                case 1:
-                    return new ModelResourceLocation(
-                            Constants.MOD_ID + ":" + NAME + "/" + "winter_bee",
-                            null
-                    );
-                case 2:
-                    return new ModelResourceLocation(
-                            Constants.MOD_ID + ":" + NAME + "/" + "forest_bee",
-                            null
-                    );
-                case 3:
-                    return new ModelResourceLocation(
-                            Constants.MOD_ID + ":" + NAME + "/" + "tropical_bee",
-                            null
-                    );
-                case 4:
-                    return new ModelResourceLocation(
-                            Constants.MOD_ID + ":" + NAME + "/" + "plains_bee",
-                            null
-                    );
-                case 5:
-                    return new ModelResourceLocation(
-                            Constants.MOD_ID + ":" + NAME + "/" + "swamp_bee",
-                            null
-                    );
-            }
-            return new ModelResourceLocation(
-                    Constants.MOD_ID + ":" + NAME + "/" + "forest_bee",
-                    null
-            );
-        });
-        String[] mode = {"winter_bee", "forest_bee", "tropical_bee", "plains_bee", "swamp_bee"};
-        for (final String s : mode) {
-            ModelBakery.registerItemVariants(this, new ModelResourceLocation(
-                    Constants.MOD_ID + ":" + NAME + "/" + s,
-                    null
-            ));
-        }
-
-    }
-
     public ItemStack getStackFromId(int id) {
         ItemStack stack = new ItemStack(this);
-        final NBTTagCompound nbt = ModUtils.nbt(stack);
-        nbt.setInteger("bee_id", id);
+        stack.set(DataComponentsInit.BEE, id);
         return stack;
     }
 
     @Override
-    public String getItemStackDisplayName(final ItemStack stack) {
-        final NBTTagCompound nbt = ModUtils.nbt(stack);
-        final IBee crop = BeeNetwork.instance.getBee(nbt.getInteger("bee_id"));
-        if (nbt.hasKey("bee_id")) {
-            return super.getItemStackDisplayName(stack) + ": " + Localization.translate("bee_" + crop.getName());
-        } else {
-            return super.getItemStackDisplayName(stack);
-        }
-    }
-
-
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-        if (this.isInCreativeTab(tab)) {
+    public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> items) {
+        if (allowedIn(tab)) {
             BeeNetwork.instance.getBeeMap().forEach((id, crop) -> {
                 ItemStack stack = new ItemStack(this);
-                final NBTTagCompound nbt = ModUtils.nbt(stack);
-                nbt.setInteger("bee_id", id);
-                subItems.add(stack);
+                stack.set(DataComponentsInit.BEE, id);
+                items.add(stack);
             });
         }
     }
 
+    @Override
+    public CreativeModeTab getItemCategory() {
+        return IUCore.BeesTab;
+    }
+
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void appendHoverText(
+            ItemStack stack,
+            @Nullable TooltipContext world,
+            List<Component> tooltip,
+            TooltipFlag flag
+    ) {
+        tooltip.add(Component.translatable("iu.use_bee_analyzer").append(Component.translatable(IUItem.bee_analyzer.getItem().getDescriptionId())));
+        Bee bee = getBee(stack);
+
+
+        if (bee != null) {
+            tooltip.add(Component.literal(Localization.translate("iu.bee_analyzer.main_crop") + " " + Localization.translate("crop." + bee
+                    .getCropFlower()
+                    .getName())));
+            tooltip.add(Component.translatable("iu.bee_negative"));
+            List<Bee> unCompatibleBees = bee.getUnCompatibleBees();
+            for (Bee bee1 : unCompatibleBees) {
+                tooltip.add(Component.translatable("bee_" + bee1.getName()));
+            }
+        }
+        if (stack.has(DataComponentsInit.SWARM)) {
+            int swarm = stack.get(DataComponentsInit.SWARM);
+            tooltip.add(Component.literal(Localization.translate("iu.bee.swarm.info") + String.valueOf(swarm)));
+        }
+        Genome genome = new Genome(stack);
+        if (!genome.getGeneticTraitsMap().isEmpty()) {
+            tooltip.add(Component.literal(Localization.translate("iu.genomes.info")));
+            genome.getGeneticTraitsMap().values().forEach(value -> tooltip.add(Component.literal(Localization.translate("iu.info.bee_genome_" + value.name().toLowerCase()))));
+
+        }
+    }
+
+    @Override
+    public Component getName(ItemStack stack) {
+        if (getBee(stack) != null) {
+            Bee crop = BeeNetwork.instance.getBee(stack.getOrDefault(DataComponentsInit.BEE, 0));
+            return Component.translatable(super.getDescriptionId(stack))
+                    .append(": ")
+                    .append(Component.translatable("bee_" + crop.getName()));
+        } else {
+            return Component.translatable(super.getDescriptionId(stack));
+        }
+    }
+
+
+    @Override
+    public String[] properties() {
+        return new String[]{"mode"};
+    }
+
+
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public float getItemProperty(ItemStack itemStack, ClientLevel level, LivingEntity entity, int p174679, String property) {
+
+        return itemStack.getOrDefault(DataComponentsInit.BEE, 0);
+    }
+
+    public ItemStack getBeeStack(final int meta) {
+        ItemStack stack = getStackFromId(meta);
+        Bee bee = getBee(stack);
+        stack.set(DataComponentsInit.SWARM, WorldBaseGen.random.nextInt(bee.getMaxSwarm() / 2) + 15);
+        return stack;
+    }
+
+
     public enum Types implements ISubEnum {
-        bees,
-        ;
+        bees;
 
         private final String name;
         private final int ID;
+
+        Types(final int ID) {
+            this.name = this.name().toLowerCase(Locale.US);
+            this.ID = ID;
+        }
 
         Types() {
             this.name = this.name().toLowerCase(Locale.US);
@@ -183,9 +155,13 @@ public class ItemJarBees extends ItemSubTypes<ItemJarBees.Types> implements IMod
             return this.name;
         }
 
+        @Override
+        public String getMainPath() {
+            return "jar_bee";
+        }
+
         public int getId() {
             return this.ID;
         }
     }
-
 }

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=minipanel": {
+      "model": "industrialupgrade:block/basemachine/minipanel"
+    },
+    "facing=south,type=minipanel": {
+      "model": "industrialupgrade:block/basemachine/minipanel",
+      "y": 180
+    },
+    "facing=west,type=minipanel": {
+      "model": "industrialupgrade:block/basemachine/minipanel",
+      "y": 270
+    },
+    "facing=east,type=minipanel": {
+      "model": "industrialupgrade:block/basemachine/minipanel",
+      "y": 90
+    },
+    "facing=north,type=minipanel_active": {
+      "model": "industrialupgrade:block/basemachine/minipanel"
+    },
+    "facing=south,type=minipanel_active": {
+      "model": "industrialupgrade:block/basemachine/minipanel",
+      "y": 180
+    },
+    "facing=west,type=minipanel_active": {
+      "model": "industrialupgrade:block/basemachine/minipanel",
+      "y": 270
+    },
+    "facing=east,type=minipanel_active": {
+      "model": "industrialupgrade:block/basemachine/minipanel",
+      "y": 90
+    }
+  }
+}

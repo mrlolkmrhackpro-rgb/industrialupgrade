@@ -2,137 +2,105 @@ package com.denfop.utils;
 
 import com.denfop.IUCore;
 import com.denfop.IUItem;
-import com.denfop.Localization;
-import com.denfop.api.radiationsystem.EnumCoefficient;
+import com.denfop.api.pollution.radiation.EnumCoefficient;
 import com.denfop.api.recipe.InventoryOutput;
-import com.denfop.invslot.Inventory;
-import com.denfop.items.bags.ItemStackBags;
-import com.denfop.tiles.base.TileEntityBlock;
-import com.denfop.tiles.base.TileEntityInventory;
-import com.denfop.tiles.mechanism.quarry.QuarryItem;
+import com.denfop.blockentity.base.BlockEntityBase;
+import com.denfop.blockentity.base.BlockEntityInventory;
+import com.denfop.blockentity.mechanism.quarry.QuarryItem;
+import com.denfop.datacomponent.DataComponentsInit;
+import com.denfop.inventory.Inventory;
 import com.denfop.world.WorldBaseGen;
 import com.denfop.world.vein.ChanceOre;
 import com.denfop.world.vein.VeinType;
 import com.google.common.base.Preconditions;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.play.server.SPacketEntityTeleport;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityFurnace;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidActionResult;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.fluids.capability.IFluidTankProperties;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.wrapper.InvWrapper;
-import net.minecraftforge.items.wrapper.SidedInvWrapper;
-import net.minecraftforge.oredict.OreDictionary;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.PatchedDataComponentMap;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.SmeltingRecipe;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.common.SoundActions;
+import net.neoforged.neoforge.fluids.FluidActionResult;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.*;
+
 
 public class ModUtils {
 
-    public static final Set<String> ignoredNbtKeys = new HashSet<>(Arrays.asList("damage", "charge", "energy", "advDmg"));
-
+    public static final Set<DataComponentType<?>> ignoredNbtKeys = new HashSet<>(Arrays.asList(DataComponents.DAMAGE, DataComponentsInit.RADIATION_ENERGY.get(), DataComponentsInit.EXPERIENCE_ENERGY.get(), DataComponentsInit.SOLARIUM_ENERGY.get(), DataComponentsInit.ENERGY.get(), DataComponentsInit.QUANTUM_ENERGY.get(), DataComponentsInit.ACTIVE.get(), DataComponentsInit.MODE.get(), DataComponentsInit.BLACK_LIST.get(), DataComponentsInit.EXPERIENCE.get(), DataComponentsInit.GENOME_CROP.get(), DataComponentsInit.GENOME_BEE.get(), DataComponentsInit.SAVE.get()
+            , DataComponents.MAX_DAMAGE, DataComponents.MAX_STACK_SIZE, DataComponents.CONTAINER, DataComponents.FOOD, DataComponents.ENCHANTMENTS, DataComponents.CUSTOM_NAME, DataComponents.TOOL, DataComponents.UNBREAKABLE, DataComponents.RARITY, DataComponents.REPAIR_COST, DataComponentsInit.LEVEL.get(), DataComponentsInit.UPGRADE_ITEM.get(), DataComponentsInit.WIND_UPGRADE.get()
+            , DataComponentsInit.WATER_UPGRADE.get(), DataComponentsInit.SKIN.get(), DataComponentsInit.FLY.get(), DataComponentsInit.JETPACK.get(), DataComponentsInit.DIRECTION.get(), DataComponentsInit.CONTAINER.get(), DataComponentsInit.CONTAINER_ADDITIONAL.get(), DataComponentsInit.LIST_STRING.get(), DataComponentsInit.LIST_INTEGER.get(), DataComponentsInit.LIST_STACK.get(), DataComponentsInit.BEE_LIST.get(), DataComponentsInit.MOB.get()
+            , DataComponentsInit.NAME.get(), DataComponentsInit.WIRELESS.get(), DataComponentsInit.ORE.get(), DataComponentsInit.SWARM.get(), DataComponentsInit.DESCRIPTIONS_CONTAINER.get(), DataComponentsInit.VEIN_INFO.get(), DataComponentsInit.UPGRADE_KIT.get(), DataComponentsInit.REACTOR_DATA.get(), DataComponentsInit.REACTOR_SCHEDULE.get(), DataComponentsInit.TELEPORT.get(), DataComponents.LORE, DataComponents.RARITY, DataComponents.REPAIR_COST, DataComponents.ATTRIBUTE_MODIFIERS));
+    private static final Direction[] BY_2D_DATA = Arrays.stream(Direction.values()).filter((p_235685_) -> p_235685_.getAxis().isHorizontal()).sorted(Comparator.comparingInt(Direction::get2DDataValue)).toArray(Direction[]::new);
     public static Logger log;
-    public static EnumFacing[] facings = EnumFacing.values();
+    public static Direction[] facings = Direction.values();
     public static ItemStack emptyStack = ItemStack.EMPTY;
-    public static Set<EnumFacing> noFacings = Collections.emptySet();
-    public static Set<EnumFacing> onlyNorth;
-    public static Set<EnumFacing> horizontalFacings;
-    public static Set<EnumFacing> verticalFacings;
-    public static Set<EnumFacing> downSideFacings;
-    public static Set<EnumFacing> allFacings;
+    public static Set<Direction> noFacings = Collections.emptySet();
+    public static Set<Direction> onlyNorth;
+    public static Set<Direction> horizontalFacings;
+    public static Direction[] HORIZONTALS;
+    public static Set<Direction> verticalFacings;
+    public static Set<Direction> downSideFacings;
+    public static Set<Direction> allFacings;
 
     static {
-        onlyNorth = Collections.unmodifiableSet(EnumSet.of(EnumFacing.NORTH));
-        horizontalFacings = Collections.unmodifiableSet(EnumSet.copyOf(Arrays.asList(EnumFacing.HORIZONTALS)));
-        verticalFacings = Collections.unmodifiableSet(EnumSet.of(EnumFacing.DOWN, EnumFacing.UP));
-        downSideFacings = Collections.unmodifiableSet(EnumSet.complementOf(EnumSet.of(EnumFacing.UP)));
-        allFacings = Collections.unmodifiableSet(EnumSet.allOf(EnumFacing.class));
+
+        onlyNorth = Collections.unmodifiableSet(EnumSet.of(Direction.NORTH));
+        horizontalFacings = Collections.unmodifiableSet(EnumSet.copyOf(Arrays.asList(BY_2D_DATA)));
+        HORIZONTALS = BY_2D_DATA;
+        verticalFacings = Collections.unmodifiableSet(EnumSet.of(Direction.DOWN, Direction.UP));
+        downSideFacings = Collections.unmodifiableSet(EnumSet.complementOf(EnumSet.of(Direction.UP)));
+        allFacings = Collections.unmodifiableSet(EnumSet.allOf(Direction.class));
     }
 
-    public static EnumFacing getFacingFromTwoPositions(BlockPos fromPos, BlockPos toPos) {
-        int dx = toPos.getX() - fromPos.getX();
-        int dy = toPos.getY() - fromPos.getY();
-        int dz = toPos.getZ() - fromPos.getZ();
-        if (dx > 0) {
-            return EnumFacing.EAST;
-        } else if (dx < 0) {
-            return EnumFacing.WEST;
-        } else if (dy > 0) {
-            return EnumFacing.DOWN;
-        } else if (dy < 0) {
-            return EnumFacing.UP;
-        } else if (dz > 0) {
-            return EnumFacing.SOUTH;
-        } else if (dz < 0) {
-            return EnumFacing.NORTH;
-        }
-
-
-        return EnumFacing.DOWN;
-    }
-
-    public static boolean inChanceOre(VeinType veinType, IBlockState state) {
-        for (ChanceOre chanceOre : veinType.getOres()) {
-            if (chanceOre.getBlock() == state) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static List<String> getInformationFromOre(IBlockState state) {
-        List<String> stringList = new ArrayList<>();
-        for (VeinType vein : WorldBaseGen.veinTypes) {
-            if ((vein.getHeavyOre() != null && vein.getHeavyOre().getStateMeta(vein.getMeta()) == state) || inChanceOre(
-                    vein,
-                    state
-            )) {
-                final String s = (vein.getHeavyOre() != null ?
-                        new ItemStack(vein.getHeavyOre().getBlock(), 1, vein.getMeta()).getDisplayName() :
-                        new ItemStack(vein.getOres().get(0).getBlock().getBlock(), 1,
-                                vein.getOres().get(0).getMeta()
-                        ).getDisplayName());
-                stringList.add(s);
-            }
-        }
-        return stringList;
+    public static Vec3 getVecFromVec3i(Vec3i vec3i) {
+        return new Vec3(vec3i.getX(), vec3i.getY(), vec3i.getZ());
     }
 
     public static double getEnergyValue(ItemStack stack) {
@@ -149,70 +117,24 @@ public class ModUtils {
         if (ModUtils.isEmpty(stack)) {
             return 0;
         } else {
-            FluidStack liquid = FluidUtil.getFluidContained(stack);
-            boolean isLava = liquid != null && liquid.amount > 0 && liquid.getFluid() == FluidRegistry.LAVA;
+            FluidStack liquid = FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY);
+            boolean isLava = !liquid.isEmpty() && liquid.getAmount() > 0 && liquid.getFluid() == Fluids.LAVA;
             if (isLava && !allowLava) {
                 return 0;
             } else {
-                int ret = TileEntityFurnace.getItemBurnTime(stack);
+                Integer ret = AbstractFurnaceBlockEntity.getFuel().get(stack.getItem());
+                if (ret == null) {
+                    return 0;
+                }
+
                 return isLava ? ret / 10 : ret;
             }
         }
     }
 
-    public static boolean interactWithFluidHandler(
-            @Nonnull EntityPlayer player,
-            @Nonnull EnumHand hand,
-            @Nonnull IFluidHandler handler
-    ) {
-        Preconditions.checkNotNull(player);
-        Preconditions.checkNotNull(hand);
-        Preconditions.checkNotNull(handler);
 
-        ItemStack heldItem = player.getHeldItem(hand);
-        if (!heldItem.isEmpty()) {
-            IItemHandler playerInventory = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-            if (playerInventory != null) {
-                FluidActionResult fluidActionResult = FluidUtil.tryFillContainerAndStow(heldItem, handler, playerInventory,
-                        Integer.MAX_VALUE, player, true
-                );
-                if (!fluidActionResult.isSuccess()) {
-                    final FluidStack stack = null;
-                    final IFluidTankProperties[] tanks = handler.getTankProperties();
-                    int capacity = -1;
-                    IFluidHandlerItem containerFluidHandler =
-                            FluidUtil.getFluidHandler(ItemHandlerHelper.copyStackWithSize(heldItem, 1));
-                    for (IFluidTankProperties fluidTankProperties : tanks) {
-                        if ((fluidTankProperties.getContents() == null && fluidTankProperties.canFill() && fluidTankProperties.canFillFluidType(
-                                containerFluidHandler.drain(Integer.MAX_VALUE,
-                                        false))) || (fluidTankProperties.getContents() != null && fluidTankProperties.canFill() && fluidTankProperties.canFillFluidType(
-                                containerFluidHandler.drain(Integer.MAX_VALUE, false)))) {
-                            capacity = fluidTankProperties.getCapacity() - (fluidTankProperties.getContents() == null ? 0 :
-                                    fluidTankProperties.getContents().amount);
-
-                        }
-                    }
-                    if (capacity <= 0) {
-                        fluidActionResult = FluidActionResult.FAILURE;
-                    } else {
-                        fluidActionResult = FluidUtil.tryEmptyContainerAndStow(heldItem, handler, playerInventory,
-                                capacity, player,
-                                true
-                        );
-                    }
-                }
-
-                if (fluidActionResult.isSuccess()) {
-                    player.setHeldItem(hand, fluidActionResult.getResult());
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public static ItemStack get(EntityPlayer player, EnumHand hand) {
-        return player.getHeldItem(hand);
+    public static ItemStack get(Player player, InteractionHand hand) {
+        return player.getItemInHand(hand);
     }
 
     public static ItemStack decSize(ItemStack stack) {
@@ -227,18 +149,18 @@ public class ModUtils {
         return setSize(stack, getSize(stack) + amount);
     }
 
-    public static boolean storeInventoryItem(ItemStack stack, EntityPlayer player, boolean simulate) {
+    public static boolean storeInventoryItem(ItemStack stack, Player player, boolean simulate) {
         if (!simulate) {
-            return player.inventory.addItemStackToInventory(stack);
+            return player.getInventory().add(stack);
         } else {
             int sizeLeft = getSize(stack);
-            int maxStackSize = Math.min(player.inventory.getInventoryStackLimit(), stack.getMaxStackSize());
+            int maxStackSize = Math.min(player.getInventory().getMaxStackSize(), stack.getMaxStackSize());
 
-            for (int i = 0; i < player.inventory.mainInventory.size() && sizeLeft > 0; ++i) {
-                ItemStack invStack = player.inventory.mainInventory.get(i);
+            for (int i = 0; i < player.getInventory().items.size() && sizeLeft > 0; ++i) {
+                ItemStack invStack = player.getInventory().items.get(i);
                 if (isEmpty(invStack)) {
                     sizeLeft -= maxStackSize;
-                } else if (checkItemEqualityStrict(stack, invStack) && getSize(invStack) < maxStackSize) {
+                } else if (checkNbtEquality(stack.getComponents(), invStack.getComponents()) && getSize(invStack) < maxStackSize) {
                     sizeLeft -= maxStackSize - getSize(invStack);
                 }
             }
@@ -247,47 +169,33 @@ public class ModUtils {
         }
     }
 
+    public static void dropAsEntity(Level world, BlockPos pos, ItemStack stack, int count) {
+        stack = stack.copy();
+        stack.setCount(count);
+        dropAsEntity(world, pos, stack);
+    }
 
-    public static void dropAsEntity(World world, BlockPos pos, ItemStack stack) {
+    public static void dropAsEntity(Level world, BlockPos pos, ItemStack stack) {
         if (!isEmpty(stack)) {
             double f = 0.7;
-            double dx = (double) world.rand.nextFloat() * f + (1.0 - f) * 0.5;
-            double dy = (double) world.rand.nextFloat() * f + (1.0 - f) * 0.5;
-            double dz = (double) world.rand.nextFloat() * f + (1.0 - f) * 0.5;
-            EntityItem entityItem = new EntityItem(
+            double dx = (double) world.random.nextFloat() * f + (1.0 - f) * 0.5;
+            double dy = (double) world.random.nextFloat() * f + (1.0 - f) * 0.5;
+            double dz = (double) world.random.nextFloat() * f + (1.0 - f) * 0.5;
+            ItemEntity entityItem = new ItemEntity(
                     world,
                     (double) pos.getX() + dx,
                     (double) pos.getY() + dy,
                     (double) pos.getZ() + dz,
                     stack.copy()
             );
-            entityItem.setDefaultPickupDelay();
-            world.spawnEntity(entityItem);
+            entityItem.setDefaultPickUpDelay();
+            world.addFreshEntity(entityItem);
         }
     }
 
-    public static void dropAsEntity(World world, BlockPos pos, ItemStack stack, int count) {
-        if (!isEmpty(stack)) {
-            double f = 0.7;
-            double dx = (double) world.rand.nextFloat() * f + (1.0 - f) * 0.5;
-            double dy = (double) world.rand.nextFloat() * f + (1.0 - f) * 0.5;
-            double dz = (double) world.rand.nextFloat() * f + (1.0 - f) * 0.5;
-            final ItemStack stack1 = stack.copy();
-            stack1.setCount(count);
-            EntityItem entityItem = new EntityItem(
-                    world,
-                    (double) pos.getX() + dx,
-                    (double) pos.getY() + dy,
-                    (double) pos.getZ() + dz,
-                    stack1
-            );
-            entityItem.setDefaultPickupDelay();
-            world.spawnEntity(entityItem);
-        }
-    }
 
     public static boolean checkItemEquality(ItemStack a, ItemStack b) {
-        return isEmpty(a) && isEmpty(b) || !isEmpty(a) && !isEmpty(b) && a.getItem() == b.getItem() && (!a.getHasSubtypes() || a.getMetadata() == b.getMetadata()) && checkNbtEquality(
+        return isEmpty(a) && isEmpty(b) || !isEmpty(a) && !isEmpty(b) && a.getItem() == b.getItem() && checkNbtEquality(
                 a,
                 b
         );
@@ -298,26 +206,52 @@ public class ModUtils {
     }
 
     public static boolean checkItemEqualityStrict(ItemStack a, ItemStack b) {
-        return isEmpty(a) && isEmpty(b) || !isEmpty(a) && !isEmpty(b) && a.isItemEqual(b) && checkNbtEqualityStrict(a, b);
+        return isEmpty(a) && isEmpty(b) || !isEmpty(a) && !isEmpty(b) && a.is(b.getItem()) && checkNbtEquality(a.getComponents(), b.getComponents());
     }
 
     private static boolean checkNbtEquality(ItemStack a, ItemStack b) {
-        return checkNbtEquality(a.getTagCompound(), b.getTagCompound());
+        return areAllDataComponentsEqual(a, b);
     }
 
-    public static boolean checkNbtEquality(NBTTagCompound a, NBTTagCompound b) {
+    public static boolean areAllDataComponentsEqual(ItemStack stack1, ItemStack stack2) {
+        if (stack1.isEmpty() && stack2.isEmpty()) return true;
+        if (stack1.isEmpty() || stack2.isEmpty()) return false;
+
+        for (DataComponentType<?> type : stack1.getComponents().keySet()) {
+            if (ignoredNbtKeys.contains(type))
+                continue;
+            boolean has1 = stack1.has(type);
+            boolean has2 = stack2.has(type);
+            if (!has1) {
+                continue;
+            }
+            if (!has2)
+                return false;
+
+            if (has1) {
+                Object comp1 = stack1.get(type);
+                Object comp2 = stack2.get(type);
+
+                if (!comp1.equals(comp2)) return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static boolean checkNbtEquality(DataComponentMap a, DataComponentMap b) {
         if (a == b) {
             return true;
         } else {
-            Set<String> keysA = a != null ? a.getKeySet() : Collections.emptySet();
-            Set<String> keysB = b != null ? b.getKeySet() : Collections.emptySet();
+            Set<DataComponentType<?>> keysA = a != null ? a.keySet() : Collections.emptySet();
+            Set<DataComponentType<?>> keysB = b != null ? b.keySet() : Collections.emptySet();
             if (keysA.isEmpty() && keysB.isEmpty()) {
                 return true;
             }
-            Set<String> toCheck = new HashSet(Math.max(keysA.size(), keysB.size()));
-            Iterator<String> var5 = keysA.iterator();
+            Set<DataComponentType<?>> toCheck = new HashSet<>(Math.max(keysA.size(), keysB.size()));
+            Iterator<DataComponentType<?>> var5 = keysA.iterator();
 
-            String key;
+            DataComponentType<?> key;
             while (var5.hasNext()) {
                 key = var5.next();
                 if (!ignoredNbtKeys.contains(key)) {
@@ -350,41 +284,27 @@ public class ModUtils {
                 }
 
                 key = var5.next();
-            } while (a.getTag(key).equals(b.getTag(key)));
+            } while (Objects.equals(Objects.requireNonNull(a).get(key), Objects.requireNonNull(b).get(key)));
 
             return false;
         }
     }
 
-    public static boolean checkNbtEqualityStrict(ItemStack a, ItemStack b) {
-        NBTTagCompound nbtA = a.getTagCompound();
-        NBTTagCompound nbtB = b.getTagCompound();
-        if (nbtA == nbtB) {
-            return true;
-        } else {
-            return nbtA != null && nbtA.equals(nbtB);
-        }
-    }
 
     public static boolean isEmpty(ItemStack stack) {
-        return stack == emptyStack || stack == null || stack.getItem() == null || stack.getCount() <= 0;
+        if (stack == emptyStack || stack == null) return true;
+
+        return stack.getCount() <= 0;
     }
 
-    public static boolean isEmpty(EntityPlayer player, EnumHand hand) {
-        return isEmpty(player.getHeldItem(hand));
+    public static boolean isEmpty(Player player, InteractionHand hand) {
+        return isEmpty(player.getItemInHand(hand));
     }
 
     public static int getSize(ItemStack stack) {
         return isEmpty(stack) ? 0 : stack.getCount();
     }
 
-    public static void setRawMeta(ItemStack stack, int meta) {
-        if (meta < 0) {
-            throw new IllegalArgumentException("negative meta");
-        } else {
-            Items.DYE.setDamage(stack, meta);
-        }
-    }
 
     public static List<ItemStack> get_blacklist_block() {
         List<ItemStack> list = new ArrayList<>();
@@ -392,14 +312,14 @@ public class ModUtils {
         list.add(new ItemStack(Blocks.DIRT));
         list.add(new ItemStack(Blocks.NETHERRACK));
         list.add(new ItemStack(Blocks.END_STONE));
-        list.add(new ItemStack(Blocks.STONE, 1, 1));
-        list.add(new ItemStack(Blocks.STONE, 1, 2));
-        list.add(new ItemStack(Blocks.STONE, 1, 3));
-        list.add(new ItemStack(Blocks.STONE, 1, 4));
-        list.add(new ItemStack(Blocks.STONE, 1, 5));
-        list.add(new ItemStack(Blocks.STONE, 1, 6));
-        list.add(new ItemStack(Blocks.DIRT, 1, 1));
-        list.add(new ItemStack(Blocks.DIRT, 1, 2));
+        list.add(new ItemStack(Blocks.ANDESITE));
+        list.add(new ItemStack(Blocks.GRANITE));
+        list.add(new ItemStack(Blocks.COBBLESTONE));
+        list.add(new ItemStack(Blocks.POLISHED_GRANITE));
+        list.add(new ItemStack(Blocks.POLISHED_DIORITE));
+        list.add(new ItemStack(Blocks.POLISHED_ANDESITE));
+        list.add(new ItemStack(Blocks.COARSE_DIRT));
+        list.add(new ItemStack(Blocks.PODZOL));
         return list;
     }
 
@@ -407,34 +327,38 @@ public class ModUtils {
         log.info(message);
     }
 
-    public static ItemStack getCellFromFluid(String name) {
-        final ItemStack stack = new ItemStack(IUItem.fluidCell, 1, 0);
-        final IFluidHandlerItem fluidDestination = FluidUtil.getFluidHandler(
-                stack);
-        Fluid liquid = FluidRegistry.getFluid(name);
-        final FluidStack drainable = new FluidStack(liquid, 1000);
-        fluidDestination.fill(drainable, true);
-        return stack;
+
+    public static CompoundTag nbt() {
+        return new CompoundTag();
     }
 
-    public static ItemStack getCellFromFluid(Fluid liquid) {
-        final ItemStack stack = new ItemStack(IUItem.fluidCell, 1, 0);
-        final IFluidHandlerItem fluidDestination = FluidUtil.getFluidHandler(
-                stack);
-        final FluidStack drainable = new FluidStack(liquid, 1000);
-        fluidDestination.fill(drainable, true);
-        return stack;
+    public static CompoundTag nbt(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return new CompoundTag();
+        }
+        CompoundTag NBTTagCompound = stack.get(DataComponentsInit.DATA);
+        if (NBTTagCompound == null) {
+            NBTTagCompound = new CompoundTag();
+        }
+        stack.set(DataComponentsInit.DATA, NBTTagCompound.copy());
+        return stack.get(DataComponentsInit.DATA);
+    }
+
+    public static CompoundTag nbtOrNull(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return null;
+        }
+        return stack.get(DataComponentsInit.DATA);
     }
 
     public static List<ItemStack> getListFromModule(ItemStack stack) {
         List<ItemStack> stacks = new ArrayList<>();
         if (!stack.isEmpty()) {
-            final NBTTagCompound nbt = ModUtils.nbt(stack);
-            int size = nbt.getInteger("size");
-            for (int j = 0; j < size; j++) {
-                String l = "number_" + j;
-                String temp = ModUtils.NBTGetString(stack, l);
-                stacks.addAll(OreDictionary.getOres(temp));
+            List<String> stringList = stack.getOrDefault(DataComponentsInit.LIST_STRING, Collections.emptyList());
+            for (String temp : stringList) {
+                TagKey<Item> tag = TagKey.create(Registries.ITEM, ResourceLocation.parse(temp));
+                List<ItemStack> list = new Ingredient.TagValue(tag).getItems().stream().toList();
+                stacks.addAll(list);
 
             }
         }
@@ -444,22 +368,19 @@ public class ModUtils {
     public static List<QuarryItem> getQuarryListFromModule(ItemStack stack) {
         List<QuarryItem> stacks = new ArrayList<>();
         if (!stack.isEmpty()) {
-            final NBTTagCompound nbt = ModUtils.nbt(stack);
-            int size = nbt.getInteger("size");
-            for (int j = 0; j < size; j++) {
-                String l = "number_" + j;
-                String temp = ModUtils.NBTGetString(stack, l);
-                stacks.add(new QuarryItem(OreDictionary.getOres(temp).get(0), temp));
+            List<String> stringList = stack.getOrDefault(DataComponentsInit.LIST_STRING, Collections.emptyList());
+            for (String s : stringList) {
+                stacks.add(new QuarryItem(s));
 
             }
         }
         return stacks;
     }
 
-    public static boolean getore(Block localBlock, int meta) {
-        ItemStack stack = new ItemStack(localBlock, 1, meta);
+    public static boolean getOre(Block localBlock) {
+        ItemStack stack = new ItemStack(localBlock, 1);
         for (ItemStack itemstack : get_blacklist_block()) {
-            if (stack.isItemEqual(itemstack)) {
+            if (stack.is(itemstack.getItem())) {
                 return false;
             }
         }
@@ -477,7 +398,7 @@ public class ModUtils {
 
     public static boolean getore(ItemStack localBlock) {
         for (ItemStack itemstack : get_blacklist_block()) {
-            if (localBlock.isItemEqual(itemstack)) {
+            if (localBlock.is(itemstack.getItem())) {
                 return false;
             }
         }
@@ -487,7 +408,7 @@ public class ModUtils {
     public static boolean getore(Block stack, Block localBlock) {
         ItemStack stack1 = new ItemStack(localBlock);
         for (ItemStack itemstack : get_blacklist_block()) {
-            if (stack1.isItemEqual(itemstack)) {
+            if (stack1.is(itemstack.getItem())) {
                 return false;
             }
         }
@@ -495,17 +416,14 @@ public class ModUtils {
             return false;
         }
 
-        if (localBlock == Blocks.LIT_REDSTONE_ORE) {
-            return true;
-        }
 
         for (ItemStack itemstack : IUCore.get_ore) {
-            if (stack == Block.getBlockFromItem(itemstack.getItem())) {
+            BlockItem blockItem = (BlockItem) itemstack.getItem();
+            if (stack == blockItem.getBlock()) {
                 return true;
             }
         }
-        return false;
-
+        return localBlock == Blocks.REDSTONE_ORE;
     }
 
     public static List<Double> Time(double time) {
@@ -534,17 +452,6 @@ public class ModUtils {
         return list;
     }
 
-    public static void NBTSetString(ItemStack stack, String name, String string) {
-        if (string == null) {
-            return;
-        }
-        NBTTagCompound NBTTagCompound = stack.getTagCompound();
-        if (NBTTagCompound == null) {
-            NBTTagCompound = new NBTTagCompound();
-        }
-        NBTTagCompound.setString(name, string);
-        stack.setTagCompound(NBTTagCompound);
-    }
 
     public static int getsum1(List<Integer> sum) {
         int sum_sum = 0;
@@ -554,11 +461,11 @@ public class ModUtils {
         return sum_sum;
     }
 
-    public static void SetDoubleWithoutItem(NBTTagCompound NBTTagCompound, String name, double amount) {
+    public static void SetDoubleWithoutItem(CompoundTag NBTTagCompound, String name, double amount) {
         if (NBTTagCompound == null) {
-            NBTTagCompound = new NBTTagCompound();
+            NBTTagCompound = new CompoundTag();
         }
-        NBTTagCompound.setDouble(name, amount);
+        NBTTagCompound.putDouble(name, amount);
 
     }
 
@@ -571,51 +478,38 @@ public class ModUtils {
 
     }
 
-    public static void mode(ItemStack stack, List<String> list) {
-        NBTTagCompound nbt = nbt(stack);
-        list.add(mode(nbt));
+    public static void mode(ItemStack stack, List<Component> list) {
+        list.add(Component.literal(mode(stack)));
     }
 
-    public static String mode(NBTTagCompound nbt) {
-        String mode = nbt.getString("mode");
+    public static String mode(ItemStack stack) {
+        String mode = stack.getOrDefault(DataComponentsInit.SKIN, "");
         if (mode.isEmpty()) {
             return Localization.translate("defaultskin");
         }
-        switch (mode) {
-            case "Zelen":
-                return Localization.translate("camouflageskin");
-            case "Demon":
-                return Localization.translate("demonskin");
-            case "Dark":
-                return Localization.translate("Darkskin");
-            case "Cold":
-                return Localization.translate("Coldskin");
-            case "Ender":
-                return Localization.translate("Enderskin");
-            case "Ukraine":
-                return Localization.translate("Ukraineskin");
-            case "Fire":
-                return Localization.translate("Fireskin");
-            case "Emerald":
-                return Localization.translate("Emeraldskin");
-            case "Taiga":
-                return Localization.translate("Taigaskin");
-            case "Desert":
-                return Localization.translate("Desertskin");
-            case "Snow":
-                return Localization.translate("Snowskin");
-        }
-        return Localization.translate("defaultskin");
+        return switch (mode) {
+            case "Zelen" -> Localization.translate("camouflageskin");
+            case "Demon" -> Localization.translate("demonskin");
+            case "Dark" -> Localization.translate("Darkskin");
+            case "Cold" -> Localization.translate("Coldskin");
+            case "Ender" -> Localization.translate("Enderskin");
+            case "Ukraine" -> Localization.translate("Ukraineskin");
+            case "Fire" -> Localization.translate("Fireskin");
+            case "Emerald" -> Localization.translate("Emeraldskin");
+            case "Taiga" -> Localization.translate("Taigaskin");
+            case "Desert" -> Localization.translate("Desertskin");
+            case "Snow" -> Localization.translate("Snowskin");
+            default -> Localization.translate("defaultskin");
+        };
     }
 
-    public static ItemStack mode(NBTTagCompound nbt, ItemStack stack) {
+    public static ItemStack mode(CompoundTag nbt, ItemStack stack) {
         String mode = nbt.getString("mode");
         ItemStack stack1 = stack.copy();
         if (mode.isEmpty()) {
             return stack1;
         }
-        nbt = nbt(stack1);
-        nbt.setString("mode", mode);
+        stack1.set(DataComponentsInit.SKIN, mode);
         return stack1;
     }
 
@@ -820,28 +714,6 @@ public class ModUtils {
 
     }
 
-    public static NBTTagCompound nbt() {
-        return new NBTTagCompound();
-    }
-
-    public static NBTTagCompound nbt(ItemStack stack) {
-        if (stack.isEmpty()) {
-            return new NBTTagCompound();
-        }
-        NBTTagCompound NBTTagCompound = stack.getTagCompound();
-        if (NBTTagCompound == null) {
-            NBTTagCompound = new NBTTagCompound();
-        }
-        stack.setTagCompound(NBTTagCompound);
-        return NBTTagCompound;
-    }
-
-    public static NBTTagCompound nbtOrNull(ItemStack stack) {
-        if (stack.isEmpty()) {
-            return null;
-        }
-        return stack.getTagCompound();
-    }
 
     public static int slot(List<Integer> list) {
         int meta = 0;
@@ -855,42 +727,6 @@ public class ModUtils {
         return meta;
     }
 
-    public static String NBTGetString(ItemStack stack, String name) {
-        if (name == null) {
-            return "";
-        }
-        if (stack == null) {
-            return "";
-        }
-        NBTTagCompound NBTTagCompound = nbt(stack);
-
-        return NBTTagCompound.getString(name);
-
-    }
-
-    public static int NBTGetInteger(ItemStack stack, String name) {
-        if (name == null) {
-            return 0;
-        }
-        NBTTagCompound NBTTagCompound = stack.getTagCompound();
-        if (NBTTagCompound == null) {
-            return 0;
-        }
-
-        return NBTTagCompound.getInteger(name);
-    }
-
-    public static void NBTSetInteger(ItemStack stack, String name, int string) {
-        if (name == null) {
-            return;
-        }
-        NBTTagCompound NBTTagCompound = stack.getTagCompound();
-        if (NBTTagCompound == null) {
-            NBTTagCompound = new NBTTagCompound();
-        }
-        NBTTagCompound.setInteger(name, string);
-        stack.setTagCompound(NBTTagCompound);
-    }
 
     public static int convertRGBcolorToInt(int r, int g, int b) {
         float divColor = 255.0F;
@@ -898,99 +734,36 @@ public class ModUtils {
         return tmpColor.getRGB();
     }
 
-    public static IItemHandler getItemHandler(@Nullable TileEntity tile, EnumFacing side) {
+    public static int convertRGBAcolorToInt(int r, int g, int b) {
+        return ((250 & 0xFF) << 24) |
+                ((r & 0xFF) << 16) |
+                ((g & 0xFF) << 8) |
+                (b & 0xFF);
+    }
+
+    public static IItemHandler getItemHandler(@Nullable BlockEntity tile, Direction side) {
         if (tile == null) {
             return null;
         }
 
-        IItemHandler handler = tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side) ? tile.getCapability(
-                CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
-                side
-        ) : null;
-
+        @org.jetbrains.annotations.Nullable IItemHandler handler = tile.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, tile.getBlockPos(), side);
         if (handler == null) {
-            if (side != null && tile instanceof ISidedInventory) {
-                handler = new SidedInvWrapper((ISidedInventory) tile, side);
-            } else if (tile instanceof IInventory) {
-                handler = new InvWrapper((IInventory) tile);
+            if (side != null && tile instanceof WorldlyContainer) {
+                handler = new SidedInvWrapper((WorldlyContainer) tile, side);
+            } else if (tile instanceof Container) {
+                handler = new InvWrapper((Container) tile);
             }
         }
 
         return handler;
     }
 
-    public static void tick(InventoryOutput slot, TileEntityBlock tile) {
+    /*  TODO: решить
+      public static void tick(InvSlotOutput slot, TileEntityBlock tile) {
 
-        for (EnumFacing facing1 : facings) {
-            BlockPos pos = tile.getPos().offset(facing1);
-            final TileEntity tile1 = tile.getWorld().getTileEntity(pos);
-            if (tile1 instanceof TileEntityInventory) {
-                TileEntityInventory inventory = (TileEntityInventory) tile1;
-                for (Inventory invSlot : inventory.getInputSlots()) {
-                    if (invSlot.acceptAllOrIndex()) {
-                        cycle2:
-                        for (int j = 0; j < slot.size(); j++) {
-                            ItemStack output = slot.get(j);
-                            if (output.isEmpty()) {
-                                continue;
-                            }
-                            if (invSlot.isItemValidForSlot(0, output)) {
-                                for (int jj = 0; jj < invSlot.size(); jj++) {
-                                    if (output.isEmpty()) {
-                                        continue cycle2;
-                                    }
-                                    ItemStack input = invSlot.get(jj);
-                                    if (input.isEmpty()) {
-                                        if (invSlot.add(output)) {
-                                            slot.put(j, ItemStack.EMPTY);
-                                            output = ItemStack.EMPTY;
-                                        }
-                                    } else {
-                                        if (!ModUtils.checkItemEquality(input, output)) {
-                                            continue;
-                                        }
-                                        int maxCount = Math.min(input.getMaxStackSize() - input.getCount(), output.getCount());
-                                        if (maxCount > 0) {
-                                            input.grow(maxCount);
-                                            output.shrink(maxCount);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        cycle3:
-                        for (int jj = 0; jj < slot.size(); jj++) {
-
-                            for (int j = 0; j < invSlot.size(); j++) {
-                                ItemStack output = slot.get(jj);
-                                if (output.isEmpty()) {
-                                    continue cycle3;
-                                }
-                                ItemStack input = invSlot.get(j);
-
-                                if (input.isEmpty()) {
-                                    if (invSlot.isItemValidForSlot(j, output)) {
-                                        if (invSlot.add(output)) {
-                                            slot.put(jj, ItemStack.EMPTY);
-                                            output = ItemStack.EMPTY;
-                                        }
-                                    }
-                                } else {
-                                    if (!ModUtils.checkItemEquality(input, output)) {
-                                        continue;
-                                    }
-                                    int maxCount = Math.min(input.getMaxStackSize() - input.getCount(), output.getCount());
-                                    if (maxCount > 0) {
-                                        input.grow(maxCount);
-                                        output.shrink(maxCount);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
+            for (EnumFacing facing1 : facings) {
+                BlockPos pos = tile.getPos().offset(facing1);
+                final TileEntity tile1 = tile.getWorld().getTileEntity(pos);
                 final IItemHandler handler = getItemHandler(tile1, facing1.getOpposite());
                 if (handler == null) {
                     continue;
@@ -1007,7 +780,7 @@ public class ModUtils {
                         took = took.copy();
                         stack1 = insertItem(handler, took, true, slots);
                         if (stack1.isEmpty()) {
-                            slot.put(j, ItemStack.EMPTY);
+                            slot.set(j, ItemStack.EMPTY);
                             insertItem(handler, took, false, slots);
                         } else if (stack1 != took) {
                             slot.get(j).shrink(stack1.getCount());
@@ -1016,7 +789,7 @@ public class ModUtils {
                     } else {
                         stack1 = insertItem1(handler, took, true, slots);
                         if (stack1.isEmpty()) {
-                            slot.put(j, ItemStack.EMPTY);
+                            slot.set(j, ItemStack.EMPTY);
                             insertItem1(handler, took, false, slots);
                         } else if (stack1 != took) {
                             slot.get(j).shrink(stack1.getCount());
@@ -1026,154 +799,153 @@ public class ModUtils {
 
                 }
             }
+
         }
 
-    }
+        public static void tick(ItemStack[] slot, IItemHandler tile, ItemStackBags handHeldBags) {
+            if (tile == null) {
+                return;
+            }
+            final int slots = tile.getSlots();
+            for (int i = 0; i < slot.length; i++) {
+                ItemStack took = slot[i];
+                if (took.isEmpty()) {
+                    continue;
+                }
 
-    public static void tick(ItemStack[] slot, IItemHandler tile, ItemStackBags handHeldBags) {
-        if (tile == null) {
-            return;
-        }
-        final int slots = tile.getSlots();
-        for (int i = 0; i < slot.length; i++) {
-            ItemStack took = slot[i];
-            if (took.isEmpty()) {
-                continue;
+                if (!(tile instanceof ISidedInventory)) {
+                    took = took.copy();
+                    final ItemStack stack = insertItem(tile, took, true, slots);
+                    if (stack.isEmpty()) {
+                        handHeldBags.set(i, ItemStack.EMPTY);
+                        insertItem(tile, took, false, slots);
+                    } else if (stack != took) {
+                        handHeldBags.get(i).shrink(stack.getCount());
+                        insertItem1(tile, stack, false, slots);
+                    }
+                } else {
+                    final ItemStack stack = insertItem1(tile, took, true, slots);
+                    if (stack.isEmpty()) {
+                        handHeldBags.set(i, ItemStack.EMPTY);
+                        insertItem1(tile, took, false, slots);
+
+                    } else if (stack != took) {
+                        handHeldBags.get(i).shrink(stack.getCount());
+                        insertItem1(tile, stack, false, slots);
+                    }
+                }
+
+
             }
 
-            if (!(tile instanceof ISidedInventory)) {
-                took = took.copy();
-                final ItemStack stack = insertItem(tile, took, true, slots);
-                if (stack.isEmpty()) {
-                    handHeldBags.put(i, ItemStack.EMPTY);
-                    insertItem(tile, took, false, slots);
-                } else if (stack != took) {
-                    handHeldBags.get(i).shrink(stack.getCount());
-                    insertItem1(tile, stack, false, slots);
-                }
-            } else {
-                final ItemStack stack = insertItem1(tile, took, true, slots);
-                if (stack.isEmpty()) {
-                    handHeldBags.put(i, ItemStack.EMPTY);
-                    insertItem1(tile, took, false, slots);
+        }
 
-                } else if (stack != took) {
-                    handHeldBags.get(i).shrink(stack.getCount());
-                    insertItem1(tile, stack, false, slots);
+        @Nonnull
+        public static ItemStack insertItem1(IItemHandler dest, @Nonnull ItemStack stack, boolean simulate, int slot) {
+            if (dest == null || stack.isEmpty()) {
+                return stack;
+            }
+            slot = Math.min(slot, dest.getSlots());
+            for (int i = 0; i < slot; i++) {
+                final ItemStack stack2 = insertItem2(dest, i, stack, simulate);
+                if (stack.isEmpty()) {
+                    return ItemStack.EMPTY;
+                } else if (stack2 != stack) {
+                    return stack2;
                 }
             }
 
-
-        }
-
-    }
-
-    @Nonnull
-    public static ItemStack insertItem1(IItemHandler dest, @Nonnull ItemStack stack, boolean simulate, int slot) {
-        if (dest == null || stack.isEmpty()) {
             return stack;
         }
-        slot = Math.min(slot, dest.getSlots());
-        for (int i = 0; i < slot; i++) {
-            final ItemStack stack2 = insertItem2(dest, i, stack, simulate);
+
+        public static boolean canItemStacksStack(@Nonnull ItemStack a, @Nonnull ItemStack b) {
+            if (a.isEmpty() || !a.isItemEqual(b) || a.hasTagCompound() != b.hasTagCompound()) {
+                return false;
+            }
+
+            return (!a.hasTagCompound() || a.getTagCompound().equals(b.getTagCompound()));
+        }
+
+        @Nonnull
+        public static ItemStack insertItem2(IItemHandler dest, int slot, @Nonnull ItemStack stack, boolean simulate) {
             if (stack.isEmpty()) {
                 return ItemStack.EMPTY;
-            } else if (stack2 != stack) {
-                return stack2;
             }
-        }
+            ItemStack stackInSlot = dest.getStackInSlot(slot);
 
-        return stack;
-    }
-
-    public static boolean canItemStacksStack(@Nonnull ItemStack a, @Nonnull ItemStack b) {
-        if (a.isEmpty() || !a.isItemEqual(b) || a.hasTagCompound() != b.hasTagCompound()) {
-            return false;
-        }
-
-        return (!a.hasTagCompound() || a.getTagCompound().equals(b.getTagCompound()));
-    }
-
-    @Nonnull
-    public static ItemStack insertItem2(IItemHandler dest, int slot, @Nonnull ItemStack stack, boolean simulate) {
-        if (stack.isEmpty()) {
-            return ItemStack.EMPTY;
-        }
-        ItemStack stackInSlot = dest.getStackInSlot(slot);
-
-        int m;
-        if (!stackInSlot.isEmpty()) {
-            int max = stackInSlot.getMaxStackSize();
-            int limit = dest.getSlotLimit(slot);
-            if (stackInSlot.getCount() >= Math.min(max, limit)) {
-                return stack;
-            }
-
-            if (!canItemStacksStack(stack, stackInSlot)) {
-                return stack;
-            }
-
-
-            m = Math.min(max, limit) - stackInSlot.getCount();
-
-            if (stack.getCount() <= m) {
-                if (!simulate) {
-                    ItemStack copy = stack.copy();
-                    copy.grow(stackInSlot.getCount());
-                    ((SidedInvWrapper) dest).setStackInSlot(slot, copy);
-                    return ItemStack.EMPTY;
+            int m;
+            if (!stackInSlot.isEmpty()) {
+                int max = stackInSlot.getMaxStackSize();
+                int limit = dest.getSlotLimit(slot);
+                if (stackInSlot.getCount() >= Math.min(max, limit)) {
+                    return stack;
                 }
 
-            } else {
-                // copy the stack to not modify the original one
-                stack = stack.copy();
-                if (!simulate) {
-                    ItemStack copy = stack.splitStack(m);
-                    copy.grow(stackInSlot.getCount());
-                    ((SidedInvWrapper) dest).setStackInSlot(slot, copy);
-                    return ItemStack.EMPTY;
+                if (!canItemStacksStack(stack, stackInSlot)) {
+                    return stack;
                 }
-            }
-            return stack;
-        } else {
 
 
-            m = Math.min(stack.getMaxStackSize(), dest.getSlotLimit(slot));
-            if (m < stack.getCount()) {
-                // copy the stack to not modify the original one
-                stack = stack.copy();
-                if (!simulate) {
-                    ((SidedInvWrapper) dest).setStackInSlot(slot, stack.splitStack(m));
+                m = Math.min(max, limit) - stackInSlot.getCount();
+
+                if (stack.getCount() <= m) {
+                    if (!simulate) {
+                        ItemStack copy = stack.copy();
+                        copy.grow(stackInSlot.getCount());
+                        ((SidedInvWrapper) dest).setStackInSlot(slot, copy);
+                        return ItemStack.EMPTY;
+                    }
+
+                } else {
+                    // copy the stack to not modify the original one
+                    stack = stack.copy();
+                    if (!simulate) {
+                        ItemStack copy = stack.splitStack(m);
+                        copy.grow(stackInSlot.getCount());
+                        ((SidedInvWrapper) dest).setStackInSlot(slot, copy);
+                        return ItemStack.EMPTY;
+                    }
                 }
                 return stack;
             } else {
-                if (!simulate) {
-                    ((SidedInvWrapper) dest).setStackInSlot(slot, stack);
+
+
+                m = Math.min(stack.getMaxStackSize(), dest.getSlotLimit(slot));
+                if (m < stack.getCount()) {
+                    // copy the stack to not modify the original one
+                    stack = stack.copy();
+                    if (!simulate) {
+                        ((SidedInvWrapper) dest).setStackInSlot(slot, stack.splitStack(m));
+                    }
+                    return stack;
+                } else {
+                    if (!simulate) {
+                        ((SidedInvWrapper) dest).setStackInSlot(slot, stack);
+                    }
+                    return ItemStack.EMPTY;
                 }
-                return ItemStack.EMPTY;
             }
+
         }
 
-    }
+        @Nonnull
+        public static ItemStack insertItem(IItemHandler dest, @Nonnull ItemStack stack, boolean simulate, int slots) {
+            if (dest == null || stack.isEmpty()) {
+                return stack;
+            }
+            slots = Math.min(slots, dest.getSlots());
+            for (int i = 0; i < slots; i++) {
+                ItemStack stack1 = dest.insertItem(i, stack, simulate);
+                if (stack1.isEmpty()) {
+                    return ItemStack.EMPTY;
+                } else if (stack1 != stack) {
+                    return stack1;
+                }
+            }
 
-    @Nonnull
-    public static ItemStack insertItem(IItemHandler dest, @Nonnull ItemStack stack, boolean simulate, int slots) {
-        if (dest == null || stack.isEmpty()) {
             return stack;
         }
-        slots = Math.min(slots, dest.getSlots());
-        for (int i = 0; i < slots; i++) {
-            ItemStack stack1 = dest.insertItem(i, stack, simulate);
-            if (stack1.isEmpty()) {
-                return ItemStack.EMPTY;
-            } else if (stack1 != stack) {
-                return stack1;
-            }
-        }
-
-        return stack;
-    }
-
+    */
     public static ItemStack setSize(ItemStack stack, int col) {
         stack = stack.copy();
         stack.setCount(col);
@@ -1211,92 +983,635 @@ public class ModUtils {
     }
 
 
-    public static ResourceLocation getName(Block block) {
-        return Block.REGISTRY.getNameForObject(block);
+    public static ItemStack getRecipeFromType(Level world, ItemStack stack1, RecipeType<SmeltingRecipe> type) {
+        List<RecipeHolder<SmeltingRecipe>> recipes = world.getRecipeManager().getAllRecipesFor(type);
+        for (RecipeHolder<SmeltingRecipe> recipe1 : recipes) {
+            SmeltingRecipe recipe = recipe1.value();
+            if (recipe.getIngredients().size() > 1)
+                return ItemStack.EMPTY;
+            else if (recipe.getIngredients().get(0).test(stack1))
+                return recipe.getResultItem(world.registryAccess()).copy();
+        }
+        return ItemStack.EMPTY;
     }
 
-    public static Item getItem(String name) {
-        if (name == null) {
-            throw new NullPointerException("null name");
-        } else {
-            return getItem(new ResourceLocation(name));
+    @Nonnull
+    public static ItemStack insertItem(IItemHandler dest, @Nonnull ItemStack stack, boolean simulate, int slots) {
+        if (dest == null || stack.isEmpty()) {
+            return stack;
+        }
+        slots = Math.min(slots, dest.getSlots());
+        for (int i = 0; i < slots; i++) {
+            ItemStack stack1 = dest.insertItem(i, stack, simulate);
+            if (stack1.isEmpty()) {
+                return ItemStack.EMPTY;
+            } else if (stack1 != stack) {
+                return stack1;
+            }
+        }
+
+        return stack;
+    }
+
+    public static void showFlames(Level level, BlockPos pos, Direction facing) {
+        if (level.random.nextInt(8) == 0) {
+            double x = pos.getX() + ((facing.getStepX() * 1.04 + 1.0) / 2.0);
+            double y = pos.getY() + level.random.nextFloat() * 0.375;
+            double z = pos.getZ() + ((facing.getStepZ() * 1.04 + 1.0) / 2.0);
+
+            if (facing.getAxis() == Direction.Axis.X) {
+                z += level.random.nextFloat() * 0.625 - 0.3125;
+            } else {
+                x += level.random.nextFloat() * 0.625 - 0.3125;
+            }
+
+            level.addParticle(ParticleTypes.SMOKE, x, y, z, 0.0, 0.0, 0.0);
+            level.addParticle(ParticleTypes.FLAME, x, y, z, 0.0, 0.0, 0.0);
         }
     }
 
-    public static Item getItem(ResourceLocation loc) {
-        return Item.REGISTRY.getObject(loc);
+    public static ItemStack getCellFromFluid(Fluid fluid) {
+        return IUItem.fluidCell.getItem().getItemStack(fluid);
     }
 
-    public static ResourceLocation getName(Item item) {
-        return Item.REGISTRY.getNameForObject(item);
+    public static void tick(InventoryOutput slot, BlockEntityBase tile) {
+
+        for (Direction facing1 : facings) {
+            BlockPos pos = tile.getBlockPos().offset(facing1.getNormal());
+            final BlockEntity tile1 = tile.getWorld().getBlockEntity(pos);
+            if (tile1 instanceof BlockEntityInventory) {
+                BlockEntityInventory inventory = (BlockEntityInventory) tile1;
+                for (Inventory invSlot : inventory.getInputSlots()) {
+                    if (invSlot.acceptAllOrIndex()) {
+                        cycle2:
+                        for (int j = 0; j < slot.size(); j++) {
+                            ItemStack output = slot.get(j);
+                            if (output.isEmpty()) {
+                                continue;
+                            }
+                            if (invSlot.canPlaceItem(0, output)) {
+                                for (int jj = 0; jj < invSlot.size(); jj++) {
+                                    if (output.isEmpty()) {
+                                        continue cycle2;
+                                    }
+                                    ItemStack input = invSlot.get(jj);
+                                    if (input.isEmpty()) {
+                                        if (invSlot.add(output)) {
+                                            slot.set(j, ItemStack.EMPTY);
+                                            output = ItemStack.EMPTY;
+                                        }
+                                    } else {
+                                        if (!ModUtils.checkItemEquality(input, output)) {
+                                            continue;
+                                        }
+                                        int maxCount = Math.min(input.getMaxStackSize() - input.getCount(), output.getCount());
+                                        if (maxCount > 0) {
+                                            input.grow(maxCount);
+                                            output.shrink(maxCount);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        cycle3:
+                        for (int jj = 0; jj < slot.size(); jj++) {
+
+                            for (int j = 0; j < invSlot.size(); j++) {
+                                ItemStack output = slot.get(jj);
+                                if (output.isEmpty()) {
+                                    continue cycle3;
+                                }
+                                ItemStack input = invSlot.get(j);
+
+                                if (input.isEmpty()) {
+                                    if (invSlot.canPlaceItem(j, output)) {
+                                        if (invSlot.add(output)) {
+                                            slot.set(jj, ItemStack.EMPTY);
+                                            output = ItemStack.EMPTY;
+                                        }
+                                    }
+                                } else {
+                                    if (!ModUtils.checkItemEquality(input, output)) {
+                                        continue;
+                                    }
+                                    int maxCount = Math.min(input.getMaxStackSize() - input.getCount(), output.getCount());
+                                    if (maxCount > 0) {
+                                        input.grow(maxCount);
+                                        output.shrink(maxCount);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                final IItemHandler handler = getItemHandler(tile1, facing1.getOpposite());
+                if (handler == null) {
+                    continue;
+                }
+                final int slots = handler.getSlots();
+                for (int j = 0; j < slot.size(); j++) {
+                    ItemStack took = slot.get(j);
+                    if (took.isEmpty()) {
+                        continue;
+                    }
+
+                    ItemStack stack1;
+                    if (!(handler instanceof Container)) {
+                        took = took.copy();
+                        stack1 = insertItem(handler, took, true, slots);
+                        if (stack1.isEmpty()) {
+                            slot.set(j, ItemStack.EMPTY);
+                            insertItem(handler, took, false, slots);
+                        } else if (stack1 != took) {
+                            int count = slot.get(j).getCount() - stack1.getCount();
+                            slot.get(j).shrink(count);
+                            stack1.setCount(count);
+                            insertItem(handler, stack1, false, slots);
+                        }
+                    } else {
+                        stack1 = insertItem1(handler, took, true, slots);
+                        if (stack1.isEmpty()) {
+                            slot.set(j, ItemStack.EMPTY);
+                            insertItem1(handler, took, false, slots);
+                        } else if (stack1 != took) {
+                            int count = slot.get(j).getCount() - stack1.getCount();
+                            slot.get(j).shrink(count);
+                            stack1.setCount(count);
+                            insertItem1(handler, stack1, false, slots);
+                        }
+                    }
+
+                }
+            }
+        }
+
     }
 
+    @Nonnull
+    public static ItemStack insertItem1(IItemHandler dest, @Nonnull ItemStack stack, boolean simulate, int slot) {
+        if (dest == null || stack.isEmpty()) {
+            return stack;
+        }
+        slot = Math.min(slot, dest.getSlots());
+        for (int i = 0; i < slot; i++) {
+            final ItemStack stack2 = insertItem2(dest, i, stack, simulate);
+            if (stack.isEmpty()) {
+                return ItemStack.EMPTY;
+            } else if (stack2 != stack) {
+                return stack2;
+            }
+        }
 
-    public static boolean matchesNBT(NBTTagCompound subject, NBTTagCompound target) {
-        if (subject == null) {
-            return target == null || target.hasNoTags();
-        } else if (target == null) {
-            return true;
-        } else {
-            Iterator<String> var2 = target.getKeySet().iterator();
-            Set<String> var3 = subject.getKeySet();
+        return stack;
+    }
 
-            NBTBase targetNBT;
-            NBTBase subjectNBT;
-            do {
-                if (!var2.hasNext()) {
-                    return true;
+    public static boolean canItemStacksStack(@Nonnull ItemStack a, @Nonnull ItemStack b) {
+        if (a.isEmpty() || !a.is(b.getItem())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Nonnull
+    public static ItemStack insertItem2(IItemHandler dest, int slot, @Nonnull ItemStack stack, boolean simulate) {
+        if (stack.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+        ItemStack stackInSlot = dest.getStackInSlot(slot);
+
+        int m;
+        if (!stackInSlot.isEmpty()) {
+            int max = stackInSlot.getMaxStackSize();
+            int limit = dest.getSlotLimit(slot);
+            if (stackInSlot.getCount() >= Math.min(max, limit)) {
+                return stack;
+            }
+
+            if (!canItemStacksStack(stack, stackInSlot)) {
+                return stack;
+            }
+
+
+            m = Math.min(max, limit) - stackInSlot.getCount();
+
+            if (stack.getCount() <= m) {
+                if (!simulate) {
+                    ItemStack copy = stack.copy();
+                    copy.grow(stackInSlot.getCount());
+                    ((SidedInvWrapper) dest).setStackInSlot(slot, copy);
+                    return ItemStack.EMPTY;
                 }
 
-                String key = var2.next();
-                targetNBT = target.getTag(key);
-                if (!subject.hasKey(key) || targetNBT.getId() != subject.getTagId(key)) {
+            } else {
+                // copy the stack to not modify the original one
+                stack = stack.copy();
+                if (!simulate) {
+                    ItemStack copy = stack.split(m);
+                    copy.grow(stackInSlot.getCount());
+                    ((SidedInvWrapper) dest).setStackInSlot(slot, copy);
+                    return ItemStack.EMPTY;
+                }
+            }
+            return stack;
+        } else {
+
+
+            m = Math.min(stack.getMaxStackSize(), dest.getSlotLimit(slot));
+            if (m < stack.getCount()) {
+                // copy the stack to not modify the original one
+                stack = stack.copy();
+                if (!simulate) {
+                    ((SidedInvWrapper) dest).setStackInSlot(slot, stack.split(m));
+                }
+                return stack;
+            } else {
+                if (!simulate) {
+                    ((SidedInvWrapper) dest).setStackInSlot(slot, stack);
+                }
+                return ItemStack.EMPTY;
+            }
+        }
+
+    }
+
+
+    public static FluidActionResult tryFillContainer(@NotNull ItemStack container, IFluidHandler fluidSource, int maxAmount, @org.jetbrains.annotations.Nullable Player player, boolean doFill) {
+        ItemStack containerCopy = copyStackWithSize(container, 1);
+        IFluidHandlerItem containerFluidHandler = containerCopy.getCapability(Capabilities.FluidHandler.ITEM);
+        for (int i = 0; i < fluidSource.getTanks(); i++) {
+            FluidStack simulatedTransfer = tryFluidTransfer(containerFluidHandler, fluidSource, maxAmount, false, i);
+            if (!simulatedTransfer.isEmpty()) {
+                if (doFill) {
+                    tryFluidTransfer(containerFluidHandler, fluidSource, maxAmount, true, i);
+                    if (player != null) {
+                        SoundEvent soundevent = simulatedTransfer.getFluid().getFluidType().getSound(simulatedTransfer, SoundActions.BUCKET_FILL);
+                        if (soundevent != null)
+                            player.level().playSound(null, player.getX(), player.getY() + 0.5, player.getZ(), soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
+                    }
+                } else {
+                    // We are acting on a COPY of the stack, so performing changes on the source is acceptable even if we are simulating.
+                    // We need to perform the change otherwise the call to getContainer() will be incorrect.
+                    containerFluidHandler.fill(simulatedTransfer, IFluidHandler.FluidAction.EXECUTE);
+                }
+
+                ItemStack resultContainer = containerFluidHandler.getContainer();
+                return new FluidActionResult(resultContainer);
+            }
+        }
+        return FluidActionResult.FAILURE;
+    }
+
+    @NotNull
+    public static FluidActionResult tryFillContainerAndStow(@NotNull ItemStack container, IFluidHandler fluidSource, IItemHandler inventory, int maxAmount, @org.jetbrains.annotations.Nullable Player player, boolean doFill) {
+        if (container.isEmpty()) {
+            return FluidActionResult.FAILURE;
+        }
+
+        if (player != null && player.getAbilities().instabuild) {
+            FluidActionResult filledReal = tryFillContainer(container, fluidSource, maxAmount, player, doFill);
+            if (filledReal.isSuccess()) {
+                return new FluidActionResult(container); // creative mode: item does not change
+            }
+        } else if (container.getCount() == 1) // don't need to stow anything, just fill the container stack
+        {
+            FluidActionResult filledReal = tryFillContainer(container, fluidSource, maxAmount, player, doFill);
+            if (filledReal.isSuccess()) {
+                return filledReal;
+            }
+        } else {
+            FluidActionResult filledSimulated = tryFillContainer(container, fluidSource, maxAmount, player, false);
+            if (filledSimulated.isSuccess()) {
+                // check if we can give the itemStack to the inventory
+                ItemStack remainder = ItemHandlerHelper.insertItemStacked(inventory, filledSimulated.getResult(), true);
+                if (remainder.isEmpty() || player != null) {
+                    FluidActionResult filledReal = tryFillContainer(container, fluidSource, maxAmount, player, doFill);
+                    remainder = ItemHandlerHelper.insertItemStacked(inventory, filledReal.getResult(), !doFill);
+
+                    // give it to the player or drop it at their feet
+                    if (!remainder.isEmpty() && player != null && doFill) {
+                        ItemHandlerHelper.giveItemToPlayer(player, remainder);
+                    }
+
+                    ItemStack containerCopy = container.copy();
+                    containerCopy.shrink(1);
+                    return new FluidActionResult(containerCopy);
+                }
+            }
+        }
+
+        return FluidActionResult.FAILURE;
+    }
+
+    @NotNull
+    public static ItemStack copyStackWithSize(@NotNull ItemStack itemStack, int size) {
+        if (size == 0)
+            return ItemStack.EMPTY;
+        ItemStack copy = itemStack.copy();
+        copy.setCount(size);
+        return copy;
+    }
+
+    public static boolean interactWithFluidHandler(
+            @Nonnull Player player,
+            @Nonnull InteractionHand hand,
+            @Nonnull IFluidHandler handler
+    ) {
+        Preconditions.checkNotNull(player);
+        Preconditions.checkNotNull(hand);
+        Preconditions.checkNotNull(handler);
+
+        ItemStack heldItem = player.getItemInHand(hand);
+        if (!heldItem.isEmpty()) {
+
+            IItemHandler playerInventory = player.getCapability(Capabilities.ItemHandler.ENTITY, null);
+            if (playerInventory != null) {
+                FluidActionResult fluidActionResult = tryFillContainerAndStow(heldItem, handler, playerInventory,
+                        Integer.MAX_VALUE, player, true
+                );
+                if (!fluidActionResult.isSuccess()) {
+                    final FluidStack stack = null;
+                    int sizeTanks = handler.getTanks();
+                    int capacity = -1;
+                    @NotNull ItemStack stack1 = copyStackWithSize(heldItem, 1);
+                    IFluidHandlerItem containerFluidHandler = FluidHandlerFix.getFluidHandler(stack1);
+                    for (int i = 0; i < sizeTanks; i++) {
+                        if ((handler.getFluidInTank(i).isEmpty() && handler.fill(containerFluidHandler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.SIMULATE) > 0) || (!handler.getFluidInTank(i).isEmpty() && FluidStack.isSameFluid(handler.getFluidInTank(i), containerFluidHandler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE)) && handler.fill(containerFluidHandler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.SIMULATE) > 0)) {
+                            capacity = handler.getTankCapacity(i) - (handler.getFluidInTank(i).isEmpty() ? 0 :
+                                    handler.getFluidInTank(i).getAmount());
+
+                        }
+                    }
+                    if (capacity <= 0) {
+                        fluidActionResult = FluidActionResult.FAILURE;
+                    } else {
+                        fluidActionResult = tryEmptyContainerAndStow(heldItem, handler, playerInventory,
+                                capacity, player,
+                                true
+                        );
+                    }
+                }
+
+                if (fluidActionResult.isSuccess()) {
+                    player.setItemInHand(hand, fluidActionResult.getResult());
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @NotNull
+    public static FluidActionResult tryEmptyContainerAndStow(@NotNull ItemStack container, IFluidHandler fluidDestination, IItemHandler inventory, int maxAmount, @org.jetbrains.annotations.Nullable Player player, boolean doDrain) {
+        if (container.isEmpty()) {
+            return FluidActionResult.FAILURE;
+        }
+
+        if (player != null && player.getAbilities().instabuild) {
+            FluidActionResult emptiedReal = tryEmptyContainer(container, fluidDestination, maxAmount, player, doDrain);
+            if (emptiedReal.isSuccess()) {
+                return new FluidActionResult(container); // creative mode: item does not change
+            }
+        } else if (container.getCount() == 1) // don't need to stow anything, just fill and edit the container stack
+        {
+            FluidActionResult emptiedReal = tryEmptyContainer(container, fluidDestination, maxAmount, player, doDrain);
+            if (emptiedReal.isSuccess()) {
+                return emptiedReal;
+            }
+        } else {
+            FluidActionResult emptiedSimulated = tryEmptyContainer(container, fluidDestination, maxAmount, player, false);
+            if (emptiedSimulated.isSuccess()) {
+                // check if we can give the itemStack to the inventory
+                ItemStack remainder = ItemHandlerHelper.insertItemStacked(inventory, emptiedSimulated.getResult(), true);
+                if (remainder.isEmpty() || player != null) {
+                    FluidActionResult emptiedReal = tryEmptyContainer(container, fluidDestination, maxAmount, player, doDrain);
+                    remainder = ItemHandlerHelper.insertItemStacked(inventory, emptiedReal.getResult(), !doDrain);
+
+                    // give it to the player or drop it at their feet
+                    if (!remainder.isEmpty() && player != null && doDrain) {
+                        ItemHandlerHelper.giveItemToPlayer(player, remainder);
+                    }
+
+                    ItemStack containerCopy = container.copy();
+                    containerCopy.shrink(1);
+                    return new FluidActionResult(containerCopy);
+                }
+            }
+        }
+
+        return FluidActionResult.FAILURE;
+    }
+
+    @NotNull
+    public static FluidActionResult tryEmptyContainer(@NotNull ItemStack container, IFluidHandler fluidDestination, int maxAmount, @org.jetbrains.annotations.Nullable Player player, boolean doDrain) {
+        ItemStack containerCopy = copyStackWithSize(container, 1); // do not modify the input
+        IFluidHandlerItem containerFluidHandler;
+        containerFluidHandler = FluidHandlerFix.getFluidHandler(containerCopy);
+        if (containerFluidHandler != null) {
+            FluidStack transfer = tryFluidTransfer(fluidDestination, containerFluidHandler, maxAmount, doDrain);
+            if (transfer.isEmpty())
+                return FluidActionResult.FAILURE;
+            if (!doDrain) {
+                // We are acting on a COPY of the stack, so performing changes on the source is acceptable even if we are simulating.
+                // We need to perform the change otherwise the call to getContainer() will be incorrect.
+                containerFluidHandler.drain(transfer, IFluidHandler.FluidAction.EXECUTE);
+            }
+
+            if (doDrain && player != null) {
+                SoundEvent soundevent = transfer.getFluid().getFluidType().getSound(transfer, SoundActions.BUCKET_EMPTY);
+                if (soundevent != null)
+                    player.level().playSound(null, player.getX(), player.getY() + 0.5, player.getZ(), soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
+            }
+
+            ItemStack resultContainer = containerFluidHandler.getContainer();
+            return new FluidActionResult(resultContainer);
+        }
+        return FluidActionResult.FAILURE;
+    }
+
+    @NotNull
+    public static FluidStack tryFluidTransfer(IFluidHandler fluidDestination, IFluidHandler fluidSource, int maxAmount, boolean doTransfer, int index) {
+        FluidStack stack = fluidSource.getFluidInTank(index).copy();
+        if (stack.isEmpty())
+            return FluidStack.EMPTY;
+        stack.setAmount(Math.min(stack.getAmount(), maxAmount));
+        FluidStack drainable = fluidSource.drain(stack, IFluidHandler.FluidAction.SIMULATE);
+        if (!drainable.isEmpty()) {
+            return tryFluidTransfer_Internal(fluidDestination, fluidSource, drainable, doTransfer);
+        }
+        return FluidStack.EMPTY;
+    }
+
+    @NotNull
+    public static FluidStack tryFluidTransfer(IFluidHandler fluidDestination, IFluidHandler fluidSource, int maxAmount, boolean doTransfer) {
+        FluidStack drainable = fluidSource.drain(maxAmount, IFluidHandler.FluidAction.SIMULATE);
+        if (!drainable.isEmpty()) {
+            return tryFluidTransfer_Internal(fluidDestination, fluidSource, drainable, doTransfer);
+        }
+        return FluidStack.EMPTY;
+    }
+
+    @NotNull
+    public static FluidStack tryFluidTransfer(IFluidHandler fluidDestination, IFluidHandler fluidSource, FluidStack resource, boolean doTransfer) {
+        FluidStack drainable = fluidSource.drain(resource, IFluidHandler.FluidAction.SIMULATE);
+        if (!drainable.isEmpty() && FluidStack.isSameFluid(resource, drainable)) {
+            return tryFluidTransfer_Internal(fluidDestination, fluidSource, drainable, doTransfer);
+        }
+        return FluidStack.EMPTY;
+    }
+
+    private static FluidStack tryFluidTransfer_Internal(IFluidHandler fluidDestination, IFluidHandler fluidSource, FluidStack drainable, boolean doTransfer) {
+        int fillableAmount = fluidDestination.fill(drainable, IFluidHandler.FluidAction.SIMULATE);
+        if (fillableAmount > 0) {
+            drainable.setAmount(fillableAmount);
+            if (doTransfer) {
+                FluidStack drained = fluidSource.drain(drainable, IFluidHandler.FluidAction.EXECUTE);
+                if (!drained.isEmpty()) {
+                    drained.setAmount(fluidDestination.fill(drained, IFluidHandler.FluidAction.EXECUTE));
+                    return drained;
+                }
+            } else {
+                return drainable;
+            }
+        }
+        return FluidStack.EMPTY;
+    }
+
+
+    public static Direction getFacingFromTwoPositions(BlockPos fromPos, BlockPos toPos) {
+        int dx = toPos.getX() - fromPos.getX();
+        int dy = toPos.getY() - fromPos.getY();
+        int dz = toPos.getZ() - fromPos.getZ();
+        if (dx > 0) {
+            return Direction.EAST;
+        } else if (dx < 0) {
+            return Direction.WEST;
+        } else if (dy > 0) {
+            return Direction.DOWN;
+        } else if (dy < 0) {
+            return Direction.UP;
+        } else if (dz > 0) {
+            return Direction.SOUTH;
+        } else if (dz < 0) {
+            return Direction.NORTH;
+        }
+
+
+        return Direction.DOWN;
+    }
+
+    public static boolean inChanceOre(VeinType veinType, BlockState state) {
+        for (ChanceOre chanceOre : veinType.getOres()) {
+            if (chanceOre.getBlock() == state) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static List<Component> getInformationFromOre(BlockState state) {
+        List<Component> stringList = new ArrayList<>();
+        for (VeinType vein : WorldBaseGen.veinTypes) {
+            if ((vein.getHeavyOre() != null && vein.getHeavyOre().getStateMeta(vein.getMeta()) == state) || inChanceOre(
+                    vein,
+                    state
+            )) {
+                final Component s = (vein.getHeavyOre() != null ?
+                        new ItemStack(vein.getHeavyOre().getBlock(), 1).getDisplayName() :
+                        new ItemStack(vein.getOres().get(0).getBlock().getBlock(), 1
+                        ).getDisplayName());
+                stringList.add(s);
+            }
+        }
+        return stringList;
+    }
+
+
+    public static boolean compareNbt(DataComponentMap a, DataComponentMap b, boolean c) {
+        if (a == b) {
+            return true;
+        } else {
+            Set<DataComponentType<?>> keysA = a != null ? a.keySet() : Collections.emptySet();
+            Set<DataComponentType<?>> keysB = b != null ? b.keySet() : Collections.emptySet();
+            if (keysA.isEmpty() && keysB.isEmpty()) {
+                return true;
+            }
+            Set<DataComponentType<?>> toCheck = new HashSet<>(Math.max(keysA.size(), keysB.size()));
+            Iterator<DataComponentType<?>> var5 = keysA.iterator();
+
+            DataComponentType<?> key;
+            while (var5.hasNext()) {
+                key = var5.next();
+                if (!keysB.contains(key)) {
                     return false;
                 }
 
-                subjectNBT = subject.getTag(key);
-            } while (targetNBT.equals(subjectNBT));
+                toCheck.add(key);
+            }
 
+            var5 = keysB.iterator();
+
+            while (var5.hasNext()) {
+                key = var5.next();
+                if (!keysA.contains(key)) {
+                    return false;
+                }
+
+                toCheck.add(key);
+            }
+
+            var5 = toCheck.iterator();
+
+            do {
+                if (!var5.hasNext()) {
+                    return true;
+                }
+
+                key = var5.next();
+                if (!Objects.equals(Objects.requireNonNull(a).get(key), Objects.requireNonNull(b).get(key))) {
+                    System.out.println(key);
+                    return false;
+                }
+            } while (true);
+
+
+        }
+    }
+
+    public static void setComponents(ItemStack toInsert, PatchedDataComponentMap components) {
+        Iterator<DataComponentType<?>> iter = toInsert.getComponents().keySet().stream().iterator();
+        while (iter.hasNext()) {
+            toInsert.remove(iter.next());
+        }
+        iter = components.keySet().stream().iterator();
+        while (iter.hasNext()) {
+            DataComponentType<Object> type = (DataComponentType<Object>) iter.next();
+            toInsert.set(type, components.get(type));
+
+        }
+    }
+
+    public static String cleanComponentString(String text) {
+        if (text == null) {
+            return "";
+        }
+        String result = text;
+        String trimmed = result.trim();
+        while (isSingleComponentListString(trimmed)) {
+            result = trimmed.substring(1, trimmed.length() - 1).trim();
+            trimmed = result.trim();
+        }
+        return result;
+    }
+
+    private static boolean isSingleComponentListString(String text) {
+        if (text.length() < 3 || text.charAt(0) != '[' || text.charAt(text.length() - 1) != ']') {
             return false;
         }
-    }
-
-    public static void showFlames(World world, BlockPos pos, EnumFacing facing) {
-        if (world.rand.nextInt(8) == 0) {
-            double x = (double) pos.getX() + ((double) facing.getFrontOffsetX() * 1.04 + 1.0) / 2.0;
-            double y = (double) pos.getY() + (double) world.rand.nextFloat() * 0.375;
-            double z = (double) pos.getZ() + ((double) facing.getFrontOffsetZ() * 1.04 + 1.0) / 2.0;
-            if (facing.getAxis() == EnumFacing.Axis.X) {
-                z += (double) world.rand.nextFloat() * 0.625 - 0.3125;
-            } else {
-                x += (double) world.rand.nextFloat() * 0.625 - 0.3125;
-            }
-
-            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x, y, z, 0.0, 0.0, 0.0);
-            world.spawnParticle(EnumParticleTypes.FLAME, x, y, z, 0.0, 0.0, 0.0);
-        }
-    }
-
-    public static void dropAsEntity(World world, BlockPos pos, ItemStack stack, EntityPlayer player) {
-        if (!isEmpty(stack)) {
-            double f = 0.7;
-            double dx = (double) world.rand.nextFloat() * f + (1.0 - f) * 0.5;
-            double dy = (double) world.rand.nextFloat() * f + (1.0 - f) * 0.5;
-            double dz = (double) world.rand.nextFloat() * f + (1.0 - f) * 0.5;
-            EntityItem entityItem = new EntityItem(
-                    world,
-                    (double) pos.getX() + dx,
-                    (double) pos.getY() + dy,
-                    (double) pos.getZ() + dz,
-                    stack.copy()
-            );
-            entityItem.setDefaultPickupDelay();
-            world.spawnEntity(entityItem);
-            if (!player.world.isRemote) {
-                ((EntityPlayerMP) player).connection.sendPacket(new SPacketEntityTeleport(entityItem));
-            }
-            entityItem.setPickupDelay(0);
-        }
+        String inner = text.substring(1, text.length() - 1).trim();
+        return !inner.isEmpty() && inner.indexOf(',') < 0 && inner.indexOf(';') < 0;
     }
 
 }

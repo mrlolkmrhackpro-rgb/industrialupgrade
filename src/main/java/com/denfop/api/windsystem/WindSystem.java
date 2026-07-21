@@ -1,25 +1,20 @@
 package com.denfop.api.windsystem;
 
 import com.denfop.api.windsystem.event.WindGeneratorEvent;
+import com.denfop.blockentity.mechanism.water.BlockEntityBaseWaterGenerator;
+import com.denfop.blockentity.mechanism.wind.BlockEntityWindGenerator;
 import com.denfop.network.packet.PacketUpdateFieldTile;
-import com.denfop.tiles.mechanism.water.TileBaseWaterGenerator;
-import com.denfop.tiles.mechanism.wind.TileWindGenerator;
 import com.denfop.utils.ModUtils;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class WindSystem implements IWindSystem {
 
@@ -30,18 +25,18 @@ public class WindSystem implements IWindSystem {
     public EnumTypeWind[] enumTypeWinds = EnumTypeWind.values();
     List<IWindMechanism> mechanismList = new ArrayList<>();
     Random rand;
-    Map<EnumFacing, EnumFacing> facingMap = new HashMap<>();
+    Map<Direction, Direction> facingMap = new HashMap<>();
     private double Wind_Strength;
 
     public WindSystem() {
         windSystem = this;
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
         this.rand = new Random();
         this.windSide = EnumWindSide.getValue(this.rand.nextInt(8));
-        facingMap.put(EnumFacing.EAST, EnumFacing.NORTH);
-        facingMap.put(EnumFacing.NORTH, EnumFacing.WEST);
-        facingMap.put(EnumFacing.WEST, EnumFacing.SOUTH);
-        facingMap.put(EnumFacing.SOUTH, EnumFacing.EAST);
+        facingMap.put(Direction.EAST, Direction.NORTH);
+        facingMap.put(Direction.NORTH, Direction.WEST);
+        facingMap.put(Direction.WEST, Direction.SOUTH);
+        facingMap.put(Direction.SOUTH, Direction.EAST);
         enumTypeWind = EnumTypeWind.SIX;
     }
 
@@ -57,19 +52,20 @@ public class WindSystem implements IWindSystem {
         return windSide;
     }
 
-    public void getNewFacing(EnumFacing facing, IWindMechanism windMechanism) {
-        if (facing == EnumFacing.DOWN || facing == EnumFacing.UP) {
+    public void getNewFacing(Direction facing, IWindMechanism windMechanism) {
+        if (facing == Direction.DOWN || facing == Direction.UP) {
             return;
         }
         facing = facingMap.get(facing);
-        if (windMechanism instanceof TileWindGenerator) {
-            ((TileWindGenerator) windMechanism).setFacingWrench(facing, null);
-            new PacketUpdateFieldTile(((TileWindGenerator) windMechanism), "facing", (byte) windMechanism.getFacing().ordinal());
+
+        if (windMechanism instanceof BlockEntityWindGenerator) {
+            ((BlockEntityWindGenerator) windMechanism).setFacingWrench(facing, null);
+            new PacketUpdateFieldTile(((BlockEntityWindGenerator) windMechanism), "facing", (byte) windMechanism.getFacing().ordinal());
             this.changeRotorSide(windMechanism, windMechanism.getFacing());
         } else {
-            ((TileBaseWaterGenerator) windMechanism).setFacingWrench(facing, null);
+            ((BlockEntityBaseWaterGenerator) windMechanism).setFacingWrench(facing, null);
             new PacketUpdateFieldTile(
-                    ((TileBaseWaterGenerator) windMechanism),
+                    ((BlockEntityBaseWaterGenerator) windMechanism),
                     "facing",
                     (byte) windMechanism.getFacing().ordinal()
             );
@@ -98,8 +94,8 @@ public class WindSystem implements IWindSystem {
     }
 
     @SubscribeEvent
-    public void EventWorldUnload(WorldEvent.Unload event) {
-        if (event.getWorld().provider.getDimension() == 0) {
+    public void EventWorldUnload(LevelEvent.Unload event) {
+        if (((Level) event.getLevel()).dimension() == Level.OVERWORLD) {
             this.mechanismList.clear();
         }
     }
@@ -108,18 +104,18 @@ public class WindSystem implements IWindSystem {
         return this.Wind_Strength;
     }
 
-    public void changeRotorSide(IWindMechanism windMechanism, EnumFacing facing) {
+    public void changeRotorSide(IWindMechanism windMechanism, Direction facing) {
         windMechanism.setRotorSide(getRotorSide(facing));
         windMechanism.setCoefficient(getCoefficient(windMechanism));
     }
 
     public void getNewPositionOfMechanism(IWindMechanism windMechanism) {
-        final EnumFacing newFacing = getNewFacing();
-        if (windMechanism instanceof TileWindGenerator) {
+        final Direction newFacing = getNewFacing();
+        if (windMechanism instanceof BlockEntityWindGenerator) {
             if (windMechanism.getFacing() != newFacing) {
-                ((TileWindGenerator) windMechanism).setFacingWrench(newFacing, null);
+                ((BlockEntityWindGenerator) windMechanism).setFacingWrench(newFacing, null);
                 new PacketUpdateFieldTile(
-                        ((TileWindGenerator) windMechanism),
+                        ((BlockEntityWindGenerator) windMechanism),
                         "facing",
                         (byte) windMechanism.getFacing().ordinal()
                 );
@@ -128,9 +124,9 @@ public class WindSystem implements IWindSystem {
 
         } else {
             if (windMechanism.getFacing() != newFacing) {
-                ((TileBaseWaterGenerator) windMechanism).setFacingWrench(newFacing, null);
+                ((BlockEntityBaseWaterGenerator) windMechanism).setFacingWrench(newFacing, null);
                 new PacketUpdateFieldTile(
-                        ((TileBaseWaterGenerator) windMechanism),
+                        ((BlockEntityBaseWaterGenerator) windMechanism),
                         "facing",
                         (byte) windMechanism.getFacing().ordinal()
                 );
@@ -139,26 +135,26 @@ public class WindSystem implements IWindSystem {
         }
     }
 
-    public EnumFacing getNewFacing() {
+    public Direction getNewFacing() {
         switch (this.windSide) {
             case E:
-                return EnumFacing.SOUTH;
+                return Direction.SOUTH;
             case W:
             case SW:
-                return EnumFacing.NORTH;
+                return Direction.NORTH;
             case N:
             case NW:
             case SE:
-                return EnumFacing.EAST;
+                return Direction.EAST;
             case S:
             case NE:
-                return EnumFacing.WEST;
+                return Direction.WEST;
         }
         return null;
 
     }
 
-    public EnumRotorSide getRotorSide(EnumFacing facing) {
+    public EnumRotorSide getRotorSide(Direction facing) {
         switch (facing) {
             case EAST:
                 return EnumRotorSide.E;
@@ -169,7 +165,7 @@ public class WindSystem implements IWindSystem {
             case SOUTH:
                 return EnumRotorSide.S;
         }
-        return null;
+        return EnumRotorSide.N;
     }
 
     public double getCoefficient(IWindMechanism windMechanism) {
@@ -210,14 +206,11 @@ public class WindSystem implements IWindSystem {
     }
 
     @SubscribeEvent
-    public void windTick(TickEvent.WorldTickEvent event) {
-        if (event.side == Side.CLIENT) {
+    public void windTick(LevelTickEvent.Post event) {
+        if (event.getLevel().isClientSide) {
             return;
         }
-        if (event.phase == TickEvent.Phase.START) {
-            return;
-        }
-        if (event.world.provider.getDimension() == 0) {
+        if (event.getLevel().dimension() == Level.OVERWORLD) {
             this.tick--;
         }
 
@@ -338,11 +331,11 @@ public class WindSystem implements IWindSystem {
             }
         }
 
-        World world = event.world;
-        if (world.getWorldTime() % 20 == 0) {
+        Level world = event.getLevel();
+        if (world.getGameTime() % 20 == 0) {
             double coef = this.enumTypeWind.getMax() - this.enumTypeWind.getMin();
             coef *= 10;
-            this.Wind_Strength = this.enumTypeWind.getMin() + world.rand.nextInt((int) coef + 1) / 10D;
+            this.Wind_Strength = this.enumTypeWind.getMin() + world.random.nextInt((int) coef + 1) / 10D;
             final double speed = getSpeed();
             for (IWindMechanism windMechanism : this.mechanismList) {
                 if (windMechanism != null) {
@@ -357,9 +350,9 @@ public class WindSystem implements IWindSystem {
     }
 
     @Override
-    public double getPower(final World world, final BlockPos pos, boolean min, IWindMechanism rotor) {
+    public double getPower(final Level world, final BlockPos pos, boolean min, IWindMechanism rotor) {
 
-        if (world.isRemote) {
+        if (world.isClientSide) {
             return 0;
         }
         if (rotor.getMinWind() != 0) {
@@ -368,7 +361,7 @@ public class WindSystem implements IWindSystem {
             double coef = enumTypeWinds.getMax() - enumTypeWinds.getMin();
             coef *= 10;
 
-            coef = enumTypeWinds.getMin() + world.rand.nextInt((int) coef + 1) / 10D;
+            coef = enumTypeWinds.getMin() + world.random.nextInt((int) coef + 1) / 10D;
             coef += rotor.getMinWindSpeed();
             coef = Math.min(coef, EnumTypeWind.TEN.getMax());
             int y = pos.getY();
@@ -380,7 +373,7 @@ public class WindSystem implements IWindSystem {
             } else {
                 coef = coef * (150D / y);
             }
-            return coef * 27;
+            return Math.max(0, coef * 27);
         } else {
             double coef = this.Wind_Strength;
             coef += rotor.getMinWindSpeed();
@@ -393,7 +386,7 @@ public class WindSystem implements IWindSystem {
             } else {
                 coef = coef * (150D / y);
             }
-            return coef * 27;
+            return Math.max(0, coef * 27);
         }
     }
 
@@ -416,7 +409,7 @@ public class WindSystem implements IWindSystem {
             copy_power = copy_power / (150D / y);
         }
 
-        return copy_power;
+        return copy_power * 0.9;
 
     }
 
@@ -427,7 +420,7 @@ public class WindSystem implements IWindSystem {
         double copy_power = power / 27;
         copy_power = copy_power / ((rotor
                 .getRotor()
-                .getEfficiency(rotor.getItemStack()) * (1 + rotor.getAdditionalPower())) * (rotor.getCoefficient() * (1 + rotor.getAdditionalCoefficient())));
+                .getEfficiency(rotor.getItemStack()) * (1 + rotor.getAdditionalPower())) * (rotor.getCoefficient() * (1 + rotor.getAdditionalCoefficient()))) * 0.9;
 
 
         return copy_power;
@@ -436,7 +429,7 @@ public class WindSystem implements IWindSystem {
 
     @Override
     public double getPowerFromWindRotor(
-            final World world,
+            final Level world,
             final BlockPos pos,
             final IWindMechanism windMechanism,
             ItemStack stack
@@ -444,19 +437,19 @@ public class WindSystem implements IWindSystem {
 
         return this.getPower(world, pos, windMechanism.getMin(), windMechanism) * (windMechanism
                 .getRotor()
-                .getEfficiency(stack) * (1 + windMechanism.getAdditionalPower())) * (windMechanism.getCoefficient() * (1 + windMechanism.getAdditionalCoefficient()));
+                .getEfficiency(stack) * (1 + windMechanism.getAdditionalPower())) * (windMechanism.getCoefficient() * (1 + windMechanism.getAdditionalCoefficient())) * 0.9;
     }
 
     @Override
     public double getPowerFromWaterRotor(
-            final World world,
+            final Level world,
             final IWindMechanism windMechanism,
             ItemStack stack
     ) {
 
         return (this.getPower(world, new BlockPos(0, 150, 0), windMechanism.getMin(), windMechanism) / 27D) * 25 * (windMechanism
                 .getRotor()
-                .getEfficiency(stack) * (1 + windMechanism.getAdditionalPower())) * (windMechanism.getCoefficient() * (1 + windMechanism.getAdditionalCoefficient()));
+                .getEfficiency(stack) * (1 + windMechanism.getAdditionalPower())) * (windMechanism.getCoefficient() * (1 + windMechanism.getAdditionalCoefficient())) * 0.9;
     }
 
 }

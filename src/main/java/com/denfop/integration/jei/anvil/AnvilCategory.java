@@ -1,89 +1,105 @@
 package com.denfop.integration.jei.anvil;
 
+import com.denfop.integration.jei.JeiIngredientHelper;
 import com.denfop.Constants;
 import com.denfop.IUItem;
-import com.denfop.Localization;
-import com.denfop.blocks.BlockAnvil;
+import com.denfop.blockentity.mechanism.triple.heat.BlockEntityAdvAlloySmelter;
+import com.denfop.blocks.BlockAnvilEntity;
+import com.denfop.blocks.mechanism.BlockBaseMachine1Entity;
+import com.denfop.integration.jei.IRecipeCategory;
 import com.denfop.integration.jei.JEICompat;
-import mezz.jei.api.IGuiHelper;
-import mezz.jei.api.gui.IDrawable;
-import mezz.jei.api.gui.IDrawableStatic;
-import mezz.jei.api.gui.IGuiItemStackGroup;
-import mezz.jei.api.gui.IRecipeLayout;
-import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.IRecipeCategory;
+import com.denfop.integration.jei.JeiInform;
+import com.denfop.screen.ScreenMain;
+import com.denfop.utils.Localization;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableStatic;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
 
-public class AnvilCategory extends Gui implements IRecipeCategory<AnvilWrapper> {
+public class AnvilCategory extends ScreenMain implements IRecipeCategory<AnvilHandler> {
 
     private final IDrawableStatic bg;
+    JeiInform jeiInform;
 
     public AnvilCategory(
-            final IGuiHelper guiHelper
+            final IGuiHelper guiHelper, JeiInform jeiInform
     ) {
-
-        bg = guiHelper.createDrawable(new ResourceLocation(Constants.MOD_ID, "textures/gui/common3" +
+        super(((BlockEntityAdvAlloySmelter) BlockBaseMachine1Entity.adv_alloy_smelter.getDummyTe()).getGuiContainer(Minecraft.getInstance().player));
+        this.jeiInform = jeiInform;
+        bg = guiHelper.createDrawable(ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/common3" +
                         ".png"), 3, 3, 140,
                 140
         );
+        this.init();
+        this.title = net.minecraft.network.chat.Component.literal(getTitles());
+    }
+
+
+    @Override
+    public RecipeType<AnvilHandler> getRecipeType() {
+        return jeiInform.recipeType;
     }
 
     @Nonnull
     @Override
-    public String getUid() {
-        return BlockAnvil.block_anvil.getName();
-    }
-
-    @Nonnull
-    @Override
-    public String getTitle() {
-        return Localization.translate(JEICompat.getBlockStack(BlockAnvil.block_anvil).getUnlocalizedName());
+    public String getTitles() {
+        return Localization.translate(JEICompat.getBlockStack(BlockAnvilEntity.block_anvil).getDescriptionId());
     }
 
 
-    @Nonnull
-    @Override
-    public String getModName() {
-        return Constants.MOD_NAME;
-    }
-
+    @SuppressWarnings("removal")
     @Nonnull
     @Override
     public IDrawable getBackground() {
         return bg;
     }
 
+    @Override
+    public IDrawable getIcon() {
+        return null;
+    }
 
     @Override
-    public void drawExtras(@Nonnull final Minecraft mc) {
+    public void setRecipe(IRecipeLayoutBuilder builder, AnvilHandler recipes, IFocusGroup focuses) {
+        JeiIngredientHelper.addInputSlot(builder, RecipeIngredientRole.INPUT, 5, 25, recipes, 0, recipes.getInput());
+
+        builder.addSlot(RecipeIngredientRole.INPUT, 30, 25).addItemStack(new ItemStack(IUItem.ForgeHammer.getItem()));
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 60, 25).addItemStack(recipes.getOutput());
 
 
     }
 
+
     @Override
-    public void setRecipe(
-            final IRecipeLayout layout,
-            final AnvilWrapper recipes,
-            @Nonnull final IIngredients ingredients
-    ) {
-        IGuiItemStackGroup isg = layout.getItemStacks();
-        isg.init(0, true, 5, 25);
-        isg.set(0, recipes.getInput());
-        isg.init(1, true, 30, 25);
-        isg.set(1, new ItemStack(IUItem.ForgeHammer));
-        isg.init(2, false, 60, 25);
-        isg.set(2, recipes.getOutput());
-
-
+    public void draw(AnvilHandler recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics stack, double mouseX, double mouseY) {
+        this.drawSplitString(stack, Minecraft.getInstance().font, Localization.translate("iu.anvil.jei"), 5, 3,
+                140 - 5, 4210752
+        );
+        this.drawSplitString(stack, Minecraft.getInstance().font, "+", 26, 31,
+                140 - 5, 4210752
+        );
+        this.drawSplitString(stack, Minecraft.getInstance().font, "->", 47, 31,
+                140 - 5, 4210752
+        );
+        this.drawSplitString(stack, Minecraft.getInstance().font, Localization.translate("iu.anvil.jei1") + "." + Localization.translate(
+                        "iu.anvil.jei2"), 5, 50,
+                140 - 5, 4210752
+        );
     }
+
 
     protected ResourceLocation getTexture() {
-        return new ResourceLocation(Constants.MOD_ID, "textures/gui/guivein.png");
+        return ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/guivein.png");
     }
 
 

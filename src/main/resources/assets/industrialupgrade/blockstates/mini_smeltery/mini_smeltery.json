@@ -1,0 +1,35 @@
+{
+  "variants": {
+    "facing=north,type=mini_smeltery": {
+      "model": "industrialupgrade:block/mini_smeltery/mini_smeltery"
+    },
+    "facing=south,type=mini_smeltery": {
+      "model": "industrialupgrade:block/mini_smeltery/mini_smeltery",
+      "y": 180
+    },
+    "facing=west,type=mini_smeltery": {
+      "model": "industrialupgrade:block/mini_smeltery/mini_smeltery",
+      "y": 270
+    },
+    "facing=east,type=mini_smeltery": {
+      "model": "industrialupgrade:block/mini_smeltery/mini_smeltery",
+      "y": 90
+    },
+   
+    "facing=north,type=mini_smeltery_invalid": {
+      "model": "industrialupgrade:block/mini_smeltery/mini_smeltery"
+    },
+    "facing=south,type=mini_smeltery_invalid": {
+      "model": "industrialupgrade:block/mini_smeltery/mini_smeltery",
+      "y": 180
+    },
+    "facing=west,type=mini_smeltery_invalid": {
+      "model": "industrialupgrade:block/mini_smeltery/mini_smeltery",
+      "y": 270
+    },
+    "facing=east,type=mini_smeltery_invalid": {
+      "model": "industrialupgrade:block/mini_smeltery/mini_smeltery",
+      "y": 90
+    }
+  }
+}

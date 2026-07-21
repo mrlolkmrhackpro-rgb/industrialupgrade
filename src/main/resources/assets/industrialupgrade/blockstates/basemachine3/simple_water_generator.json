@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=simple_water_generator": {
+      "model": "industrialupgrade:block/basemachine/simple_water_generator"
+    },
+    "facing=south,type=simple_water_generator": {
+      "model": "industrialupgrade:block/basemachine/simple_water_generator",
+      "y": 180
+    },
+    "facing=west,type=simple_water_generator": {
+      "model": "industrialupgrade:block/basemachine/simple_water_generator",
+      "y": 270
+    },
+    "facing=east,type=simple_water_generator": {
+      "model": "industrialupgrade:block/basemachine/simple_water_generator",
+      "y": 90
+    },
+    "facing=north,type=simple_water_generator_active": {
+      "model": "industrialupgrade:block/basemachine/simple_water_generator"
+    },
+    "facing=south,type=simple_water_generator_active": {
+      "model": "industrialupgrade:block/basemachine/simple_water_generator",
+      "y": 180
+    },
+    "facing=west,type=simple_water_generator_active": {
+      "model": "industrialupgrade:block/basemachine/simple_water_generator",
+      "y": 270
+    },
+    "facing=east,type=simple_water_generator_active": {
+      "model": "industrialupgrade:block/basemachine/simple_water_generator",
+      "y": 90
+    }
+  }
+}

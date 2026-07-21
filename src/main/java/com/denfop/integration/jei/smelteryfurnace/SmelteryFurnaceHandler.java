@@ -1,25 +1,31 @@
 package com.denfop.integration.jei.smelteryfurnace;
 
 
+import com.denfop.integration.jei.IJeiVariantRecipe;
+import com.denfop.integration.jei.JeiIngredientHelper;
 import com.denfop.api.Recipes;
 import com.denfop.api.recipe.BaseFluidMachineRecipe;
 import com.denfop.api.recipe.BaseMachineRecipe;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SmelteryFurnaceHandler {
+public class SmelteryFurnaceHandler implements IJeiVariantRecipe {
 
     private static final List<SmelteryFurnaceHandler> recipes = new ArrayList<>();
-    private final ItemStack input;
+    
+    private List<List<ItemStack>> inputVariants = new ArrayList<>();
+private final ItemStack input;
     private final FluidStack outputFluid;
+    private final BaseMachineRecipe container;
 
 
-    public SmelteryFurnaceHandler(ItemStack input, FluidStack outputFluid) {
+    public SmelteryFurnaceHandler(ItemStack input, FluidStack outputFluid, BaseMachineRecipe baseMachineRecipe) {
         this.input = input;
         this.outputFluid = outputFluid;
+        this.container = baseMachineRecipe;
     }
 
     public static List<SmelteryFurnaceHandler> getRecipes() {
@@ -28,7 +34,6 @@ public class SmelteryFurnaceHandler {
         }
         return recipes;
     }
-
 
     public static SmelteryFurnaceHandler getRecipe(ItemStack is) {
         if (is == null || is.isEmpty()) {
@@ -54,17 +59,17 @@ public class SmelteryFurnaceHandler {
             FluidStack outputFluid = baseFluidMachineRecipe.output_fluid.get(0);
 
 
-            addRecipe(
+            JeiIngredientHelper.attachInputVariants(addRecipe(
                     input,
-                    outputFluid
-            );
+                    outputFluid, baseMachineRecipe
+            ), baseMachineRecipe);
         }
 
 
     }
 
-    private static SmelteryFurnaceHandler addRecipe(ItemStack input, FluidStack outputFluid) {
-        SmelteryFurnaceHandler recipe = new SmelteryFurnaceHandler(input, outputFluid);
+    private static SmelteryFurnaceHandler addRecipe(ItemStack input, FluidStack outputFluid, BaseMachineRecipe baseMachineRecipe) {
+        SmelteryFurnaceHandler recipe = new SmelteryFurnaceHandler(input, outputFluid, baseMachineRecipe);
         if (recipes.contains(recipe)) {
             return null;
         }
@@ -72,6 +77,9 @@ public class SmelteryFurnaceHandler {
         return recipe;
     }
 
+    public BaseMachineRecipe getContainer() {
+        return container;
+    }
 
     public ItemStack getInput() {
         return input;
@@ -82,4 +90,15 @@ public class SmelteryFurnaceHandler {
         return outputFluid;
     }
 
+
+
+    @Override
+    public void setInputVariants(final List<List<ItemStack>> inputVariants) {
+        this.inputVariants = inputVariants == null ? new ArrayList<>() : inputVariants;
+    }
+
+    @Override
+    public List<ItemStack> getInputVariants(final int slot, final ItemStack fallback) {
+        return JeiIngredientHelper.getInputVariants(this.inputVariants, slot, fallback);
+    }
 }

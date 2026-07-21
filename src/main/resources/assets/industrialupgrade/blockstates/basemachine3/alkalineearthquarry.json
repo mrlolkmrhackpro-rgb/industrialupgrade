@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=alkalineearthquarry": {
+      "model": "industrialupgrade:block/basemachine/alkalineearthquarry"
+    },
+    "facing=south,type=alkalineearthquarry": {
+      "model": "industrialupgrade:block/basemachine/alkalineearthquarry",
+      "y": 180
+    },
+    "facing=west,type=alkalineearthquarry": {
+      "model": "industrialupgrade:block/basemachine/alkalineearthquarry",
+      "y": 270
+    },
+    "facing=east,type=alkalineearthquarry": {
+      "model": "industrialupgrade:block/basemachine/alkalineearthquarry",
+      "y": 90
+    },
+    "facing=north,type=alkalineearthquarry_active": {
+      "model": "industrialupgrade:block/basemachine/alkalineearthquarry_active"
+    },
+    "facing=south,type=alkalineearthquarry_active": {
+      "model": "industrialupgrade:block/basemachine/alkalineearthquarry_active",
+      "y": 180
+    },
+    "facing=west,type=alkalineearthquarry_active": {
+      "model": "industrialupgrade:block/basemachine/alkalineearthquarry_active",
+      "y": 270
+    },
+    "facing=east,type=alkalineearthquarry_active": {
+      "model": "industrialupgrade:block/basemachine/alkalineearthquarry_active",
+      "y": 90
+    }
+  }
+}

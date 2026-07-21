@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=steam_wire_insulator": {
+      "model": "industrialupgrade:block/basemachine/steam_wire_insulator"
+    },
+    "facing=south,type=steam_wire_insulator": {
+      "model": "industrialupgrade:block/basemachine/steam_wire_insulator",
+      "y": 180
+    },
+    "facing=west,type=steam_wire_insulator": {
+      "model": "industrialupgrade:block/basemachine/steam_wire_insulator",
+      "y": 270
+    },
+    "facing=east,type=steam_wire_insulator": {
+      "model": "industrialupgrade:block/basemachine/steam_wire_insulator",
+      "y": 90
+    },
+    "facing=north,type=steam_wire_insulator_active": {
+      "model": "industrialupgrade:block/basemachine/steam_wire_insulator_active"
+    },
+    "facing=south,type=steam_wire_insulator_active": {
+      "model": "industrialupgrade:block/basemachine/steam_wire_insulator_active",
+      "y": 180
+    },
+    "facing=west,type=steam_wire_insulator_active": {
+      "model": "industrialupgrade:block/basemachine/steam_wire_insulator_active",
+      "y": 270
+    },
+    "facing=east,type=steam_wire_insulator_active": {
+      "model": "industrialupgrade:block/basemachine/steam_wire_insulator_active",
+      "y": 90
+    }
+  }
+}

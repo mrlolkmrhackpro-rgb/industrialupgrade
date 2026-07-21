@@ -1,0 +1,50 @@
+{
+  "variants": {
+    "facing=north,type=uhv": {
+      "model": "industrialupgrade:block/basemachine/uhv"
+    },
+    "facing=north,type=uhv_active": {
+      "model": "industrialupgrade:block/basemachine/uhv"
+    },
+    "facing=south,type=uhv": {
+      "model": "industrialupgrade:block/basemachine/uhv",
+      "y": 180
+    },
+    "facing=south,type=uhv_active": {
+      "model": "industrialupgrade:block/basemachine/uhv",
+      "y": 180
+    },
+    "facing=west,type=uhv": {
+      "model": "industrialupgrade:block/basemachine/uhv",
+      "y": 270
+    },
+    "facing=west,type=uhv_active": {
+      "model": "industrialupgrade:block/basemachine/uhv",
+      "y": 270
+    },
+    "facing=east,type=uhv": {
+      "model": "industrialupgrade:block/basemachine/uhv",
+      "y": 90
+    },
+    "facing=east,type=uhv_active": {
+      "model": "industrialupgrade:block/basemachine/uhv",
+      "y": 90
+    },
+    "facing=down,type=uhv": {
+      "model": "industrialupgrade:block/basemachine/uhv",
+      "x": 90
+    },
+    "facing=down,type=uhv_active": {
+      "model": "industrialupgrade:block/basemachine/uhv",
+      "x": 90
+    },
+    "facing=up,type=uhv": {
+      "model": "industrialupgrade:block/basemachine/uhv",
+      "x": 270
+    },
+    "facing=up,type=uhv_active": {
+      "model": "industrialupgrade:block/basemachine/uhv",
+      "x": 270
+    }
+  }
+}

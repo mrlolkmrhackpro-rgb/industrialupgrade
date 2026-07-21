@@ -1,6 +1,6 @@
 package com.denfop.componets;
 
-import com.denfop.invslot.Inventory;
+import com.denfop.inventory.Inventory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,4 +46,11 @@ public class ComponentRenderInventory {
     }
 
 
+    public boolean contains(Inventory inventory) {
+        for (Inventory slot : getSlotList()) {
+            if (slot == inventory)
+                return true;
+        }
+        return false;
+    }
 }

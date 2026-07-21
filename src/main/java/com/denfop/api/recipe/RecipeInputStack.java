@@ -1,45 +1,49 @@
 package com.denfop.api.recipe;
 
+import com.denfop.api.Recipes;
 import com.denfop.recipe.IInputItemStack;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
+import com.denfop.utils.ModUtils;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Collections;
 import java.util.List;
 
 public class RecipeInputStack implements IRecipeInputStack {
 
-    private final List<ItemStack> input;
+    private final IInputItemStack input;
 
     public RecipeInputStack(IInputItemStack input) {
-        this.input = input.getInputs();
+        this.input = input;
 
     }
 
     public RecipeInputStack(ItemStack input) {
-        this.input = Collections.singletonList(input);
+        this.input = Recipes.inputFactory.getInput(Collections.singletonList(input));
 
     }
 
     @Override
     public List<ItemStack> getItemStack() {
-        return input;
+        return input.getInputs();
     }
 
     @Override
     public boolean matched(final ItemStack stack) {
-        final int damage = stack.getItemDamage();
         for (ItemStack input : getItemStack()) {
-            final int damage1 = input.getItemDamage();
-            if (input.getItem() == stack.getItem() && (damage == OreDictionary.WILDCARD_VALUE || damage == damage1 || damage1 == OreDictionary.WILDCARD_VALUE)) {
-                if (stack.getTagCompound() == null || input.getTagCompound() == null) {
+            if (input.getItem() == stack.getItem()) {
+                if (stack.getComponents().isEmpty() || input.getComponents().isEmpty()) {
                     return true;
                 } else {
-                    return stack.getTagCompound().equals(input.getTagCompound());
+                    return ModUtils.checkItemEquality(input, stack);
                 }
             }
         }
         return false;
+    }
+
+    @Override
+    public IInputItemStack getInput() {
+        return input;
     }
 
     @Override
@@ -52,14 +56,13 @@ public class RecipeInputStack implements IRecipeInputStack {
         }
         RecipeInputStack that = (RecipeInputStack) o;
         for (ItemStack input : getItemStack()) {
-            final int damage = input.getItemDamage();
+
             for (ItemStack input1 : that.getItemStack()) {
-                final int damage1 = input1.getItemDamage();
-                if (input.getItem() == input1.getItem() && (damage1 == OreDictionary.WILDCARD_VALUE || damage == damage1)) {
-                    if (input.getTagCompound() == null) {
+                if (input.getItem() == input1.getItem()) {
+                    if (input.getComponents().isEmpty()) {
                         return true;
                     } else {
-                        return input.getTagCompound().equals(input1.getTagCompound());
+                        return input.getComponents().equals(input1.getComponents());
                     }
                 }
             }

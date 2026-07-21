@@ -1,0 +1,22 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:module_schedule"
+    },
+    "B": {
+      "item": "industrialupgrade:crafting_elements/crafting_90_element"
+    }
+  },
+  "pattern": [
+    "   ",
+    " A ",
+    " B "
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:additionmodule/wireless"
+  },
+  "show_notification": false
+}

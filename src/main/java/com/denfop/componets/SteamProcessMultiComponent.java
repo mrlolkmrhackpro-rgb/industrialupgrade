@@ -1,29 +1,28 @@
 package com.denfop.componets;
 
-import com.denfop.IUCore;
 import com.denfop.IUItem;
-import com.denfop.Localization;
-import com.denfop.api.audio.EnumTypeAudio;
-import com.denfop.api.inv.IAdvInventory;
+import com.denfop.api.container.CustomWorldContainer;
 import com.denfop.api.recipe.IMultiUpdateTick;
 import com.denfop.api.recipe.InventoryOutput;
 import com.denfop.api.recipe.InventorySteamMultiRecipes;
 import com.denfop.api.recipe.MachineRecipe;
+import com.denfop.api.sound.EnumTypeAudio;
+import com.denfop.blockentity.base.BlockEntityBase;
+import com.denfop.blockentity.base.BlockEntityInventory;
+import com.denfop.blockentity.base.EnumMultiMachine;
+import com.denfop.blockentity.base.ISteamMechanism;
+import com.denfop.blockentity.mechanism.EnumTypeMachines;
 import com.denfop.blocks.FluidName;
 import com.denfop.network.packet.CustomPacketBuffer;
-import com.denfop.tiles.base.EnumMultiMachine;
-import com.denfop.tiles.base.ISteamMechanism;
-import com.denfop.tiles.base.TileEntityBlock;
-import com.denfop.tiles.base.TileEntityInventory;
-import com.denfop.tiles.mechanism.EnumTypeMachines;
 import com.denfop.utils.Timer;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 
 import java.io.IOException;
 import java.util.List;
@@ -47,18 +46,20 @@ public class SteamProcessMultiComponent extends AbstractComponent implements IMu
     public int operationLength;
     private int mode;
     private int[] col;
+    private Timer timer1 = new Timer(0, 0, 0);
+    private Timer timer = null;
 
     public SteamProcessMultiComponent(final ISteamMechanism parent, final EnumMultiMachine enumMultiMachine) {
-        super((TileEntityBlock) parent);
+        super((BlockEntityBase) parent);
         this.multimachine = parent;
         this.inputSlots = new InventorySteamMultiRecipes(
-                (TileEntityInventory) parent,
+                (BlockEntityInventory) parent,
                 enumMultiMachine.type.recipe,
                 (IMultiUpdateTick) this,
                 enumMultiMachine.sizeWorkingSlot, this
         );
         this.outputSlot = new InventoryOutput(
-                (IAdvInventory<?>) parent,
+                (CustomWorldContainer) parent,
                 enumMultiMachine.sizeWorkingSlot + (enumMultiMachine.output ? 2 : 0)
         );
         this.enumMultiMachine = enumMultiMachine;
@@ -72,52 +73,41 @@ public class SteamProcessMultiComponent extends AbstractComponent implements IMu
         this.defaultOperationLength = this.operationChange = this.operationLength =
                 Math.max((int) (enumMultiMachine.lenghtOperation * 1D / speed), 1);
         this.output = new MachineRecipe[sizeWorkingSlot];
-        this.steam = ((TileEntityBlock) parent).getComp(ComponentSteamEnergy.class);
-        this.pressure = ((TileEntityBlock) parent).getComp(PressureComponent.class);
+        this.steam = ((BlockEntityBase) parent).getComp(ComponentSteamEnergy.class);
+        this.pressure = ((BlockEntityBase) parent).getComp(PressureComponent.class);
     }
-    private Timer timer1 = new Timer(0, 0, 0);
-    private Timer timer = null;
 
-    @Override
-    public boolean onBlockActivated(final EntityPlayer player, final EnumHand hand) {
-        ItemStack stack = player.getHeldItem(hand);
-        if (stack.getItem().equals(IUItem.canister)) {
-            FluidStack fluid = FluidUtil.getFluidContained(stack);
-            if (fluid != null && fluid.getFluid() == FluidName.fluidsteam_oil.getInstance() && fluid.amount >= 250 && (!timer1.canWork() || timer1.getBar() == 0) && (timer == null || !timer.canWork())) {
-                this.timer = new Timer(0, 0, 40);
-                final IFluidHandlerItem handler = FluidUtil.getFluidHandler(stack);
-                handler.drain(250, true);
-                return true;
-            }
-        }
-        return super.onBlockActivated(player, hand);
-    }
     @Override
     public void onLoaded() {
         super.onLoaded();
-        if (IUCore.proxy.isSimulating()) {
+        if (!this.parent.getLevel().isClientSide()) {
             inputSlots.load();
             this.getsOutputs();
         }
     }
 
-
+    @Override
+    public boolean onBlockActivated(final Player player, final InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (stack.getItem().equals(IUItem.canister.getItem())) {
+            IFluidHandlerItem handler = stack.getCapability(Capabilities.FluidHandler.ITEM, null);
+            FluidStack fluid = handler.getFluidInTank(0);
+            if (fluid != FluidStack.EMPTY && fluid.getFluid() == FluidName.fluidsteam_oil.getInstance().get() && fluid.getAmount() >= 250 && (!timer1.canWork() || timer1.getBar() == 0) && (timer == null || !timer.canWork())) {
+                this.timer = new Timer(0, 0, 40);
+                handler.drain(250, IFluidHandler.FluidAction.EXECUTE);
+                return true;
+            }
+        }
+        return super.onBlockActivated(player, hand);
+    }
 
     public void setOverclockRates() {
 
     }
 
     @Override
-    public void addInformation(final ItemStack stack, final List<String> tooltip) {
-        super.addInformation(stack, tooltip);
-        if (parent.getWorld() == null) {
-            tooltip.add(Localization.translate("iu.speed_canister.info1"));
-        }
-    }
-
-    @Override
-    public void onContainerUpdate(final EntityPlayerMP player) {
-        CustomPacketBuffer buffer = new CustomPacketBuffer(16);
+    public void onContainerUpdate(final ServerPlayer player) {
+        CustomPacketBuffer buffer = new CustomPacketBuffer(16, player.registryAccess());
         buffer.writeInt(this.operationLength);
         for (int i = 0; i < sizeWorkingSlot; i++) {
             buffer.writeInt(this.progress[i]);
@@ -131,7 +121,7 @@ public class SteamProcessMultiComponent extends AbstractComponent implements IMu
 
     @Override
     public CustomPacketBuffer updateComponent() {
-        CustomPacketBuffer buffer = new CustomPacketBuffer(16);
+        CustomPacketBuffer buffer = new CustomPacketBuffer(16, parent.registryAccess());
         buffer.writeInt(this.operationLength);
         for (int i = 0; i < sizeWorkingSlot; i++) {
             buffer.writeInt(this.progress[i]);
@@ -212,7 +202,7 @@ public class SteamProcessMultiComponent extends AbstractComponent implements IMu
             this.parent.setActive(active);
         }
         if (this.parent.getActive()) {
-            if (this.parent.getWorld().getWorldTime() % 20 == 0) {
+            if (this.parent.getWorld().getGameTime() % 20 == 0) {
                 if (this.timer != null && this.timer.canWork()) {
                     this.timer.work();
                     if (!this.timer.canWork()) {
@@ -304,14 +294,14 @@ public class SteamProcessMultiComponent extends AbstractComponent implements IMu
     public MachineRecipe getOutput(int slotId) {
         if (enumMultiMachine == null || (
                 enumMultiMachine.type != EnumTypeMachines.COMBRECYCLER && enumMultiMachine.type != EnumTypeMachines.RECYCLER)) {
-            if (this.inputSlots.isEmpty(slotId)) {
+            if (this.inputSlots.get(slotId).isEmpty()) {
                 this.output[slotId] = null;
                 return null;
             }
             this.output[slotId] = this.inputSlots.process(slotId);
             return this.output[slotId];
         } else {
-            if (this.inputSlots.isEmpty(slotId)) {
+            if (this.inputSlots.get(slotId).isEmpty()) {
                 this.output[slotId] = null;
                 return null;
             }

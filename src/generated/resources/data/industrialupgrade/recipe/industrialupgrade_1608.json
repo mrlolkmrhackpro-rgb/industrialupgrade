@@ -1,0 +1,31 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:battery/advanced_re_battery"
+    },
+    "B": {
+      "item": "industrialupgrade:wiring/copper"
+    },
+    "C": {
+      "item": "industrialupgrade:charged_quartz"
+    },
+    "D": {
+      "tag": "c:casings/iron"
+    },
+    "E": {
+      "item": "industrialupgrade:crafting_elements/crafting_276_element"
+    }
+  },
+  "pattern": [
+    " BD",
+    "ACE",
+    " BD"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:crafting_elements/crafting_278_element"
+  },
+  "show_notification": false
+}

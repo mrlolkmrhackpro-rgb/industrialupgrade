@@ -1,0 +1,35 @@
+{
+  "variants": {
+    "facing=north,type=double_transformer": {
+      "model": "industrialupgrade:block/basemachine/double_transformer"
+    },
+    "facing=south,type=double_transformer": {
+      "model": "industrialupgrade:block/basemachine/double_transformer",
+      "y": 180
+    },
+    "facing=west,type=double_transformer": {
+      "model": "industrialupgrade:block/basemachine/double_transformer",
+      "y": 270
+    },
+    "facing=east,type=double_transformer": {
+      "model": "industrialupgrade:block/basemachine/double_transformer",
+      "y": 90
+    },
+   
+    "facing=north,type=double_transformer_active": {
+      "model": "industrialupgrade:block/basemachine/double_transformer"
+    },
+    "facing=south,type=double_transformer_active": {
+      "model": "industrialupgrade:block/basemachine/double_transformer",
+      "y": 180
+    },
+    "facing=west,type=double_transformer_active": {
+      "model": "industrialupgrade:block/basemachine/double_transformer",
+      "y": 270
+    },
+    "facing=east,type=double_transformer_active": {
+      "model": "industrialupgrade:block/basemachine/double_transformer",
+      "y": 90
+    }
+  }
+}

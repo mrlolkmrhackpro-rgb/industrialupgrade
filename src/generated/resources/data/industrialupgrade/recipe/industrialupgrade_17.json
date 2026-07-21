@@ -1,0 +1,28 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:module_storage"
+    },
+    "B": {
+      "tag": "c:plates/carbon"
+    },
+    "D": {
+      "tag": "c:gears/electrum"
+    },
+    "E": {
+      "tag": "c:doubleplate/aluminumbronze"
+    }
+  },
+  "pattern": [
+    "BBB",
+    " A ",
+    "DED"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:module_separate"
+  },
+  "show_notification": false
+}

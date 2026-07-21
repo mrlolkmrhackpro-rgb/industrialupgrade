@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=tuner": {
+      "model": "industrialupgrade:block/basemachine/tuner"
+    },
+    "facing=south,type=tuner": {
+      "model": "industrialupgrade:block/basemachine/tuner",
+      "y": 180
+    },
+    "facing=west,type=tuner": {
+      "model": "industrialupgrade:block/basemachine/tuner",
+      "y": 270
+    },
+    "facing=east,type=tuner": {
+      "model": "industrialupgrade:block/basemachine/tuner",
+      "y": 90
+    },
+    "facing=north,type=tuner_active": {
+      "model": "industrialupgrade:block/basemachine/tuner_active"
+    },
+    "facing=south,type=tuner_active": {
+      "model": "industrialupgrade:block/basemachine/tuner_active",
+      "y": 180
+    },
+    "facing=west,type=tuner_active": {
+      "model": "industrialupgrade:block/basemachine/tuner_active",
+      "y": 270
+    },
+    "facing=east,type=tuner_active": {
+      "model": "industrialupgrade:block/basemachine/tuner_active",
+      "y": 90
+    }
+  }
+}

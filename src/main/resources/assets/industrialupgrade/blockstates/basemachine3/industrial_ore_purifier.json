@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=industrial_ore_purifier": {
+      "model": "industrialupgrade:block/basemachine/industrial_ore_purifier"
+    },
+    "facing=south,type=industrial_ore_purifier": {
+      "model": "industrialupgrade:block/basemachine/industrial_ore_purifier",
+      "y": 180
+    },
+    "facing=west,type=industrial_ore_purifier": {
+      "model": "industrialupgrade:block/basemachine/industrial_ore_purifier",
+      "y": 270
+    },
+    "facing=east,type=industrial_ore_purifier": {
+      "model": "industrialupgrade:block/basemachine/industrial_ore_purifier",
+      "y": 90
+    },
+    "facing=north,type=industrial_ore_purifier_active": {
+      "model": "industrialupgrade:block/basemachine/industrial_ore_purifier_active"
+    },
+    "facing=south,type=industrial_ore_purifier_active": {
+      "model": "industrialupgrade:block/basemachine/industrial_ore_purifier_active",
+      "y": 180
+    },
+    "facing=west,type=industrial_ore_purifier_active": {
+      "model": "industrialupgrade:block/basemachine/industrial_ore_purifier_active",
+      "y": 270
+    },
+    "facing=east,type=industrial_ore_purifier_active": {
+      "model": "industrialupgrade:block/basemachine/industrial_ore_purifier_active",
+      "y": 90
+    }
+  }
+}

@@ -1,6 +1,6 @@
 package com.denfop.world.vein.noise;
 
-
+import net.minecraft.util.RandomSource;
 
 import java.util.*;
 
@@ -45,7 +45,7 @@ public class PerlinNoiseViewer {
         return false;
     }
 
-    public static List<ShellCluster> createClusters(Random random) {
+    public static List<ShellCluster> createClusters(RandomSource random) {
         int maxCenters = 512 * maxValue * maxValue * 2;
         double minDist = 3;
         ArrayList<Center> centers = generateCenters(maxCenters, minDist, WIDTH, HEIGHT);
@@ -54,44 +54,8 @@ public class PerlinNoiseViewer {
 
         List<ShellCluster> clusters = new LinkedList<>();
 
-        class Pixel {
-            short x, y;
-            double dist;
 
-            Pixel(int x, int y, double dist) {
-                this.x = (short) x;
-                this.y = (short) y;
-                this.dist = dist;
-            }
-        }
-
-        Map<Integer, List<Pixel>> centerPixels = new HashMap<>();
-
-        for (int y = 0; y < HEIGHT; y++) {
-            for (int x = 0; x < WIDTH; x++) {
-                double minDistSq = Double.MAX_VALUE;
-                int nearestIndex = -1;
-
-                for (int i = 0; i < centers.size(); i++) {
-                    Center c = centers.get(i);
-                    double dx = x - c.x;
-                    double dy = y - c.y;
-                    double distSq = dx * dx + dy * dy;
-
-                    if (distSq < minDistSq) {
-                        minDistSq = distSq;
-                        nearestIndex = i;
-                    }
-                }
-
-
-                double randomShellDist = random.nextDouble() * maxShellRadius;
-                if (minDistSq <= randomShellDist * randomShellDist) {
-                    List<Pixel> list = centerPixels.computeIfAbsent(nearestIndex, k -> new LinkedList<>());
-                    list.add(new Pixel(x, y, Math.sqrt(minDistSq)));
-                }
-            }
-        }
+        Map<Integer, List<Pixel>> centerPixels = EDTVoronoi.fastAssign(centers, WIDTH, HEIGHT, maxShellRadius, random);
 
         for (Map.Entry<Integer, List<Pixel>> entry : centerPixels.entrySet()) {
             List<Pixel> pixels = new ArrayList<>(entry.getValue());
@@ -142,7 +106,7 @@ public class PerlinNoiseViewer {
         return clusters;
     }
 
-    public static ShellCluster createVolcanoClusters(Random random) {
+    public static ShellCluster createVolcanoClusters(RandomSource random) {
         int maxCenters = 1;
         double minDist = 1;
         ArrayList<Center> centers = generateCenters(maxCenters, minDist, 24, 24);

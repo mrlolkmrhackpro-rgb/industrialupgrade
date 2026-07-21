@@ -1,0 +1,8 @@
+{
+  "values": [
+    "industrialupgrade:baseore2/molybdenum",
+    "industrialupgrade:blockspace4/tethys_molybdenum_ore",
+    "industrialupgrade:asteroidore1/asteroid_molybdenum_ore",
+    "industrialupgrade:deepore1/deep_molybdenum_ore"
+  ]
+}

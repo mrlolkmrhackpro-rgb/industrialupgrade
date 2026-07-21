@@ -1,14 +1,14 @@
 package com.denfop.integration.jei.smeltery_controller;
 
 
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.denfop.tiles.smeltery.TileEntitySmelteryController.mapRecipes;
+import static com.denfop.blockentity.smeltery.BlockEntitySmelteryController.mapRecipes;
 
 public class SmelteryControllerHandler {
 

@@ -1,0 +1,35 @@
+{
+  "variants": {
+    "facing=north,type=volcano_chest": {
+      "model": "industrialupgrade:block/volcano_chest"
+    },
+    "facing=south,type=volcano_chest": {
+      "model": "industrialupgrade:block/volcano_chest",
+      "y": 180
+    },
+    "facing=west,type=volcano_chest": {
+      "model": "industrialupgrade:block/volcano_chest",
+      "y": 270
+    },
+    "facing=east,type=volcano_chest": {
+      "model": "industrialupgrade:block/volcano_chest",
+      "y": 90
+    },
+    
+    "facing=north,type=volcano_chest_invalid": {
+      "model": "industrialupgrade:block/volcano_chest"
+    },
+    "facing=south,type=volcano_chest_invalid": {
+      "model": "industrialupgrade:block/volcano_chest",
+      "y": 180
+    },
+    "facing=west,type=volcano_chest_invalid": {
+      "model": "industrialupgrade:block/volcano_chest",
+      "y": 270
+    },
+    "facing=east,type=volcano_chest_invalid": {
+      "model": "industrialupgrade:block/volcano_chest",
+      "y": 90
+    }
+  }
+}

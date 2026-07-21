@@ -1,10 +1,9 @@
 package com.denfop.integration.jei.genneutronium;
 
 
-import com.denfop.Config;
 import com.denfop.blocks.FluidName;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +52,7 @@ public class GenNeuHandler {
 
     public static void initRecipes() {
 
-        addRecipe(Config.energy * 1000 / 100, new FluidStack(FluidName.fluidNeutron.getInstance(), 1000));
+        addRecipe(16250000.0D * 1000 / 100, new FluidStack(FluidName.fluidneutron.getInstance().get(), 1000));
 
 
     }

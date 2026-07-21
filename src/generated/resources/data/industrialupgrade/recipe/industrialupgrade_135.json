@@ -1,0 +1,28 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:lens/sunlinse"
+    },
+    "B": {
+      "item": "industrialupgrade:quantumitems4"
+    },
+    "C": {
+      "item": "industrialupgrade:module_schedule"
+    },
+    "D": {
+      "item": "industrialupgrade:quantumitems3"
+    }
+  },
+  "pattern": [
+    "BBB",
+    "ACA",
+    "ADA"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:modultype/module56"
+  },
+  "show_notification": false
+}

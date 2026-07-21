@@ -1,19 +1,19 @@
 package com.denfop.items.relocator;
 
-import com.denfop.network.packet.PacketSynhronyzationRelocator;
-import net.minecraft.entity.player.EntityPlayer;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+
+import com.denfop.config.ModConfig;
+import com.denfop.network.packet.PacketSynhronyzationRelocator;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RelocatorNetwork {
-
     public static RelocatorNetwork instance;
-    Map<Integer, Map<UUID, List<Point>>> worldDataPoints = new HashMap<>();
+    Map<ResourceKey<Level>, Map<UUID, List<Point>>> worldDataPoints = new ConcurrentHashMap<>();
 
     public static void init() {
         if (instance == null) {
@@ -21,68 +21,78 @@ public class RelocatorNetwork {
         }
     }
 
-    public Map<Integer, Map<UUID, List<Point>>> getWorldDataPoints() {
+    public Map<ResourceKey<Level>, Map<UUID, List<Point>>> getWorldDataPoints() {
         return worldDataPoints;
     }
 
-    public void addPoint(EntityPlayer player, Point point) {
+    public void addPoint(Player player, Point point) {
         final Map<UUID, List<Point>> map = worldDataPoints.computeIfAbsent(
-                player.getEntityWorld().provider.getDimension(),
-                k -> new HashMap<>()
-        );
-        final List<Point> list = map.computeIfAbsent(player.getPersistentID(), k -> new LinkedList<>());
-        list.add(point);
-        new PacketSynhronyzationRelocator(player,list);
-    }
-
-    public void removePoint(EntityPlayer player, Point point) {
-        final Map<UUID, List<Point>> map = worldDataPoints.computeIfAbsent(
-                player.getEntityWorld().provider.getDimension(),
-                k -> new HashMap<>()
-        );
-        final List<Point> list = map.computeIfAbsent(player.getPersistentID(), k -> new LinkedList<>());
-        list.removeIf(point1 -> point1.getName().equals(point.getName()));
-        new PacketSynhronyzationRelocator(player,list);
-    }
-    public void addPoints(EntityPlayer player, int levelKey, List<Point> points) {
-        final Map<UUID, List<Point>> map = worldDataPoints.computeIfAbsent(
-                levelKey,
-                k -> new HashMap<>()
-        );
-        map.put(player.getUniqueID(),points);
-    }
-    public void addPoints(EntityPlayer player, List<Point> points) {
-        final Map<UUID, List<Point>> map = worldDataPoints.computeIfAbsent(
-                player.getEntityWorld().provider.getDimension(),
+                player.level().dimension(),
                 k -> new ConcurrentHashMap<>()
         );
-        map.put(player.getUniqueID(),points);
+        final List<Point> list = map.computeIfAbsent(player.getUUID(), k -> new LinkedList<>());
+        int maxPoints = ModConfig.itemInt("relocator_max_points", 0);
+        if (maxPoints > 0 && list.size() >= maxPoints) {
+            return;
+        }
+        list.add(point);
+        new PacketSynhronyzationRelocator(player, list);
+    }
+
+    public void addPoints(Player player, ResourceKey<Level> levelKey, List<Point> points) {
+        final Map<UUID, List<Point>> map = worldDataPoints.computeIfAbsent(
+                levelKey,
+                k -> new ConcurrentHashMap<>()
+        );
+        map.put(player.getUUID(), points);
+    }
+
+    public void addPoints(Player player, List<Point> points) {
+        final Map<UUID, List<Point>> map = worldDataPoints.computeIfAbsent(
+                player.level().dimension(),
+                k -> new ConcurrentHashMap<>()
+        );
+        map.put(player.getUUID(), points);
 
     }
-    public void teleportPlayer(EntityPlayer player, Point point) {
-        if (!player.getEntityWorld().isRemote) {
+
+    public void removePoint(Player player, Point point) {
+        final Map<UUID, List<Point>> map = worldDataPoints.computeIfAbsent(
+                player.level().dimension(),
+                k -> new HashMap<>()
+        );
+        final List<Point> list = map.computeIfAbsent(player.getUUID(), k -> new LinkedList<>());
+        list.removeIf(point1 -> point1.getName().equals(point.getName()));
+        new PacketSynhronyzationRelocator(player, list);
+    }
+
+    public void teleportPlayer(Player player, Point point) {
+        if (!player.level().isClientSide()) {
+            int maxDistance = ModConfig.itemInt("relocator_max_teleport_distance", 0);
+            if (maxDistance > 0 && player.blockPosition().distSqr(point.getPos()) > (double) maxDistance * (double) maxDistance) {
+                return;
+            }
             double x = point.getPos().getX() + 0.5;
             double y = point.getPos().getY();
             double z = point.getPos().getZ() + 0.5;
 
 
-            player.setPositionAndUpdate(x, y, z);
+            player.teleportTo(x, y, z);
 
 
             player.fallDistance = 0.0F;
         }
     }
 
-    public List<Point> getPoints(EntityPlayer player) {
+    public List<Point> getPoints(Player player) {
         final Map<UUID, List<Point>> map = worldDataPoints.computeIfAbsent(
-                player.getEntityWorld().provider.getDimension(),
+                player.level().dimension(),
                 k -> new HashMap<>()
         );
-        return map.computeIfAbsent(player.getPersistentID(), k -> new LinkedList<>());
+        return map.computeIfAbsent(player.getUUID(), k -> new LinkedList<>());
     }
 
     public void onUnload() {
         worldDataPoints.clear();
     }
-
 }

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=cooling": {
+      "model": "industrialupgrade:block/basemachine/cooling"
+    },
+    "facing=south,type=cooling": {
+      "model": "industrialupgrade:block/basemachine/cooling",
+      "y": 180
+    },
+    "facing=west,type=cooling": {
+      "model": "industrialupgrade:block/basemachine/cooling",
+      "y": 270
+    },
+    "facing=east,type=cooling": {
+      "model": "industrialupgrade:block/basemachine/cooling",
+      "y": 90
+    },
+    "facing=north,type=cooling_active": {
+      "model": "industrialupgrade:block/basemachine/cooling_active"
+    },
+    "facing=south,type=cooling_active": {
+      "model": "industrialupgrade:block/basemachine/cooling_active",
+      "y": 180
+    },
+    "facing=west,type=cooling_active": {
+      "model": "industrialupgrade:block/basemachine/cooling_active",
+      "y": 270
+    },
+    "facing=east,type=cooling_active": {
+      "model": "industrialupgrade:block/basemachine/cooling_active",
+      "y": 90
+    }
+  }
+}

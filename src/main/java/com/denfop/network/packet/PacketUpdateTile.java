@@ -1,69 +1,71 @@
 package com.denfop.network.packet;
 
 import com.denfop.IUCore;
+import com.denfop.api.blockentity.MultiBlockEntity;
+import com.denfop.blockentity.base.BlockEntityBase;
 import com.denfop.blocks.TileBlockCreator;
 import com.denfop.network.DecoderHandler;
-import com.denfop.tiles.base.TileEntityBlock;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.io.IOException;
 
 public class PacketUpdateTile implements IPacket {
 
+    private CustomPacketBuffer buffer;
+
     public PacketUpdateTile() {
 
     }
 
-    public PacketUpdateTile(TileEntityBlock te) {
-        final Chunk chunk = te.getWorld().getChunkFromBlockCoords(te.getPos());
-        ExtendedBlockStorage extendedblockstorage = chunk.storageArrays[te.getPos().getY() >> 4];
-        int i = te.getPos().getX() & 15;
-        int j = te.getPos().getY();
-        int k = te.getPos().getZ() & 15;
-        extendedblockstorage.set(i, j & 15, k, te.getBlockState());
+    public PacketUpdateTile(BlockEntityBase te) {
+
         IUCore.network.getServer().addTileToUpdate(te);
 
     }
 
-    public PacketUpdateTile(CustomPacketBuffer data, EntityPlayerMP player) {
+    public PacketUpdateTile(CustomPacketBuffer data, ServerPlayer player) {
 
-        IUCore.network.getServer().sendPacket(data, player);
+        this.buffer = data;
+        IUCore.network.getServer().sendPacket(this, data, player);
     }
 
-    private static void apply(BlockPos pos, Class<? extends TileEntityBlock> teClass, World world, byte[] is) {
-        if (world.isBlockLoaded(pos, false)) {
-            TileEntity te = world.getTileEntity(pos);
-            if (teClass != null && (te == null || te.getClass() != teClass || te.isInvalid() || te.getWorld() != world)) {
+    private static void apply(BlockPos pos, Class<? extends BlockEntityBase> teClass, Level world, byte[] is) {
+        if (world.isLoaded(pos)) {
+            BlockEntity te = world.getBlockEntity(pos);
+            if (teClass != null && (te == null || te.getClass() != teClass || te.isRemoved() || te.getLevel() != world)) {
 
 
-                te = TileEntityBlock.instantiate(teClass);
-                world.setTileEntity(pos, te);
-
-                assert !te.isInvalid();
-
-                assert te.getWorld() == world;
             } else {
                 if (te == null) {
                     return;
                 }
 
-                new PacketUpdateTe(world, pos);
-                if (te.isInvalid() || te.getWorld() != world) {
+
+                if (te.isRemoved() || te.getLevel() != world) {
                     return;
                 }
 
 
             }
-            final CustomPacketBuffer buf = new CustomPacketBuffer();
+            final CustomPacketBuffer buf = new CustomPacketBuffer(world.registryAccess());
             buf.writeBytes(is);
-            ((TileEntityBlock) te).readPacket(buf);
+            ((BlockEntityBase) te).readPacket(buf);
+
         }
+    }
+
+    @Override
+    public CustomPacketBuffer getPacketBuffer() {
+        return buffer;
+    }
+
+    @Override
+    public void setPacketBuffer(CustomPacketBuffer customPacketBuffer) {
+        buffer = customPacketBuffer;
     }
 
     @Override
@@ -72,8 +74,7 @@ public class PacketUpdateTile implements IPacket {
     }
 
     @Override
-    public void readPacket(final CustomPacketBuffer is, final EntityPlayer entityPlayer) {
-        final int dimensionId = is.readInt();
+    public void readPacket(final CustomPacketBuffer is, final Player entityPlayer) {
         BlockPos pos;
         try {
             pos = DecoderHandler.decode(is, BlockPos.class);
@@ -81,21 +82,11 @@ public class PacketUpdateTile implements IPacket {
             throw new RuntimeException(e);
         }
         int firstPart = is.readShort();
-        int secondPart = is.readShort();
-        Class<? extends TileEntityBlock> teClass = TileBlockCreator.instance.get(firstPart).teInfo
-                .getListBlock()
-                .get(secondPart)
-                .getTeClass();
+        Class<? extends BlockEntityBase> teClass = ((MultiBlockEntity) TileBlockCreator.instance.get(firstPart).teInfo.getListBlock().get(0)).getTeClass();
         byte[] bytes = new byte[is.writerIndex() - is.readerIndex()];
         is.readBytes(bytes);
         if (!(is.readerIndex() < is.writerIndex())) {
-            IUCore.proxy.requestTick(false, () -> {
-                World world = IUCore.proxy.getPlayerWorld();
-                if (world != null && world.provider.getDimension() == dimensionId) {
-                    apply(pos, teClass, world, bytes);
-
-                }
-            });
+            apply(pos, teClass, entityPlayer.level(), bytes);
         }
     }
 

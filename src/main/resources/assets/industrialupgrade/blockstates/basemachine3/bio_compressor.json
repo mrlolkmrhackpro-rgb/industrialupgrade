@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=bio_compressor": {
+      "model": "industrialupgrade:block/basemachine/bio_compressor"
+    },
+    "facing=south,type=bio_compressor": {
+      "model": "industrialupgrade:block/basemachine/bio_compressor",
+      "y": 180
+    },
+    "facing=west,type=bio_compressor": {
+      "model": "industrialupgrade:block/basemachine/bio_compressor",
+      "y": 270
+    },
+    "facing=east,type=bio_compressor": {
+      "model": "industrialupgrade:block/basemachine/bio_compressor",
+      "y": 90
+    },
+    "facing=north,type=bio_compressor_active": {
+      "model": "industrialupgrade:block/basemachine/bio_compressor_active"
+    },
+    "facing=south,type=bio_compressor_active": {
+      "model": "industrialupgrade:block/basemachine/bio_compressor_active",
+      "y": 180
+    },
+    "facing=west,type=bio_compressor_active": {
+      "model": "industrialupgrade:block/basemachine/bio_compressor_active",
+      "y": 270
+    },
+    "facing=east,type=bio_compressor_active": {
+      "model": "industrialupgrade:block/basemachine/bio_compressor_active",
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=geothermal_controller": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_controller"
+    },
+    "facing=south,type=geothermal_controller": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_controller",
+      "y": 180
+    },
+    "facing=west,type=geothermal_controller": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_controller",
+      "y": 270
+    },
+    "facing=east,type=geothermal_controller": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_controller",
+      "y": 90
+    },
+    "facing=north,type=geothermal_controller_active": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_controller"
+    },
+    "facing=south,type=geothermal_controller_active": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_controller",
+      "y": 180
+    },
+    "facing=west,type=geothermal_controller_active": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_controller",
+      "y": 270
+    },
+    "facing=east,type=geothermal_controller_active": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_controller",
+      "y": 90
+    }
+  }
+}

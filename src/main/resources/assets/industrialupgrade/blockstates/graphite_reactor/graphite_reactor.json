@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=graphite_reactor": {
+      "model": "industrialupgrade:block/graphite_reactor/graphite_reactor"
+    },
+    "facing=south,type=graphite_reactor": {
+      "model": "industrialupgrade:block/graphite_reactor/graphite_reactor",
+      "y": 180
+    },
+    "facing=west,type=graphite_reactor": {
+      "model": "industrialupgrade:block/graphite_reactor/graphite_reactor",
+      "y": 270
+    },
+    "facing=east,type=graphite_reactor": {
+      "model": "industrialupgrade:block/graphite_reactor/graphite_reactor",
+      "y": 90
+    },
+    "facing=north,type=graphite_reactor_active": {
+      "model": "industrialupgrade:block/graphite_reactor/graphite_reactor"
+    },
+    "facing=south,type=graphite_reactor_active": {
+      "model": "industrialupgrade:block/graphite_reactor/graphite_reactor",
+      "y": 180
+    },
+    "facing=west,type=graphite_reactor_active": {
+      "model": "industrialupgrade:block/graphite_reactor/graphite_reactor",
+      "y": 270
+    },
+    "facing=east,type=graphite_reactor_active": {
+      "model": "industrialupgrade:block/graphite_reactor/graphite_reactor",
+      "y": 90
+    }
+  }
+}

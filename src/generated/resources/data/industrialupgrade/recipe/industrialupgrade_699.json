@@ -1,0 +1,28 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:spectral_box"
+    },
+    "B": {
+      "item": "industrialupgrade:itemcore/specore"
+    },
+    "C": {
+      "item": "industrialupgrade:rotors_upgrade/rotorupgrade1"
+    },
+    "D": {
+      "tag": "c:casings/muntsa"
+    }
+  },
+  "pattern": [
+    "   ",
+    "DBD",
+    "ACA"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:rotors_upgrade/rotorupgrade2"
+  },
+  "show_notification": false
+}

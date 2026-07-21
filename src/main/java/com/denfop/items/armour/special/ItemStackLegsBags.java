@@ -1,23 +1,20 @@
 package com.denfop.items.armour.special;
 
-import com.denfop.ElectricItem;
-import com.denfop.api.upgrade.UpgradeSystem;
-import com.denfop.container.ContainerBase;
-import com.denfop.invslot.Inventory;
+import com.denfop.api.container.CustomWorldContainer;
+import com.denfop.api.item.upgrade.UpgradeSystem;
+import com.denfop.containermenu.ContainerMenuBase;
+import com.denfop.datacomponent.DataComponentsInit;
 import com.denfop.items.EnumInfoUpgradeModules;
 import com.denfop.items.ItemStackInventory;
 import com.denfop.items.bags.BagsDescription;
-import com.denfop.utils.ModUtils;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.denfop.screen.ScreenIndustrialUpgrade;
+import com.denfop.utils.ElectricItem;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ItemStackLegsBags extends ItemStackInventory {
@@ -26,7 +23,7 @@ public class ItemStackLegsBags extends ItemStackInventory {
     public final ItemStack itemStack1;
     private final double coef;
 
-    public ItemStackLegsBags(EntityPlayer player, ItemStack stack) {
+    public ItemStackLegsBags(Player player, ItemStack stack) {
         super(player, stack, 45);
         this.inventorySize = 45;
         this.itemStack1 = stack;
@@ -35,47 +32,23 @@ public class ItemStackLegsBags extends ItemStackInventory {
         this.updatelist();
     }
 
-    public ContainerBase<ItemStackLegsBags> getGuiContainer(EntityPlayer player) {
-        return new ContainerLegsBags(player, this);
+    public ContainerMenuBase<ItemStackLegsBags> getGuiContainer(Player player) {
+        return new ContainerMenuLegsBags(player, this);
     }
 
-    @SideOnly(Side.CLIENT)
-    public GuiScreen getGui(EntityPlayer player, boolean isAdmin) {
-        return new GuiLegsBags(new ContainerLegsBags(player, this), itemStack1);
+    @OnlyIn(Dist.CLIENT)
+    public ScreenIndustrialUpgrade<ContainerMenuBase<? extends CustomWorldContainer>> getGui(Player player, ContainerMenuBase<? extends CustomWorldContainer> isAdmin) {
+        return new ScreenLegsBags((ContainerMenuLegsBags) isAdmin, itemStack1);
     }
 
 
     @Override
-    public void addInventorySlot(final Inventory var1) {
-
-    }
-
-
-    @Nonnull
-    public String getName() {
-        return "toolbox";
-    }
-
-    public boolean hasCustomName() {
-
-        return false;
-
-    }
-
-    public void setInventorySlotContents(int slot, ItemStack stack) {
-        if (!ModUtils.isEmpty(stack) && ModUtils.getSize(stack) > this.getInventoryStackLimit()) {
-            stack = ModUtils.setSize(stack, this.getInventoryStackLimit());
-        }
-
-        if (ModUtils.isEmpty(stack)) {
-            this.inventory[slot] = ModUtils.emptyStack;
-        } else {
-            this.inventory[slot] = stack;
-        }
+    public void setItem(int slot, ItemStack stack) {
+        super.setItem(slot, stack);
 
         this.updatelist();
-        this.save();
     }
+
 
     private void updatelist() {
         List<BagsDescription> list = new ArrayList<>();
@@ -89,98 +62,18 @@ public class ItemStackLegsBags extends ItemStackInventory {
             if (list.isEmpty()) {
                 list.add(new BagsDescription(stack));
             } else if (list.contains(new BagsDescription(stack))) {
-                list.get(list.indexOf(new BagsDescription(stack))).addCount(stack.getCount());
+                for (BagsDescription bagsDescription : list) {
+                    if (bagsDescription.equals(new BagsDescription(stack))) {
+                        bagsDescription.addCount(stack.getCount());
+                    }
+                }
             } else {
                 list.add(new BagsDescription(stack));
             }
         }
-        final NBTTagCompound nbt = ModUtils.nbt(itemStack1);
-        NBTTagCompound nbt1 = new NBTTagCompound();
-        nbt1.setInteger("size", list.size());
-        for (int i = 0; i < list.size(); i++) {
-            nbt1.setTag(String.valueOf(i), list.get(i).write(new NBTTagCompound()));
-        }
-        nbt.setTag("bag", nbt1);
+        this.itemStack1.set(DataComponentsInit.DESCRIPTIONS_CONTAINER, list);
     }
 
-    public ItemStack get(int index) {
-        return this.inventory[index];
-    }
-
-    public ItemStack[] getAll() {
-        return this.inventory;
-    }
-
-    public void put(ItemStack content) {
-        this.put(0, content);
-    }
-
-    public void put(int index, ItemStack content) {
-        if (ModUtils.isEmpty(content)) {
-            content = ModUtils.emptyStack;
-        }
-
-        this.inventory[index] = content;
-        this.save();
-    }
-
-    private boolean add(List<ItemStack> stacks, boolean simulate) {
-        if (stacks != null && !stacks.isEmpty()) {
-
-            for (ItemStack stack : stacks) {
-                for (int i = 0; i < this.inventory.length; i++) {
-                    if (this.get(i) == null || this.get(i).isEmpty()) {
-                        if (!simulate) {
-                            this.put(i, stack.copy());
-                            stack.setCount(0);
-                        }
-                        return true;
-                    } else {
-                        if (this.get(i).isItemEqual(stack)) {
-                            if (this.get(i).getCount() + stack.getCount() <= stack.getMaxStackSize()) {
-                                if (stack.getTagCompound() == null && this.get(i).getTagCompound() == null) {
-                                    if (!simulate) {
-                                        this.get(i).grow(stack.getCount());
-                                        stack.setCount(0);
-                                    }
-                                    return true;
-                                } else {
-                                    if (stack.getTagCompound() != null &&
-                                            stack.getTagCompound().equals(this.get(i).getTagCompound())) {
-                                        if (!simulate) {
-                                            this.get(i).grow(stack.getCount());
-                                            stack.setCount(0);
-
-                                        }
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-        return true;
-    }
-
-    public boolean add(ItemStack stack) {
-        if (stack == null) {
-            throw new NullPointerException("null ItemStack");
-        } else {
-            return this.add(Collections.singletonList(stack), false);
-        }
-    }
-
-
-    public boolean canAdd(ItemStack stack) {
-        if (stack == null) {
-            throw new NullPointerException("null ItemStack");
-        } else {
-            return this.add(Collections.singletonList(stack), true);
-        }
-    }
 
     public boolean isItemValidForSlot(int i, ItemStack itemstack) {
 

@@ -2,8 +2,8 @@ package com.denfop.integration.jei.genbio;
 
 
 import com.denfop.blocks.FluidName;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +52,7 @@ public class GenBioHandler {
 
     public static void initRecipes() {
 
-        addRecipe(5000, new FluidStack(FluidName.fluidbiomass.getInstance(), 1000));
+        addRecipe(5000, new FluidStack(FluidName.fluidbiomass.getInstance().get(), 1000));
 
 
     }

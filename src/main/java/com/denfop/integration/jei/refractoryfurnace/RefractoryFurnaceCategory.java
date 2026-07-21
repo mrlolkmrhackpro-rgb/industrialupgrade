@@ -1,89 +1,89 @@
 package com.denfop.integration.jei.refractoryfurnace;
 
+import com.denfop.integration.jei.JeiIngredientHelper;
 import com.denfop.Constants;
-import com.denfop.Localization;
-import com.denfop.api.gui.Component;
-import com.denfop.api.gui.EnumTypeComponent;
-import com.denfop.api.gui.GuiComponent;
-import com.denfop.api.gui.GuiElement;
-import com.denfop.api.gui.TankGauge;
 import com.denfop.api.recipe.InventoryRecipes;
-import com.denfop.blocks.mechanism.BlockBaseMachine3;
-import com.denfop.blocks.mechanism.BlockRefractoryFurnace;
+import com.denfop.api.widget.EnumTypeComponent;
+import com.denfop.api.widget.ScreenWidget;
+import com.denfop.api.widget.TankWidget;
+import com.denfop.api.widget.WidgetDefault;
+import com.denfop.blockentity.mechanism.BlockEntityItemDivider;
+import com.denfop.blocks.mechanism.BlockBaseMachine3Entity;
+import com.denfop.blocks.mechanism.BlockRefractoryFurnaceEntity;
 import com.denfop.componets.ComponentProgress;
 import com.denfop.componets.ComponentRenderInventory;
 import com.denfop.componets.EnumTypeComponentSlot;
-import com.denfop.container.ContainerItemDivider;
-import com.denfop.container.SlotInvSlot;
-import com.denfop.gui.GuiIU;
+import com.denfop.containermenu.ContainerMenuItemDivider;
+import com.denfop.containermenu.SlotInvSlot;
+import com.denfop.integration.jei.IRecipeCategory;
 import com.denfop.integration.jei.JEICompat;
-import com.denfop.tiles.mechanism.TileEntityItemDivider;
-import mezz.jei.api.IGuiHelper;
-import mezz.jei.api.gui.IDrawable;
-import mezz.jei.api.gui.IDrawableStatic;
-import mezz.jei.api.gui.IGuiFluidStackGroup;
-import mezz.jei.api.gui.IGuiItemStackGroup;
-import mezz.jei.api.gui.IRecipeLayout;
-import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.IRecipeCategory;
+import com.denfop.integration.jei.JeiInform;
+import com.denfop.screen.ScreenMain;
+import com.denfop.utils.Localization;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableStatic;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 
-public class RefractoryFurnaceCategory extends GuiIU implements IRecipeCategory<RefractoryFurnaceWrapper> {
+public class RefractoryFurnaceCategory extends ScreenMain implements IRecipeCategory<RefractoryFurnaceHandler> {
 
     private final IDrawableStatic bg;
-    private final ContainerItemDivider container1;
-    private final GuiComponent progress_bar;
+    private final ContainerMenuItemDivider container1;
+    private final ScreenWidget progress_bar;
+    JeiInform jeiInform;
     private int progress = 0;
     private int energy = 0;
 
     public RefractoryFurnaceCategory(
-            final IGuiHelper guiHelper
+            IGuiHelper guiHelper, JeiInform jeiInform
     ) {
-        super(((TileEntityItemDivider) BlockBaseMachine3.item_divider.getDummyTe()).getGuiContainer(Minecraft.getMinecraft().player));
-        bg = guiHelper.createDrawable(new ResourceLocation(Constants.MOD_ID, "textures/gui/guimachine" +
+        super(((BlockEntityItemDivider) BlockBaseMachine3Entity.item_divider.getDummyTe()).getGuiContainer(Minecraft.getInstance().player));
+        bg = guiHelper.createDrawable(ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/guimachine" +
                         ".png"), 3, 3, 140,
                 77
         );
-        this.slots = new GuiComponent(this, 3, 3, getComponent(),
-                new Component<>(new ComponentRenderInventory(EnumTypeComponentSlot.SLOTS__JEI_INPUT))
+        this.jeiInform = jeiInform;
+        this.title = net.minecraft.network.chat.Component.literal(getTitles());
+        this.slots = new ScreenWidget(this, 3, 3, getComponent(),
+                new WidgetDefault<>(new ComponentRenderInventory(EnumTypeComponentSlot.SLOTS__JEI_INPUT))
         );
         this.componentList.clear();
-        this.container1 = (ContainerItemDivider) this.getContainer();
-        progress_bar = new GuiComponent(this, 70, 35, EnumTypeComponent.PROCESS,
-                new Component<>(new ComponentProgress(this.container1.base, 1, (short) 100))
+        this.container1 = (ContainerMenuItemDivider) this.getContainer();
+        progress_bar = new ScreenWidget(this, 70, 35, EnumTypeComponent.PROCESS,
+                new WidgetDefault<>(new ComponentProgress(this.container1.base, 1, (short) 100))
         );
         this.componentList.add(slots);
         this.componentList.add(progress_bar);
-        this.addElement(TankGauge.createNormal(this, 100, 4,
-                ((TileEntityItemDivider) BlockBaseMachine3.item_divider.getDummyTe()).fluidTank1
+        this.addWidget(TankWidget.createNormal(this, 100, 4,
+                ((BlockEntityItemDivider) BlockBaseMachine3Entity.item_divider.getDummyTe()).fluidTank1
         ));
 
 
     }
 
-    @Nonnull
     @Override
-    public String getUid() {
-        return BlockRefractoryFurnace.refractory_furnace.getName();
+    public RecipeType<RefractoryFurnaceHandler> getRecipeType() {
+        return jeiInform.recipeType;
     }
 
     @Nonnull
     @Override
-    public String getTitle() {
-        return Localization.translate(JEICompat.getBlockStack(BlockRefractoryFurnace.refractory_furnace).getUnlocalizedName());
+    public String getTitles() {
+        return Localization.translate(JEICompat.getBlockStack(BlockRefractoryFurnaceEntity.refractory_furnace).getDescriptionId());
     }
 
-    @Nonnull
-    @Override
-    public String getModName() {
-        return Constants.MOD_NAME;
-    }
 
     @Nonnull
     @Override
@@ -91,9 +91,8 @@ public class RefractoryFurnaceCategory extends GuiIU implements IRecipeCategory<
         return bg;
     }
 
-
     @Override
-    public void drawExtras(@Nonnull final Minecraft mc) {
+    public void draw(RefractoryFurnaceHandler recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics stack, double mouseX, double mouseY) {
         progress++;
         if (this.energy < 100) {
             energy++;
@@ -103,42 +102,34 @@ public class RefractoryFurnaceCategory extends GuiIU implements IRecipeCategory<
         if (xScale >= 1) {
             progress = 0;
         }
-        mc.getTextureManager().bindTexture(getTexture());
-        this.slots.drawBackground(0, -10);
-        progress_bar.renderBar(0, 0, xScale);
+        bindTexture(getTexture());
+        this.slots.drawBackground(stack, 0, -10);
+        progress_bar.renderBar(stack, 0, 0, xScale);
 
-        for (final GuiElement element : ((List<GuiElement>) this.elements)) {
-            element.drawBackground(this.guiLeft, this.guiTop - 5);
+        for (final ScreenWidget element : ((List<ScreenWidget>) this.elements)) {
+            element.drawBackground(stack, this.guiLeft, this.guiTop);
         }
-
     }
+
 
     @Override
-    public void setRecipe(
-            final IRecipeLayout layout,
-            final RefractoryFurnaceWrapper recipes,
-            @Nonnull final IIngredients ingredients
-    ) {
-
-
-        IGuiFluidStackGroup fff = layout.getFluidStacks();
-        IGuiItemStackGroup isg = layout.getItemStacks();
+    public void setRecipe(IRecipeLayoutBuilder builder, RefractoryFurnaceHandler recipe, IFocusGroup focuses) {
         final List<SlotInvSlot> slots1 = container1.findClassSlots(InventoryRecipes.class);
-        final List<ItemStack> inputs = Collections.singletonList(recipes.getInputstack());
+        final List<ItemStack> inputs = Collections.singletonList(recipe.getInput());
         int i = 0;
         for (; i < inputs.size(); i++) {
-            isg.init(i, true, slots1.get(i).getJeiX(), slots1.get(i).getJeiY() - 10);
-            isg.set(i, inputs.get(i));
+            JeiIngredientHelper.addInputSlot(builder, RecipeIngredientRole.INPUT, slots1.get(i).getJeiX(), slots1.get(i).getJeiY() - 10, recipe, i, inputs.get(i));
+
 
         }
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 104, 8).setFluidRenderer(10000, true, 12, 47).addFluidStack(recipe.getOutput().getFluid(), recipe.getOutput().getAmount());
 
 
-        fff.init(1, false, 104, 8, 12, 47, 1000, true, null);
-        fff.set(1, recipes.getOutputstack());
     }
 
+
     protected ResourceLocation getTexture() {
-        return new ResourceLocation(Constants.MOD_ID, "textures/gui/guimachine.png");
+        return ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/guimachine.png");
     }
 
 

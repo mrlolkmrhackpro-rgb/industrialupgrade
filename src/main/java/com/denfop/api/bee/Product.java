@@ -1,6 +1,6 @@
 package com.denfop.api.bee;
 
-import com.denfop.api.agriculture.ICrop;
+import com.denfop.api.crop.ICrop;
 
 import java.util.Objects;
 
@@ -32,9 +32,8 @@ public class Product {
 
     public void removeChance(double chance) {
         this.chance -= chance;
-        if (this.chance < 0) {
+        if (this.chance < 0)
             this.chance = 0;
-        }
     }
 
     @Override

@@ -1,14 +1,16 @@
 package com.denfop.api.energy;
 
-import net.minecraftforge.event.world.WorldEvent;
+import com.denfop.api.energy.interfaces.EnergyTile;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.event.level.LevelEvent;
 
-public class EnergyTileEvent extends WorldEvent {
+public class EnergyTileEvent extends LevelEvent {
 
-    public final IEnergyTile tile;
+    public final EnergyTile tile;
 
-    public EnergyTileEvent(IEnergyTile tile) {
-        super(EnergyNetGlobal.instance.getWorld(tile));
-        if (this.getWorld() == null) {
+    public EnergyTileEvent(EnergyTile tile, Level level) {
+        super(level);
+        if (this.getLevel() == null) {
             throw new NullPointerException("world is null");
         } else {
             this.tile = tile;

@@ -1,37 +1,30 @@
 package com.denfop.componets;
 
-import com.denfop.api.energy.IEnergyAcceptor;
-import com.denfop.api.energy.IEnergySource;
-import com.denfop.api.energy.IEnergyTile;
-import com.denfop.api.energy.event.EnergyTileLoadEvent;
-import com.denfop.api.energy.event.EnergyTileUnLoadEvent;
-import com.denfop.api.sytem.InfoTile;
-import com.denfop.invslot.InventoryUpgrade;
+import com.denfop.api.energy.event.load.EnergyTileLoadEvent;
+import com.denfop.api.energy.event.unload.EnergyTileUnLoadEvent;
+import com.denfop.api.energy.interfaces.EnergyAcceptor;
+import com.denfop.api.energy.interfaces.EnergySource;
+import com.denfop.api.energy.interfaces.EnergyTile;
+import com.denfop.api.otherenergies.common.InfoTile;
+import com.denfop.blockentity.base.BlockEntityInventory;
+import com.denfop.blockentity.panels.entity.BlockEntityMiniPanels;
+import com.denfop.inventory.InventoryUpgrade;
 import com.denfop.network.packet.CustomPacketBuffer;
-import com.denfop.tiles.base.TileEntityInventory;
-import com.denfop.tiles.panels.entity.TileEntityMiniPanels;
 import com.denfop.utils.ModUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ComponentMiniPanel extends AbstractComponent {
 
@@ -42,7 +35,7 @@ public class ComponentMiniPanel extends AbstractComponent {
     public double storage;
     public int sourceTier;
     public int defaultSourceTier;
-    public Set<EnumFacing> sourceDirections;
+    public Set<Direction> sourceDirections;
     public boolean multiSource;
     public ComponentMiniPanel.EnergyNetDelegate delegate;
     public boolean loaded;
@@ -53,29 +46,29 @@ public class ComponentMiniPanel extends AbstractComponent {
     protected double bonusCapacity;
     protected double bonusProdution;
     Map<BlockPos, IEnergyStorage> energyStorageMap = new HashMap<>();
-    List<InfoTile<IEnergyTile>> validReceivers = new LinkedList<>();
-    Map<EnumFacing, IEnergyTile> energyConductorMap = new HashMap<>();
+    List<InfoTile<EnergyTile>> validReceivers = new LinkedList<>();
+    Map<Direction, EnergyTile> energyConductorMap = new HashMap<>();
     private double prodution;
     private ChunkPos chunkPos;
 
-    public ComponentMiniPanel(TileEntityMiniPanels parent, double capacity) {
+    public ComponentMiniPanel(BlockEntityMiniPanels parent, double capacity) {
         this(parent, capacity, Collections.emptySet(), 1);
     }
 
 
     public ComponentMiniPanel(
-            TileEntityInventory parent,
+            BlockEntityInventory parent,
             double capacity,
-            Set<EnumFacing> sourceDirections,
+            Set<Direction> sourceDirections,
             int tier
     ) {
         this(parent, capacity, sourceDirections, tier, false);
     }
 
     public ComponentMiniPanel(
-            TileEntityInventory parent,
+            BlockEntityInventory parent,
             double capacity,
-            Set<EnumFacing> sourceDirections,
+            Set<Direction> sourceDirections,
             int sourceTier,
             boolean fullEnergy
     ) {
@@ -94,11 +87,11 @@ public class ComponentMiniPanel extends AbstractComponent {
         this.prodution = 0;
     }
 
-    public static ComponentMiniPanel asBasicSource(TileEntityInventory parent, double capacity) {
+    public static ComponentMiniPanel asBasicSource(BlockEntityInventory parent, double capacity) {
         return asBasicSource(parent, capacity, 1);
     }
 
-    public static ComponentMiniPanel asBasicSource(TileEntityInventory parent, double capacity, int tier) {
+    public static ComponentMiniPanel asBasicSource(BlockEntityInventory parent, double capacity, int tier) {
         return new ComponentMiniPanel(parent, capacity, ModUtils.allFacings, tier);
     }
 
@@ -119,27 +112,21 @@ public class ComponentMiniPanel extends AbstractComponent {
     }
 
     @Override
-    public void onNeighborChange(final Block srcBlock, final BlockPos srcPos) {
-        TileEntity tile = this.getParent().getWorld().getTileEntity(srcPos);
+    public void onNeighborChange(final BlockState srcBlock, final BlockPos srcPos) {
+        BlockEntity tile = this.getParent().getWorld().getBlockEntity(srcPos);
         boolean hasElement = this.energyStorageMap.containsKey(srcPos);
-        if (srcBlock.getDefaultState().getMaterial() == Material.AIR && hasElement) {
+        if (srcBlock.getBlock() == Blocks.AIR && hasElement) {
             this.energyStorageMap.remove(srcPos);
         } else if (hasElement) {
             this.energyStorageMap.remove(srcPos);
         }
-        if (tile instanceof TileEntityInventory) {
+        if (tile instanceof BlockEntityInventory) {
             return;
         }
         if (tile == null) {
             return;
         }
-        if (tile.hasCapability(CapabilityEnergy.ENERGY, this.getParent().getFacing().getOpposite())) {
-            IEnergyStorage energy_storage = tile.getCapability(
-                    CapabilityEnergy.ENERGY,
-                    this.getParent().getFacing().getOpposite()
-            );
-            this.energyStorageMap.put(srcPos, energy_storage);
-        }
+
     }
 
     @Override
@@ -150,7 +137,7 @@ public class ComponentMiniPanel extends AbstractComponent {
                         (int) Math.min(Math.min(
                                 this.getEnergy() / 4,
                                 Integer.MAX_VALUE - 1
-                        ), ((IEnergySource) this.getDelegate()).canExtractEnergy() / 4),
+                        ), ((EnergySource) this.getDelegate()).canExtractEnergy() / 4),
                         false
                 ));
                 if (this.getEnergy() <= 0) {
@@ -165,18 +152,18 @@ public class ComponentMiniPanel extends AbstractComponent {
         return true;
     }
 
-    public void readFromNbt(NBTTagCompound nbt) {
+    public void readFromNbt(CompoundTag nbt) {
         this.storage = nbt.getDouble("storage");
     }
 
-    public NBTTagCompound writeToNbt() {
-        NBTTagCompound ret = new NBTTagCompound();
-        ret.setDouble("storage", this.storage);
+    public CompoundTag writeToNbt() {
+        CompoundTag ret = new CompoundTag();
+        ret.putDouble("storage", this.storage);
 
         return ret;
     }
 
-    public List<InfoTile<IEnergyTile>> getValidReceivers() {
+    public List<InfoTile<EnergyTile>> getValidReceivers() {
         return validReceivers;
     }
 
@@ -184,37 +171,30 @@ public class ComponentMiniPanel extends AbstractComponent {
         if (this.capacity < this.defaultCapacity) {
             this.capacity = this.defaultCapacity;
         }
-        if (!this.parent.getWorld().isRemote) {
-            for (EnumFacing facing : EnumFacing.VALUES) {
-                final BlockPos srcPos = this.parent.getPos().offset(facing);
-                TileEntity tile = this.getParent().getWorld().getTileEntity(srcPos);
+        if (!this.parent.getWorld().isClientSide) {
+            for (Direction facing : Direction.values()) {
+                final BlockPos srcPos = this.parent.getPos().offset(facing.getNormal());
+                BlockEntity tile = this.getParent().getWorld().getBlockEntity(srcPos);
                 boolean hasElement = this.energyStorageMap.containsKey(srcPos);
                 if (hasElement) {
                     continue;
                 }
-                if (tile instanceof TileEntityInventory) {
+                if (tile instanceof BlockEntityInventory) {
                     continue;
                 }
                 if (tile == null) {
                     continue;
                 }
-                if (tile.hasCapability(CapabilityEnergy.ENERGY, this.getParent().getFacing().getOpposite())) {
-                    IEnergyStorage energy_storage = tile.getCapability(
-                            CapabilityEnergy.ENERGY,
-                            this.getParent().getFacing().getOpposite()
-                    );
-                    this.energyStorageMap.put(srcPos, energy_storage);
-                }
             }
         }
         assert this.delegate == null;
 
-        if (!this.parent.getWorld().isRemote) {
+        if (!this.parent.getWorld().isClientSide) {
             if (!(this.sourceDirections.isEmpty())) {
                 this.energyConductorMap.clear();
                 validReceivers.clear();
                 this.createDelegate();
-                MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(this.parent.getWorld(), this.delegate));
+                NeoForge.EVENT_BUS.post(new EnergyTileLoadEvent(this.parent.getWorld(), this.delegate));
             }
             this.loaded = true;
         }
@@ -233,21 +213,20 @@ public class ComponentMiniPanel extends AbstractComponent {
             this.delegate = new ComponentMiniPanel.EnergyNetDelegateSource();
 
 
-            this.delegate.setWorld(this.parent.getWorld());
-            this.delegate.setPos(this.parent.getPos());
+            this.delegate.setLevel(this.parent.getWorld());
         }
     }
 
     public void onUnloaded() {
         if (this.delegate != null) {
-            MinecraftForge.EVENT_BUS.post(new EnergyTileUnLoadEvent(this.parent.getWorld(), this.delegate));
+            NeoForge.EVENT_BUS.post(new EnergyTileUnLoadEvent(this.parent.getWorld(), this.delegate));
             this.delegate = null;
         }
         this.loaded = false;
     }
 
-    public void onContainerUpdate(EntityPlayerMP player) {
-        CustomPacketBuffer buffer = new CustomPacketBuffer(16);
+    public void onContainerUpdate(ServerPlayer player) {
+        CustomPacketBuffer buffer = new CustomPacketBuffer(16, player.registryAccess());
         buffer.writeDouble(this.capacity);
         buffer.writeDouble(this.storage);
         buffer.writeDouble(this.bonusCapacity);
@@ -369,12 +348,12 @@ public class ComponentMiniPanel extends AbstractComponent {
         this.sendingSidabled = !enabled;
     }
 
-    public void setDirections(Set<EnumFacing> sourceDirections) {
+    public void setDirections(Set<Direction> sourceDirections) {
         if (this.delegate != null) {
 
-            assert !this.parent.getWorld().isRemote;
+            assert !this.parent.getWorld().isClientSide;
 
-            MinecraftForge.EVENT_BUS.post(new EnergyTileUnLoadEvent(this.parent.getWorld(), this.delegate));
+            NeoForge.EVENT_BUS.post(new EnergyTileUnLoadEvent(this.parent.getWorld(), this.delegate));
         }
 
         this.sourceDirections = sourceDirections;
@@ -386,9 +365,9 @@ public class ComponentMiniPanel extends AbstractComponent {
         if (this.delegate != null) {
 
 
-            assert !this.parent.getWorld().isRemote;
+            assert !this.parent.getWorld().isClientSide;
 
-            MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(this.parent.getWorld(), this.delegate));
+            NeoForge.EVENT_BUS.post(new EnergyTileLoadEvent(this.parent.getWorld(), this.delegate));
         }
 
 
@@ -401,11 +380,11 @@ public class ComponentMiniPanel extends AbstractComponent {
         return chunkPos;
     }
 
-    public Set<EnumFacing> getSourceDirs() {
+    public Set<Direction> getSourceDirs() {
         return Collections.unmodifiableSet(this.sourceDirections);
     }
 
-    public IEnergyTile getDelegate() {
+    public EnergyTile getDelegate() {
         return this.delegate;
     }
 
@@ -413,12 +392,12 @@ public class ComponentMiniPanel extends AbstractComponent {
         return Math.min(this.storage, this.getProdution());
     }
 
-    public void RemoveTile(IEnergyTile tile, final EnumFacing facing1) {
-        if (!parent.getWorld().isRemote) {
+    public void RemoveTile(EnergyTile tile, final Direction facing1) {
+        if (!parent.getWorld().isClientSide) {
             this.energyConductorMap.remove(facing1);
-            final Iterator<InfoTile<IEnergyTile>> iter = validReceivers.iterator();
+            final Iterator<InfoTile<EnergyTile>> iter = validReceivers.iterator();
             while (iter.hasNext()) {
-                InfoTile<IEnergyTile> tileInfoTile = iter.next();
+                InfoTile<EnergyTile> tileInfoTile = iter.next();
                 if (tileInfoTile.tileEntity == tile) {
                     iter.remove();
                     break;
@@ -427,25 +406,26 @@ public class ComponentMiniPanel extends AbstractComponent {
         }
     }
 
-    public void AddTile(IEnergyTile tile, final EnumFacing facing1) {
-        if (!parent.getWorld().isRemote) {
+    public void AddTile(EnergyTile tile, final Direction facing1) {
+        if (!parent.getWorld().isClientSide) {
             this.energyConductorMap.put(facing1, tile);
             validReceivers.add(new InfoTile<>(tile, facing1.getOpposite()));
         }
     }
 
-    public Map<EnumFacing, IEnergyTile> getTiles() {
+    public Map<Direction, EnergyTile> getTiles() {
         return energyConductorMap;
     }
 
-    private abstract static class EnergyNetDelegate extends TileEntity implements IEnergyTile {
+    private abstract class EnergyNetDelegate extends BlockEntity implements EnergyTile {
 
         private EnergyNetDelegate() {
+            super(ComponentMiniPanel.this.parent.getType(), ComponentMiniPanel.this.parent.getBlockPos(), ComponentMiniPanel.this.parent.getBlockState());
         }
 
     }
 
-    private class EnergyNetDelegateSource extends ComponentMiniPanel.EnergyNetDelegate implements IEnergySource {
+    private class EnergyNetDelegateSource extends ComponentMiniPanel.EnergyNetDelegate implements EnergySource {
 
 
         int hashCodeSource;
@@ -474,25 +454,25 @@ public class ComponentMiniPanel extends AbstractComponent {
             this.id = id;
         }
 
-        public List<InfoTile<IEnergyTile>> getValidReceivers() {
+        public List<InfoTile<EnergyTile>> getValidReceivers() {
             return validReceivers;
         }
 
-        public void RemoveTile(IEnergyTile tile, final EnumFacing facing1) {
-            if (!parent.getWorld().isRemote) {
+        public void RemoveTile(EnergyTile tile, final Direction facing1) {
+            if (!parent.getWorld().isClientSide) {
                 ComponentMiniPanel.this.RemoveTile(tile, facing1);
 
             }
         }
 
 
-        public void AddTile(IEnergyTile tile, final EnumFacing facing1) {
-            if (!parent.getWorld().isRemote) {
+        public void AddTile(EnergyTile tile, final Direction facing1) {
+            if (!parent.getWorld().isClientSide) {
                 ComponentMiniPanel.this.AddTile(tile, facing1);
             }
         }
 
-        public Map<EnumFacing, IEnergyTile> getTiles() {
+        public Map<Direction, EnergyTile> getTiles() {
             return ComponentMiniPanel.this.energyConductorMap;
         }
 
@@ -505,7 +485,7 @@ public class ComponentMiniPanel extends AbstractComponent {
             return ComponentMiniPanel.this.sourceTier;
         }
 
-        public boolean emitsEnergyTo(IEnergyAcceptor receiver, EnumFacing dir) {
+        public boolean emitsEnergyTo(EnergyAcceptor receiver, Direction dir) {
             return ComponentMiniPanel.this.sourceDirections.contains(dir);
         }
 
@@ -546,9 +526,10 @@ public class ComponentMiniPanel extends AbstractComponent {
             return true;
         }
 
+
         @Override
-        public TileEntity getTileEntity() {
-            return this;
+        public BlockPos getPos() {
+            return ComponentMiniPanel.this.parent.getPos();
         }
 
     }

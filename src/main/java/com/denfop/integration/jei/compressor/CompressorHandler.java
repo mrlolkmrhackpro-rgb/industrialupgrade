@@ -1,21 +1,27 @@
 package com.denfop.integration.jei.compressor;
 
 
+import com.denfop.integration.jei.IJeiVariantRecipe;
+import com.denfop.integration.jei.JeiIngredientHelper;
 import com.denfop.api.Recipes;
 import com.denfop.api.recipe.BaseMachineRecipe;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompressorHandler {
+public class CompressorHandler implements IJeiVariantRecipe {
 
     private static final List<CompressorHandler> recipes = new ArrayList<>();
-    private final ItemStack input, output;
+    
+    private List<List<ItemStack>> inputVariants = new ArrayList<>();
+private final ItemStack input, output;
+    private final BaseMachineRecipe container;
 
-    public CompressorHandler(ItemStack input, ItemStack output) {
+    public CompressorHandler(ItemStack input, ItemStack output, BaseMachineRecipe container) {
         this.input = input;
         this.output = output;
+        this.container = container;
     }
 
     public static List<CompressorHandler> getRecipes() {
@@ -25,8 +31,8 @@ public class CompressorHandler {
         return recipes;
     }
 
-    public static CompressorHandler addRecipe(ItemStack input, ItemStack output) {
-        CompressorHandler recipe = new CompressorHandler(input, output);
+    public static CompressorHandler addRecipe(ItemStack input, ItemStack output, BaseMachineRecipe container) {
+        CompressorHandler recipe = new CompressorHandler(input, output, container);
         if (recipes.contains(recipe)) {
             return null;
         }
@@ -49,10 +55,10 @@ public class CompressorHandler {
     public static void initRecipes() {
         for (BaseMachineRecipe container : Recipes.recipes.getRecipeList("compressor")) {
             try {
-                addRecipe(
+                JeiIngredientHelper.attachInputVariants(addRecipe(
                         container.input.getInputs().get(0).getInputs().get(0),
-                        container.getOutput().items.get(0)
-                );
+                        container.getOutput().items.get(0), container
+                ), container);
             } catch (Exception e) {
                 throw new RuntimeException();
             }
@@ -60,6 +66,9 @@ public class CompressorHandler {
         }
     }
 
+    public BaseMachineRecipe getContainer() {
+        return container;
+    }
 
     public ItemStack getInput() { // Получатель входного предмета рецепта.
         return input;
@@ -73,4 +82,15 @@ public class CompressorHandler {
         return is.getItem() == input.getItem();
     }
 
+
+
+    @Override
+    public void setInputVariants(final List<List<ItemStack>> inputVariants) {
+        this.inputVariants = inputVariants == null ? new ArrayList<>() : inputVariants;
+    }
+
+    @Override
+    public List<ItemStack> getInputVariants(final int slot, final ItemStack fallback) {
+        return JeiIngredientHelper.getInputVariants(this.inputVariants, slot, fallback);
+    }
 }

@@ -2,8 +2,8 @@ package com.denfop.integration.jei.distiller;
 
 
 import com.denfop.blocks.FluidName;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
+import com.denfop.componets.Fluids;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +44,8 @@ public class DistillerHandler {
 
     public static void initRecipes() {
         addRecipe(
-                new FluidStack(FluidRegistry.WATER, 4000),
-                new FluidStack(FluidName.fluiddistilled_water.getInstance(), 1000)
+                new FluidStack(Fluids.WATER, 4000),
+                new FluidStack(FluidName.fluiddistilled_water.getInstance().get(), 1000)
         );
     }
 

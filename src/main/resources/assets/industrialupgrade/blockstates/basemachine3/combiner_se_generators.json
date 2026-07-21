@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=combiner_se_generators": {
+      "model": "industrialupgrade:block/basemachine/combiner_se_generators"
+    },
+    "facing=south,type=combiner_se_generators": {
+      "model": "industrialupgrade:block/basemachine/combiner_se_generators",
+      "y": 180
+    },
+    "facing=west,type=combiner_se_generators": {
+      "model": "industrialupgrade:block/basemachine/combiner_se_generators",
+      "y": 270
+    },
+    "facing=east,type=combiner_se_generators": {
+      "model": "industrialupgrade:block/basemachine/combiner_se_generators",
+      "y": 90
+    },
+    "facing=north,type=combiner_se_generators_active": {
+      "model": "industrialupgrade:block/basemachine/combiner_se_generators"
+    },
+    "facing=south,type=combiner_se_generators_active": {
+      "model": "industrialupgrade:block/basemachine/combiner_se_generators",
+      "y": 180
+    },
+    "facing=west,type=combiner_se_generators_active": {
+      "model": "industrialupgrade:block/basemachine/combiner_se_generators",
+      "y": 270
+    },
+    "facing=east,type=combiner_se_generators_active": {
+      "model": "industrialupgrade:block/basemachine/combiner_se_generators",
+      "y": 90
+    }
+  }
+}

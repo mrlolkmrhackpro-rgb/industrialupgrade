@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=creative_radiation_storage": {
+      "model": "industrialupgrade:block/basemachine/creative_radiation_storage"
+    },
+    "facing=south,type=creative_radiation_storage": {
+      "model": "industrialupgrade:block/basemachine/creative_radiation_storage",
+      "y": 180
+    },
+    "facing=west,type=creative_radiation_storage": {
+      "model": "industrialupgrade:block/basemachine/creative_radiation_storage",
+      "y": 270
+    },
+    "facing=east,type=creative_radiation_storage": {
+      "model": "industrialupgrade:block/basemachine/creative_radiation_storage",
+      "y": 90
+    },
+    "facing=north,type=creative_radiation_storage_active": {
+      "model": "industrialupgrade:block/basemachine/creative_radiation_storage"
+    },
+    "facing=south,type=creative_radiation_storage_active": {
+      "model": "industrialupgrade:block/basemachine/creative_radiation_storage",
+      "y": 180
+    },
+    "facing=west,type=creative_radiation_storage_active": {
+      "model": "industrialupgrade:block/basemachine/creative_radiation_storage",
+      "y": 270
+    },
+    "facing=east,type=creative_radiation_storage_active": {
+      "model": "industrialupgrade:block/basemachine/creative_radiation_storage",
+      "y": 90
+    }
+  }
+}

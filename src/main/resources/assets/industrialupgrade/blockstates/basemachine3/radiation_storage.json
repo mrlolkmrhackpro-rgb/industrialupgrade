@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=radiation_storage": {
+      "model": "industrialupgrade:block/basemachine/radiation_storage"
+    },
+    "facing=south,type=radiation_storage": {
+      "model": "industrialupgrade:block/basemachine/radiation_storage",
+      "y": 180
+    },
+    "facing=west,type=radiation_storage": {
+      "model": "industrialupgrade:block/basemachine/radiation_storage",
+      "y": 270
+    },
+    "facing=east,type=radiation_storage": {
+      "model": "industrialupgrade:block/basemachine/radiation_storage",
+      "y": 90
+    },
+    "facing=north,type=radiation_storage_active": {
+      "model": "industrialupgrade:block/basemachine/radiation_storage"
+    },
+    "facing=south,type=radiation_storage_active": {
+      "model": "industrialupgrade:block/basemachine/radiation_storage",
+      "y": 180
+    },
+    "facing=west,type=radiation_storage_active": {
+      "model": "industrialupgrade:block/basemachine/radiation_storage",
+      "y": 270
+    },
+    "facing=east,type=radiation_storage_active": {
+      "model": "industrialupgrade:block/basemachine/radiation_storage",
+      "y": 90
+    }
+  }
+}

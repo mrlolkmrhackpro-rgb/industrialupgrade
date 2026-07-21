@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=aqua_solidmatter": {
+      "model": "industrialupgrade:block/solid/aqua_solidmatter"
+    },
+    "facing=south,type=aqua_solidmatter": {
+      "model": "industrialupgrade:block/solid/aqua_solidmatter",
+      "y": 180
+    },
+    "facing=west,type=aqua_solidmatter": {
+      "model": "industrialupgrade:block/solid/aqua_solidmatter",
+      "y": 270
+    },
+    "facing=east,type=aqua_solidmatter": {
+      "model": "industrialupgrade:block/solid/aqua_solidmatter",
+      "y": 90
+    },
+    "facing=north,type=aqua_solidmatter_active": {
+      "model": "industrialupgrade:block/solid/aqua_solidmatter_active"
+    },
+    "facing=south,type=aqua_solidmatter_active": {
+      "model": "industrialupgrade:block/solid/aqua_solidmatter_active",
+      "y": 180
+    },
+    "facing=west,type=aqua_solidmatter_active": {
+      "model": "industrialupgrade:block/solid/aqua_solidmatter_active",
+      "y": 270
+    },
+    "facing=east,type=aqua_solidmatter_active": {
+      "model": "industrialupgrade:block/solid/aqua_solidmatter_active",
+      "y": 90
+    }
+  }
+}

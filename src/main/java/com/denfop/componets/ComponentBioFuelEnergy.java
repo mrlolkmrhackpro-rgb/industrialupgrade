@@ -1,16 +1,13 @@
 package com.denfop.componets;
 
-import com.denfop.api.sytem.EnergyType;
+import com.denfop.api.otherenergies.common.EnergyType;
+import com.denfop.blockentity.base.BlockEntityInventory;
 import com.denfop.blocks.FluidName;
-import com.denfop.effects.BiomassParticle;
-import com.denfop.tiles.base.TileEntityInventory;
 import com.denfop.utils.ModUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.Direction;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,85 +17,83 @@ public class ComponentBioFuelEnergy extends ComponentBaseEnergy {
 
     FluidTank fluidTank;
 
-    public ComponentBioFuelEnergy(EnergyType type, TileEntityInventory parent, double capacity) {
+    public ComponentBioFuelEnergy(EnergyType type, BlockEntityInventory parent, double capacity) {
         this(type, parent, capacity, Collections.emptySet(), Collections.emptySet(), 1);
     }
 
     public ComponentBioFuelEnergy(
-            EnergyType type, TileEntityInventory parent,
+            EnergyType type, BlockEntityInventory parent,
             double capacity,
-            Set<EnumFacing> sinkDirections,
-            Set<EnumFacing> sourceDirections,
+            Set<Direction> sinkDirections,
+            Set<Direction> sourceDirections,
             int tier
     ) {
         this(type, parent, capacity, sinkDirections, sourceDirections, tier, tier, false);
     }
 
     public ComponentBioFuelEnergy(
-            EnergyType type, TileEntityInventory parent,
+            EnergyType type, BlockEntityInventory parent,
             double capacity,
-            Set<EnumFacing> sinkDirections,
-            Set<EnumFacing> sourceDirections,
+            Set<Direction> sinkDirections,
+            Set<Direction> sourceDirections,
             int sinkTier,
             int sourceTier,
             boolean fullEnergy
     ) {
-        super(type, parent, capacity, sinkDirections, sourceDirections, sinkTier, sourceTier, fullEnergy);
+        super(type, parent, capacity, sinkDirections, sourceDirections, sinkTier, sourceTier);
     }
 
     public ComponentBioFuelEnergy(
-            EnergyType type, TileEntityInventory parent,
+            EnergyType type, BlockEntityInventory parent,
             double capacity,
-            List<EnumFacing> sinkDirections,
-            List<EnumFacing> sourceDirections,
+            List<Direction> sinkDirections,
+            List<Direction> sourceDirections,
             int sinkTier,
             int sourceTier,
             boolean fullEnergy
     ) {
-        super(type, parent, capacity, sinkDirections, sourceDirections, sinkTier, sourceTier, fullEnergy);
+        super(type, parent, capacity, sinkDirections, sourceDirections, sinkTier, sourceTier);
     }
 
-    public static ComponentBioFuelEnergy asBasicSink(TileEntityInventory parent, double capacity) {
+    public static ComponentBioFuelEnergy asBasicSink(BlockEntityInventory parent, double capacity) {
         return asBasicSink(parent, capacity, 1);
     }
 
-    public static ComponentBioFuelEnergy asBasicSink(TileEntityInventory parent, double capacity, int tier) {
-        return new ComponentBioFuelEnergy(
-                EnergyType.BIOFUEL,
-                parent,
-                capacity,
-                ModUtils.allFacings,
-                Collections.emptySet(),
-                tier
-        );
+    public static ComponentBioFuelEnergy asBasicSink(BlockEntityInventory parent, double capacity, int tier) {
+        return new ComponentBioFuelEnergy(EnergyType.BIOFUEL, parent, capacity, ModUtils.allFacings, Collections.emptySet(), tier);
     }
 
-    public static ComponentBioFuelEnergy asBasicSource(TileEntityInventory parent, double capacity) {
+    public static ComponentBioFuelEnergy asBasicSource(BlockEntityInventory parent, double capacity) {
         return asBasicSource(parent, capacity, 1);
     }
 
-    public static ComponentBioFuelEnergy asBasicSource(TileEntityInventory parent, double capacity, int tier) {
-        return new ComponentBioFuelEnergy(
-                EnergyType.BIOFUEL,
-                parent,
-                capacity,
-                Collections.emptySet(),
-                ModUtils.allFacings,
-                tier
-        );
+    public static ComponentBioFuelEnergy asBasicSource(BlockEntityInventory parent, double capacity, int tier) {
+        return new ComponentBioFuelEnergy(EnergyType.BIOFUEL, parent, capacity, Collections.emptySet(), ModUtils.allFacings, tier);
     }
 
-    public void setFluidTank(final FluidTank fluidTank) {
-        this.fluidTank = fluidTank;
+    @Override
+    public boolean isServer() {
+        return true;
+    }
+
+    @Override
+    public void updateEntityServer() {
+        super.updateEntityServer();
+        if (fluidTank.getFluid().getAmount() != this.buffer.storage && (this.buffer.storage > fluidTank.getFluid().getAmount())) {
+            fluidTank.fill(new FluidStack(FluidName.fluidbiomass.getInstance().get(), (int) this.buffer.storage - fluidTank.getFluid().getAmount()), IFluidHandler.FluidAction.EXECUTE);
+        }
+        if (fluidTank.getFluid().getAmount() != this.buffer.storage && (this.buffer.storage < fluidTank.getFluid().getAmount())) {
+            fluidTank.drain(fluidTank.getFluid().getAmount() - (int) this.buffer.storage, IFluidHandler.FluidAction.EXECUTE);
+        }
     }
 
     @Override
     public double addEnergy(final double amount) {
         super.addEnergy(amount);
-        if (fluidTank.getFluid() == null && amount >= 1) {
-            fluidTank.fill(new FluidStack(FluidName.fluidbiomass.getInstance(), (int) this.storage), true);
-        } else if (fluidTank.getFluid() != null) {
-            fluidTank.getFluid().amount = (int) this.storage;
+        if (fluidTank.getFluid().isEmpty() && amount >= 1) {
+            fluidTank.fill(new FluidStack(FluidName.fluidbiomass.getInstance().get(), (int) this.buffer.storage), IFluidHandler.FluidAction.EXECUTE);
+        } else if (!fluidTank.getFluid().isEmpty()) {
+            fluidTank.getFluid().setAmount((int) this.buffer.storage);
         }
         return amount;
     }
@@ -109,27 +104,22 @@ public class ComponentBioFuelEnergy extends ComponentBaseEnergy {
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public void updateEntityClient() {
-        super.updateEntityClient();
-        if (this.parent.getActive() && this.parent.getWorld().getWorldTime() % 4 == 0) {
-            Minecraft.getMinecraft().effectRenderer.addEffect(new BiomassParticle(this.parent.getWorld(),
-                    this.parent.getPos().getX() + 0.5,
-                    this.parent.getPos().getY() + 1, this.parent.getPos().getZ() + 0.5
-            ));
-        }
-    }
-
-    @Override
     public boolean useEnergy(final double amount) {
         super.useEnergy(amount);
-        if (fluidTank.getFluid() != null) {
-            fluidTank.getFluid().amount = (int) this.storage;
-            if (fluidTank.getFluid().amount == 0) {
-                fluidTank.setFluid(null);
+        if (!fluidTank.getFluid().isEmpty()) {
+            fluidTank.getFluid().setAmount((int) this.buffer.storage);
+            if (fluidTank.getFluid().getAmount() == 0) {
+                fluidTank.setFluid(FluidStack.EMPTY);
             }
         }
         return true;
     }
 
+    public FluidTank getFluidTank() {
+        return fluidTank;
+    }
+
+    public void setFluidTank(final FluidTank fluidTank) {
+        this.fluidTank = fluidTank;
+    }
 }

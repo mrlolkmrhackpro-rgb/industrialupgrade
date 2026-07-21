@@ -1,3 +1,14 @@
+markdown
+# ⚠️ This is a modified fork of Industrial Upgrade
+
+**Original mod by:** [ZelGimi](https://github.com/ZelGimi/industrialupgrade)  
+**License:** AGPLv3 (same as original)
+
+**Changes in this fork:**
+- The operation of primitive devices (rolling machine, squeezer, etc.) has been significantly accelerated.
+
+
+All other features and mechanics remain unchanged from the original mod.
 ![Industrial Upgrade is a comprehensive technology mod that transforms your Minecraft survival experience — from simple tools and early automation to massive factories and complex infrastructure. It greatly increases the challenge and depth of gameplay, extending your survival journey and rewarding careful planning. Perfect for players who enjoy building intricate systems, mastering advanced technologies, and reimagining the legacy of IndustrialCraft² in a fresh, refined form.](https://i.postimg.cc/BvjBhjXS/preview-01.png) ![The mod features its own ore generation system, covering both custom and vanilla ores, arranged in veins. Each vein contains specific ores with defined spawn chances. On a player’s first login, they receive a special tablet — the “Ore Scanner” — which can be used to detect nearby ores.](https://i.postimg.cc/y6mXr4YZ/preview-02.png) ![The mod features three main eras: 
 -Primitive 
 -Steam 

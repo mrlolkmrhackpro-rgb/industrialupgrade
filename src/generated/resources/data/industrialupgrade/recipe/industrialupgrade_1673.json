@@ -1,0 +1,25 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "tag": "c:plates/tin"
+    },
+    "B": {
+      "item": "minecraft:sticky_piston"
+    },
+    "C": {
+      "item": "industrialupgrade:upgrade_casing"
+    }
+  },
+  "pattern": [
+    "ABA",
+    " C ",
+    "A A"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:upgrades/pulling"
+  },
+  "show_notification": false
+}

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=refrigerator_fluids": {
+      "model": "industrialupgrade:block/basemachine/refrigerator_fluids"
+    },
+    "facing=south,type=refrigerator_fluids": {
+      "model": "industrialupgrade:block/basemachine/refrigerator_fluids",
+      "y": 180
+    },
+    "facing=west,type=refrigerator_fluids": {
+      "model": "industrialupgrade:block/basemachine/refrigerator_fluids",
+      "y": 270
+    },
+    "facing=east,type=refrigerator_fluids": {
+      "model": "industrialupgrade:block/basemachine/refrigerator_fluids",
+      "y": 90
+    },
+    "facing=north,type=refrigerator_fluids_active": {
+      "model": "industrialupgrade:block/basemachine/refrigerator_fluids_active"
+    },
+    "facing=south,type=refrigerator_fluids_active": {
+      "model": "industrialupgrade:block/basemachine/refrigerator_fluids_active",
+      "y": 180
+    },
+    "facing=west,type=refrigerator_fluids_active": {
+      "model": "industrialupgrade:block/basemachine/refrigerator_fluids_active",
+      "y": 270
+    },
+    "facing=east,type=refrigerator_fluids_active": {
+      "model": "industrialupgrade:block/basemachine/refrigerator_fluids_active",
+      "y": 90
+    }
+  }
+}

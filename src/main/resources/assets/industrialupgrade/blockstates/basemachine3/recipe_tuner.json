@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=recipe_tuner": {
+      "model": "industrialupgrade:block/basemachine/recipe_tuner"
+    },
+    "facing=south,type=recipe_tuner": {
+      "model": "industrialupgrade:block/basemachine/recipe_tuner",
+      "y": 180
+    },
+    "facing=west,type=recipe_tuner": {
+      "model": "industrialupgrade:block/basemachine/recipe_tuner",
+      "y": 270
+    },
+    "facing=east,type=recipe_tuner": {
+      "model": "industrialupgrade:block/basemachine/recipe_tuner",
+      "y": 90
+    },
+    "facing=north,type=recipe_tuner_active": {
+      "model": "industrialupgrade:block/basemachine/recipe_tuner"
+    },
+    "facing=south,type=recipe_tuner_active": {
+      "model": "industrialupgrade:block/basemachine/recipe_tuner",
+      "y": 180
+    },
+    "facing=west,type=recipe_tuner_active": {
+      "model": "industrialupgrade:block/basemachine/recipe_tuner",
+      "y": 270
+    },
+    "facing=east,type=recipe_tuner_active": {
+      "model": "industrialupgrade:block/basemachine/recipe_tuner",
+      "y": 90
+    }
+  }
+}

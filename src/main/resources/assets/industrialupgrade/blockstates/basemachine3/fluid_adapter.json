@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=fluid_adapter": {
+      "model": "industrialupgrade:block/basemachine/fluid_adapter"
+    },
+    "facing=south,type=fluid_adapter": {
+      "model": "industrialupgrade:block/basemachine/fluid_adapter",
+      "y": 180
+    },
+    "facing=west,type=fluid_adapter": {
+      "model": "industrialupgrade:block/basemachine/fluid_adapter",
+      "y": 270
+    },
+    "facing=east,type=fluid_adapter": {
+      "model": "industrialupgrade:block/basemachine/fluid_adapter",
+      "y": 90
+    },
+    "facing=north,type=fluid_adapter_active": {
+      "model": "industrialupgrade:block/basemachine/fluid_adapter_active"
+    },
+    "facing=south,type=fluid_adapter_active": {
+      "model": "industrialupgrade:block/basemachine/fluid_adapter_active",
+      "y": 180
+    },
+    "facing=west,type=fluid_adapter_active": {
+      "model": "industrialupgrade:block/basemachine/fluid_adapter_active",
+      "y": 270
+    },
+    "facing=east,type=fluid_adapter_active": {
+      "model": "industrialupgrade:block/basemachine/fluid_adapter_active",
+      "y": 90
+    }
+  }
+}

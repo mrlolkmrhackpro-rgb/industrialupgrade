@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=adv_coke_oven_main": {
+      "model": "industrialupgrade:block/adv_cokeoven/coke_oven_main"
+    },
+    "facing=south,type=adv_coke_oven_main": {
+      "model": "industrialupgrade:block/adv_cokeoven/coke_oven_main",
+      "y": 180
+    },
+    "facing=west,type=adv_coke_oven_main": {
+      "model": "industrialupgrade:block/adv_cokeoven/coke_oven_main",
+      "y": 270
+    },
+    "facing=east,type=adv_coke_oven_main": {
+      "model": "industrialupgrade:block/adv_cokeoven/coke_oven_main",
+      "y": 90
+    },
+    "facing=north,type=adv_coke_oven_main_active": {
+      "model": "industrialupgrade:block/adv_cokeoven/coke_oven_main_active"
+    },
+    "facing=south,type=adv_coke_oven_main_active": {
+      "model": "industrialupgrade:block/adv_cokeoven/coke_oven_main_active",
+      "y": 180
+    },
+    "facing=west,type=adv_coke_oven_main_active": {
+      "model": "industrialupgrade:block/adv_cokeoven/coke_oven_main_active",
+      "y": 270
+    },
+    "facing=east,type=adv_coke_oven_main_active": {
+      "model": "industrialupgrade:block/adv_cokeoven/coke_oven_main_active",
+      "y": 90
+    }
+  }
+}

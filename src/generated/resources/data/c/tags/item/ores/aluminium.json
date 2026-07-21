@@ -1,0 +1,8 @@
+{
+  "values": [
+    "industrialupgrade:baseore/aluminium",
+    "industrialupgrade:blockspace2/ganymede_aluminium_ore",
+    "industrialupgrade:asteroidore/asteroid_aluminium_ore",
+    "industrialupgrade:deepore/deep_aluminium_ore"
+  ]
+}

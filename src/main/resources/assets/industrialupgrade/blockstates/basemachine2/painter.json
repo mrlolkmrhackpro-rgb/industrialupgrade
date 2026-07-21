@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=painter": {
+      "model": "industrialupgrade:block/basemachine/painter"
+    },
+    "facing=south,type=painter": {
+      "model": "industrialupgrade:block/basemachine/painter",
+      "y": 180
+    },
+    "facing=west,type=painter": {
+      "model": "industrialupgrade:block/basemachine/painter",
+      "y": 270
+    },
+    "facing=east,type=painter": {
+      "model": "industrialupgrade:block/basemachine/painter",
+      "y": 90
+    },
+    "facing=north,type=painter_active": {
+      "model": "industrialupgrade:block/basemachine/painter_active"
+    },
+    "facing=south,type=painter_active": {
+      "model": "industrialupgrade:block/basemachine/painter_active",
+      "y": 180
+    },
+    "facing=west,type=painter_active": {
+      "model": "industrialupgrade:block/basemachine/painter_active",
+      "y": 270
+    },
+    "facing=east,type=painter_active": {
+      "model": "industrialupgrade:block/basemachine/painter_active",
+      "y": 90
+    }
+  }
+}

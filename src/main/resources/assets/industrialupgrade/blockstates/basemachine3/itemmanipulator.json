@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=itemmanipulator": {
+      "model": "industrialupgrade:block/basemachine/itemmanipulator"
+    },
+    "facing=south,type=itemmanipulator": {
+      "model": "industrialupgrade:block/basemachine/itemmanipulator",
+      "y": 180
+    },
+    "facing=west,type=itemmanipulator": {
+      "model": "industrialupgrade:block/basemachine/itemmanipulator",
+      "y": 270
+    },
+    "facing=east,type=itemmanipulator": {
+      "model": "industrialupgrade:block/basemachine/itemmanipulator",
+      "y": 90
+    },
+    "facing=north,type=itemmanipulator_active": {
+      "model": "industrialupgrade:block/basemachine/itemmanipulator"
+    },
+    "facing=south,type=itemmanipulator_active": {
+      "model": "industrialupgrade:block/basemachine/itemmanipulator",
+      "y": 180
+    },
+    "facing=west,type=itemmanipulator_active": {
+      "model": "industrialupgrade:block/basemachine/itemmanipulator",
+      "y": 270
+    },
+    "facing=east,type=itemmanipulator_active": {
+      "model": "industrialupgrade:block/basemachine/itemmanipulator",
+      "y": 90
+    }
+  }
+}

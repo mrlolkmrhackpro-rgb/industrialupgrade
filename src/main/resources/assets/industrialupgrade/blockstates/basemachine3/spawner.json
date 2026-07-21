@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=spawner": {
+      "model": "industrialupgrade:block/basemachine/spawner"
+    },
+    "facing=south,type=spawner": {
+      "model": "industrialupgrade:block/basemachine/spawner",
+      "y": 180
+    },
+    "facing=west,type=spawner": {
+      "model": "industrialupgrade:block/basemachine/spawner",
+      "y": 270
+    },
+    "facing=east,type=spawner": {
+      "model": "industrialupgrade:block/basemachine/spawner",
+      "y": 90
+    },
+    "facing=north,type=spawner_active": {
+      "model": "industrialupgrade:block/basemachine/spawner_active"
+    },
+    "facing=south,type=spawner_active": {
+      "model": "industrialupgrade:block/basemachine/spawner_active",
+      "y": 180
+    },
+    "facing=west,type=spawner_active": {
+      "model": "industrialupgrade:block/basemachine/spawner_active",
+      "y": 270
+    },
+    "facing=east,type=spawner_active": {
+      "model": "industrialupgrade:block/basemachine/spawner_active",
+      "y": 90
+    }
+  }
+}

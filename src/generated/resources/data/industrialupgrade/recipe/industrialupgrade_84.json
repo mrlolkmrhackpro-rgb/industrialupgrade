@@ -1,0 +1,25 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:energy/wrench"
+    },
+    "C": {
+      "item": "industrialupgrade:battery/lapotron_crystal"
+    },
+    "D": {
+      "item": "industrialupgrade:photoniy_ingot"
+    }
+  },
+  "pattern": [
+    "CDC",
+    "DAD",
+    "CDC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:upgradekitstorage/upgradekit2"
+  },
+  "show_notification": false
+}

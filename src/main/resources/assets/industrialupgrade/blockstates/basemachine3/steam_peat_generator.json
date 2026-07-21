@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=steam_peat_generator": {
+      "model": "industrialupgrade:block/basemachine/steam_peat_generator"
+    },
+    "facing=south,type=steam_peat_generator": {
+      "model": "industrialupgrade:block/basemachine/steam_peat_generator",
+      "y": 180
+    },
+    "facing=west,type=steam_peat_generator": {
+      "model": "industrialupgrade:block/basemachine/steam_peat_generator",
+      "y": 270
+    },
+    "facing=east,type=steam_peat_generator": {
+      "model": "industrialupgrade:block/basemachine/steam_peat_generator",
+      "y": 90
+    },
+    "facing=north,type=steam_peat_generator_active": {
+      "model": "industrialupgrade:block/basemachine/steam_peat_generator_active"
+    },
+    "facing=south,type=steam_peat_generator_active": {
+      "model": "industrialupgrade:block/basemachine/steam_peat_generator_active",
+      "y": 180
+    },
+    "facing=west,type=steam_peat_generator_active": {
+      "model": "industrialupgrade:block/basemachine/steam_peat_generator_active",
+      "y": 270
+    },
+    "facing=east,type=steam_peat_generator_active": {
+      "model": "industrialupgrade:block/basemachine/steam_peat_generator_active",
+      "y": 90
+    }
+  }
+}

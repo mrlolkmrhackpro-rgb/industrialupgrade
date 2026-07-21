@@ -10,42 +10,32 @@ import com.denfop.api.space.rovers.enums.EnumTypeUpgrade;
 import com.denfop.api.space.upgrades.api.ISpaceUpgradeSystem;
 import com.denfop.api.space.upgrades.event.EventItemLoad;
 import com.denfop.api.space.upgrades.info.SpaceUpgradeItemInform;
+import com.denfop.datacomponent.DataComponentsInit;
+import com.denfop.datacomponent.UpgradeRover;
 import com.denfop.recipe.IInputHandler;
-import com.denfop.utils.ModUtils;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.oredict.OreDictionary;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.LevelEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class BaseSpaceUpgradeSystem implements ISpaceUpgradeSystem {
 
-    Map<Integer, List<SpaceUpgradeItemInform>> map;
-    Map<Integer, ItemStack> map_stack;
-    Map<Integer, Integer> map_col;
+    public static List<Runnable> list = new ArrayList<>();
 
     int max;
 
     public BaseSpaceUpgradeSystem() {
-        this.map = new HashMap<>();
         this.max = 0;
-        this.map_col = new HashMap<>();
-        this.map_stack = new HashMap<>();
 
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
 
     }
 
@@ -55,14 +45,13 @@ public class BaseSpaceUpgradeSystem implements ISpaceUpgradeSystem {
                 "roverupgradeblock",
                 new BaseMachineRecipe(
                         new Input(
-                                input.getInput(new ItemStack(container, 1, OreDictionary.WILDCARD_VALUE)),
+                                input.getInput(new ItemStack(container, 1)),
                                 input.getInput(fill)
                         ),
-                        new RecipeOutput(null, new ItemStack(container, 1, OreDictionary.WILDCARD_VALUE))
+                        new RecipeOutput(null, new ItemStack(container, 1))
                 )
         );
     }
-
 
     @SubscribeEvent
     public void loadItem(EventItemLoad event) {
@@ -70,38 +59,21 @@ public class BaseSpaceUpgradeSystem implements ISpaceUpgradeSystem {
         this.updateListFromNBT(event.item, event.stack);
     }
 
-
     @Override
     public int getRemaining(final ItemStack item) {
-        final NBTTagCompound nbt = ModUtils.nbt(item);
-        final int id = nbt.getInteger("ID_Item");
-        return this.map_col.getOrDefault(id, 24);
+        return 24 - item.get(DataComponentsInit.UPGRADE_ROVER).amount();
     }
-
 
     @Override
     public boolean hasInMap(final ItemStack stack) {
-        final NBTTagCompound nbt = ModUtils.nbt(stack);
-        final int id = nbt.getInteger("ID_Item");
-        ItemStack item = this.map_stack.get(id);
-        if (item == null || item.isEmpty()) {
-            return false;
-        }
-        int id1 = ModUtils.nbt(item).getInteger("ID_Item");
+        return stack.has(DataComponentsInit.UPGRADE_ROVER) && !stack.get(DataComponentsInit.UPGRADE_ROVER).equals(UpgradeRover.EMPTY);
 
-        return item.isItemEqual(stack) && id1 == id && (item.getTagCompound() != null && item
-                .getTagCompound()
-                .equals(stack.getTagCompound()));
     }
 
     @Override
     public List<SpaceUpgradeItemInform> getInformation(final ItemStack item) {
-        final NBTTagCompound nbt = ModUtils.nbt(item);
-        final int id = nbt.getInteger("ID_Item");
-        final List<SpaceUpgradeItemInform> list = this.map.get(id);
-        return list != null ? list : Collections.emptyList();
+        return item.getOrDefault(DataComponentsInit.UPGRADE_ROVER, UpgradeRover.EMPTY).upgradeItemInforms();
     }
-
 
     @Override
     public SpaceUpgradeItemInform getModules(final EnumTypeUpgrade module, final ItemStack item) {
@@ -113,7 +85,6 @@ public class BaseSpaceUpgradeSystem implements ISpaceUpgradeSystem {
         }
         return null;
     }
-
 
     @Override
     public boolean hasModules(final EnumTypeUpgrade module, final ItemStack item) {
@@ -129,43 +100,22 @@ public class BaseSpaceUpgradeSystem implements ISpaceUpgradeSystem {
         return false;
     }
 
-
     @Override
     public void updateListFromNBT(final IRoversItem item, ItemStack stack) {
-        final NBTTagCompound nbt = ModUtils.nbt(stack);
-        boolean hasID = nbt.getBoolean("hasID");
-        int id = nbt.getInteger("ID_Item");
+        UpgradeRover upgradeItem = stack.getOrDefault(DataComponentsInit.UPGRADE_ROVER, UpgradeRover.EMPTY);
+        boolean hasID = upgradeItem == UpgradeRover.EMPTY;
 
         if (!hasID) {
-            id = this.max;
             this.max++;
-            nbt.setInteger("ID_Item", id);
-            nbt.setBoolean("hasID", true);
+            upgradeItem = stack.set(DataComponentsInit.UPGRADE_ROVER, UpgradeRover.EMPTY.copy());
         }
 
+        int modesTagList = upgradeItem.amount();
+        int ost = 24 - modesTagList;
+        upgradeItem = upgradeItem.updateCanUpgrade(stack, ost > 0);
 
-        NBTTagList modesTagList = nbt.getTagList("modes", 10);
-        List<EnumTypeUpgrade> lst = new ArrayList<>();
-        for (int i = 0; i < modesTagList.tagCount(); i++) {
-            NBTTagCompound modeTag = modesTagList.getCompoundTagAt(i);
-            int index = modeTag.getInteger("index");
-            lst.add(EnumTypeUpgrade.getFromID(index));
-        }
-
-        int ost = 24 - modesTagList.tagCount();
-        nbt.setBoolean("canupgrade", ost > 0);
-
-        if (this.map_col.containsKey(id)) {
-            this.map_col.replace(id, ost);
-        } else {
-            this.map_col.put(id, ost);
-        }
-
-
-        this.setInformation(item, lst, stack);
 
     }
-
 
     @Override
     public void setInformation(final IRoversItem item, List<EnumTypeUpgrade> lst, ItemStack stack) {
@@ -173,80 +123,42 @@ public class BaseSpaceUpgradeSystem implements ISpaceUpgradeSystem {
     }
 
     @SubscribeEvent
-    public void onWorldUnload(final WorldEvent.Unload event) {
-        if (event.getWorld().isRemote) {
+    public void onWorldUnload(final LevelEvent.Unload event) {
+        if ((event.getLevel()).isClientSide()) {
             return;
         }
-        this.map.clear();
         this.max = 0;
-        this.map_col.clear();
-        this.map_stack.clear();
     }
 
     @Override
     public void write(final IRoversItem item, final List<EnumTypeUpgrade> lst, ItemStack stack) {
-        NBTTagCompound nbt = ModUtils.nbt(stack);
-        final int id = nbt.getInteger("ID_Item");
 
-        Map<EnumTypeUpgrade, Integer> moduleCounts = lst.stream()
-                .collect(Collectors.toMap(
-                        module -> module,
-                        module -> 1,
-                        Integer::sum
-                ));
-
-        List<SpaceUpgradeItemInform> upgrades = moduleCounts.entrySet().stream()
-                .map(entry -> new SpaceUpgradeItemInform(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
-
-
-        this.map.put(id, upgrades);
-        this.map_stack.put(id, stack);
     }
-
 
     private int getModulesValue(EnumTypeUpgrade module, ItemStack stack) {
         SpaceUpgradeItemInform modules = this.getModules(module, stack);
-        if (modules == null) {
+        if (modules == null)
             return 0;
-        }
         return modules.number;
     }
 
-
     @Override
-    public void removeUpdate(final ItemStack stack, final World world, final int index) {
-        final NBTTagCompound nbt = ModUtils.nbt(stack);
-        NBTTagList modesTagList = nbt.getTagList("modes", 10);
-        int i = 0;
-        for (int ii = 0; ii < modesTagList.tagCount(); ii++) {
-            NBTTagCompound tagCompound = modesTagList.getCompoundTagAt(ii);
-            if (tagCompound.getInteger("index") == index) {
-                i = ii;
-                break;
-            }
-        }
-        modesTagList.removeTag(i);
-        MinecraftForge.EVENT_BUS.post(new EventItemLoad(world, (IRoversItem) stack.getItem(), stack));
+    public void removeUpdate(final ItemStack stack, final Level world, final int index) {
+
 
     }
 
     @Override
     public List<ItemStack> getListStack(final ItemStack stack) {
         List<ItemStack> list = new LinkedList<>();
-        final NBTTagCompound nbt = ModUtils.nbt(stack);
-        NBTTagList modesTagList = nbt.getTagList("modes", 10);
-        for (int ii = 0; ii < modesTagList.tagCount(); ii++) {
-            NBTTagCompound tagCompound = modesTagList.getCompoundTagAt(ii);
-            list.add(new ItemStack(IUItem.spaceupgrademodule, 1, tagCompound.getInteger("index")));
-        }
+
         return list;
     }
 
     @Override
     public void addRecipe(final Item stack, final EnumTypeUpgrade... lst) {
         for (EnumTypeUpgrade upgrades : lst) {
-            addupgrade(stack, new ItemStack(IUItem.spaceupgrademodule, 1, upgrades.ordinal()));
+            addupgrade(stack, new ItemStack(IUItem.spaceupgrademodule.getStack(upgrades.ordinal()), 1));
 
         }
     }
@@ -266,9 +178,8 @@ public class BaseSpaceUpgradeSystem implements ISpaceUpgradeSystem {
 
     @Override
     public List<String> getAvailableUpgrade(final IRoversItem iUpgradeItem, final ItemStack item) {
-        final NBTTagCompound nbt = ModUtils.nbt(item);
-        final int id = nbt.getInteger("ID_Item");
-        final List<SpaceUpgradeItemInform> list = this.map.get(id);
+        UpgradeRover upgradeItem = item.getOrDefault(DataComponentsInit.UPGRADE_ROVER, UpgradeRover.EMPTY);
+        final List<SpaceUpgradeItemInform> list = upgradeItem.upgradeItemInforms();
         final List<EnumTypeUpgrade> list1 = iUpgradeItem.getUpgradeModules();
         final List<String> stringList = new LinkedList<>();
         cycle:
@@ -276,21 +187,19 @@ public class BaseSpaceUpgradeSystem implements ISpaceUpgradeSystem {
             for (SpaceUpgradeItemInform upgradeItemInform : list) {
                 if (upgradeItemInform.upgrade.equals(enumInfoUpgradeModules)) {
                     if (upgradeItemInform.number < upgradeItemInform.upgrade.getMax()) {
-                        stringList.add(TextFormatting.GREEN + "" + (upgradeItemInform.upgrade.getMax() - upgradeItemInform.number) +
-                                "x " + (new ItemStack(
-                                IUItem.spaceupgrademodule,
-                                1,
-                                enumInfoUpgradeModules.ordinal()
-                        ).getDisplayName()));
+                        stringList.add(ChatFormatting.GREEN + "" + (upgradeItemInform.upgrade.getMax() - upgradeItemInform.number) +
+                                "x " + (com.denfop.utils.ModUtils.cleanComponentString(new ItemStack(
+                                IUItem.spaceupgrademodule.getStack(enumInfoUpgradeModules.ordinal()),
+                                1
+                        ).getDisplayName().getString())));
                     }
                     continue cycle;
                 }
             }
-            stringList.add(TextFormatting.GREEN + "" + (enumInfoUpgradeModules.getMax()) + "x " + (new ItemStack(
-                    IUItem.spaceupgrademodule,
-                    1,
-                    enumInfoUpgradeModules.ordinal()
-            ).getDisplayName()));
+            stringList.add(ChatFormatting.GREEN + "" + (enumInfoUpgradeModules.getMax()) + "x " + (com.denfop.utils.ModUtils.cleanComponentString(new ItemStack(
+                    IUItem.spaceupgrademodule.getStack(enumInfoUpgradeModules.ordinal()),
+                    1
+            ).getDisplayName().getString())));
 
         }
         return list != null ? stringList : Collections.emptyList();

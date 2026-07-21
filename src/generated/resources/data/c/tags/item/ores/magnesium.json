@@ -1,0 +1,10 @@
+{
+  "values": [
+    "industrialupgrade:baseore/magnesium",
+    "industrialupgrade:blockspace/enceladus_magnesium_ore",
+    "industrialupgrade:blockspace/eris_magnesium",
+    "industrialupgrade:asteroidore1/asteroid_magnesium",
+    "industrialupgrade:asteroidore1/asteroid_magnesium_ore",
+    "industrialupgrade:deepore/deep_magnesium_ore"
+  ]
+}

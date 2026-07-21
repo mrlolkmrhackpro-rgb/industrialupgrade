@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=generator_microchip": {
+      "model": "industrialupgrade:block/basemachine/generator_microchip"
+    },
+    "facing=south,type=generator_microchip": {
+      "model": "industrialupgrade:block/basemachine/generator_microchip",
+      "y": 180
+    },
+    "facing=west,type=generator_microchip": {
+      "model": "industrialupgrade:block/basemachine/generator_microchip",
+      "y": 270
+    },
+    "facing=east,type=generator_microchip": {
+      "model": "industrialupgrade:block/basemachine/generator_microchip",
+      "y": 90
+    },
+    "facing=north,type=generator_microchip_active": {
+      "model": "industrialupgrade:block/basemachine/generator_microchip_active"
+    },
+    "facing=south,type=generator_microchip_active": {
+      "model": "industrialupgrade:block/basemachine/generator_microchip_active",
+      "y": 180
+    },
+    "facing=west,type=generator_microchip_active": {
+      "model": "industrialupgrade:block/basemachine/generator_microchip_active",
+      "y": 270
+    },
+    "facing=east,type=generator_microchip_active": {
+      "model": "industrialupgrade:block/basemachine/generator_microchip_active",
+      "y": 90
+    }
+  }
+}

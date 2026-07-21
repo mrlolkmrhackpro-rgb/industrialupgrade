@@ -1,10 +1,11 @@
 package com.denfop.api.recipe;
 
+
 import com.denfop.network.DecoderHandler;
 import com.denfop.network.EncoderHandler;
 import com.denfop.network.packet.CustomPacketBuffer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.world.item.ItemStack;
 
 import java.io.IOException;
 
@@ -18,10 +19,6 @@ public class RecipeInfo {
         this.col = col;
     }
 
-    public RecipeInfo(NBTTagCompound tagCompound) {
-        this.stack = new ItemStack(tagCompound.getCompoundTag("stack"));
-        this.col = tagCompound.getDouble("matter");
-    }
 
     public RecipeInfo(CustomPacketBuffer packetBuffer) {
         this.col = packetBuffer.readDouble();
@@ -33,8 +30,8 @@ public class RecipeInfo {
 
     }
 
-    public CustomPacketBuffer getPacket() {
-        CustomPacketBuffer packetBuffer = new CustomPacketBuffer();
+    public CustomPacketBuffer getPacket(RegistryAccess access) {
+        CustomPacketBuffer packetBuffer = new CustomPacketBuffer(access);
         packetBuffer.writeDouble(this.col);
         try {
             EncoderHandler.encode(packetBuffer, this.stack);
@@ -52,13 +49,5 @@ public class RecipeInfo {
         return stack;
     }
 
-    public NBTTagCompound writeCompound() {
-        NBTTagCompound tag = new NBTTagCompound();
-        NBTTagCompound stackNBT = new NBTTagCompound();
-        stack.writeToNBT(stackNBT);
-        tag.setTag("stack", stackNBT);
-        tag.setDouble("matter", col);
-        return tag;
-    }
 
 }

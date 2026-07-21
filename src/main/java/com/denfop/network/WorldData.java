@@ -1,72 +1,157 @@
 package com.denfop.network;
 
-import com.denfop.items.ItemStackInventory;
+import com.denfop.blockentity.base.BlockEntityBase;
 import com.denfop.network.packet.CustomPacketBuffer;
-import com.denfop.tiles.base.TileEntityBlock;
 import com.denfop.world.IWorldTickCallback;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.neoforged.fml.loading.FMLEnvironment;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 public class WorldData {
 
-    public static Map<Integer, WorldData> idxClient = FMLCommonHandler.instance().getSide().isClient()
+    public static Map<ResourceKey<Level>, WorldData> idxClient = FMLEnvironment.dist.isClient()
             ? new HashMap<>()
             : null;
-    public static Map<Integer, WorldData> idxServer = new HashMap<>();
+    public static Map<ResourceKey<Level>, WorldData> idxServer = new HashMap<>();
+    private static final Set<ResourceKey<Level>> unloadingServer = new HashSet<>();
+    private static final Set<ResourceKey<Level>> unloadingClient = FMLEnvironment.dist.isClient()
+            ? new HashSet<>()
+            : null;
+    private static volatile boolean serverStopping;
+
     public final Queue<IWorldTickCallback> singleUpdates = new LinkedList<>();
-    public final Map<TileEntityBlock, Map<EntityPlayer, CustomPacketBuffer>> mapUpdateContainer = new HashMap<>();
-    public final Map<ItemStackInventory, Map<EntityPlayer, CustomPacketBuffer>> mapUpdateItemStackContainer = new HashMap<>();
+    public final List<BlockEntityBase> listUpdateTile = new LinkedList<>();
+    public final Map<BlockEntityBase, List<CustomPacketBuffer>> mapUpdateField = new HashMap<>();
+    public final Map<BlockEntityBase, Map<Player, CustomPacketBuffer>> mapUpdateContainer = new HashMap<>();
 
-    public final List<TileEntityBlock> listUpdateTile = new ArrayList<>();
-    public final Map<TileEntityBlock, List<CustomPacketBuffer>> mapUpdateField = new HashMap<>();
+    public final Map<BlockPos, BlockEntityBase> mapUpdateOvertimeField = new HashMap<>();
+    private final Level world;
 
-    public final Map<BlockPos, TileEntityBlock> mapUpdateOvertimeField = new HashMap<>();
-    private final World world;
-
-    public WorldData(World world) {
+    public WorldData(Level world) {
         this.world = world;
     }
 
-    public static WorldData get(World world) {
+    public static WorldData get(Level world) {
         return get(world, true);
     }
 
-    public static WorldData get(World world, boolean load) {
+    public static WorldData get(Level world, boolean load) {
         if (world == null) {
             return null;
-        } else {
-            Map<Integer, WorldData> index = getIndex(!world.isRemote);
-            WorldData ret = index.get(world.provider.getDimension());
-            if (ret == null && load) {
-                ret = new WorldData(world);
-                WorldData prev = index.putIfAbsent(world.provider.getDimension(), ret);
-                if (prev != null) {
-                    ret = prev;
-                }
+        }
 
+        boolean simulating = !world.isClientSide;
+        Map<ResourceKey<Level>, WorldData> index = getIndex(simulating);
+        if (index == null) {
+            return null;
+        }
+
+        ResourceKey<Level> dimension = world.dimension();
+        WorldData ret = index.get(dimension);
+        Set<ResourceKey<Level>> unloadingIndex = getUnloadingIndex(simulating);
+        boolean unloading = unloadingIndex != null && unloadingIndex.contains(dimension);
+        if (ret == null && load && !unloading && !(simulating && serverStopping)) {
+            ret = new WorldData(world);
+            WorldData prev = index.putIfAbsent(dimension, ret);
+            if (prev != null) {
+                ret = prev;
             }
-            return ret;
+        }
+        return ret;
+    }
+
+    public static void onWorldLoad(Level world) {
+        if (world == null) {
+            return;
+        }
+        boolean simulating = !world.isClientSide;
+        if (simulating) {
+            serverStopping = false;
+        }
+        Set<ResourceKey<Level>> unloadingIndex = getUnloadingIndex(simulating);
+        if (unloadingIndex != null) {
+            unloadingIndex.remove(world.dimension());
         }
     }
 
-    public static void onWorldUnload(World world) {
-        getIndex(!world.isRemote).remove(world.provider.getDimension());
+    public static void onWorldUnload(Level world) {
+        if (world == null) {
+            return;
+        }
+
+        boolean simulating = !world.isClientSide;
+        ResourceKey<Level> dimension = world.dimension();
+        Set<ResourceKey<Level>> unloadingIndex = getUnloadingIndex(simulating);
+        if (unloadingIndex != null) {
+            unloadingIndex.add(dimension);
+        }
+
+        Map<ResourceKey<Level>, WorldData> index = getIndex(simulating);
+        if (index == null) {
+            return;
+        }
+
+        WorldData data = index.remove(dimension);
+        if (data != null) {
+            data.clear();
+        }
     }
 
-    private static Map<Integer, WorldData> getIndex(boolean simulating) {
+    public static void onServerStopping() {
+        serverStopping = true;
+        clearIndex(idxServer);
+        idxServer.clear();
+    }
+
+    public static void onServerStopped() {
+        onServerStopping();
+        unloadingServer.clear();
+    }
+
+    public static boolean isStoppingOrUnloading(Level world) {
+        if (world == null) {
+            return true;
+        }
+        boolean simulating = !world.isClientSide;
+        if (simulating && serverStopping) {
+            return true;
+        }
+        Set<ResourceKey<Level>> unloadingIndex = getUnloadingIndex(simulating);
+        return unloadingIndex != null && unloadingIndex.contains(world.dimension());
+    }
+
+    private static void clearIndex(Map<ResourceKey<Level>, WorldData> index) {
+        if (index == null) {
+            return;
+        }
+        for (WorldData data : index.values()) {
+            if (data != null) {
+                data.clear();
+            }
+        }
+    }
+
+    private static Map<ResourceKey<Level>, WorldData> getIndex(boolean simulating) {
         return simulating ? idxServer : idxClient;
     }
 
-    public World getWorld() {
+    private static Set<ResourceKey<Level>> getUnloadingIndex(boolean simulating) {
+        return simulating ? unloadingServer : unloadingClient;
+    }
+
+    private void clear() {
+        singleUpdates.clear();
+        listUpdateTile.clear();
+        mapUpdateField.clear();
+        mapUpdateContainer.clear();
+        mapUpdateOvertimeField.clear();
+    }
+
+    public Level getWorld() {
         return world;
     }
 

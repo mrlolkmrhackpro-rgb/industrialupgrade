@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=per_wind_generator": {
+      "model": "industrialupgrade:block/basemachine/per_kg"
+    },
+    "facing=south,type=per_wind_generator": {
+      "model": "industrialupgrade:block/basemachine/per_kg",
+      "y": 180
+    },
+    "facing=west,type=per_wind_generator": {
+      "model": "industrialupgrade:block/basemachine/per_kg",
+      "y": 270
+    },
+    "facing=east,type=per_wind_generator": {
+      "model": "industrialupgrade:block/basemachine/per_kg",
+      "y": 90
+    },
+    "facing=north,type=per_wind_generator_active": {
+      "model": "industrialupgrade:block/basemachine/per_kg_active"
+    },
+    "facing=south,type=per_wind_generator_active": {
+      "model": "industrialupgrade:block/basemachine/per_kg_active",
+      "y": 180
+    },
+    "facing=west,type=per_wind_generator_active": {
+      "model": "industrialupgrade:block/basemachine/per_kg_active",
+      "y": 270
+    },
+    "facing=east,type=per_wind_generator_active": {
+      "model": "industrialupgrade:block/basemachine/per_kg_active",
+      "y": 90
+    }
+  }
+}

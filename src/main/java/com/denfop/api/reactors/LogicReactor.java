@@ -1,7 +1,7 @@
 package com.denfop.api.reactors;
 
 import com.denfop.world.WorldBaseGen;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -167,25 +167,25 @@ public class LogicReactor {
                 ));
                 rad_generation += (int) component.getItem().getRadiation();
                 if (component.getItem().getType() == EnumTypeComponent.ENERGY_COUPLER) {
-                    int temp_generation = 0;
-                    int temp_rad_generation = 0;
+                    double temp_generation = 0;
+                    double temp_rad_generation = 0;
                     int count = 0;
                     for (LogicComponent component1 : component.getLogicComponents()) {
                         if (component1.getItem().getType() == EnumTypeComponent.ROD) {
                             count++;
-                            temp_generation += (int) ((int) (component1
+                            temp_generation += ((component1
                                     .getItem()
                                     .getEnergyProduction(this.reactor) * reactor.getMulOutput(component1.getX(),
                                     component1.getY(), component1.getStack()
-                            )) * component.getItem().getEnergyProduction(this.reactor));
-                            temp_rad_generation += (int) ((int) component1.getItem().getRadiation() * component
+                            )) * (0.45 + component.getItem().getEnergyProduction(this.reactor)));
+                            temp_rad_generation += component1.getItem().getRadiation() * component
                                     .getItem()
-                                    .getEnergyProduction(this.reactor));
+                                    .getEnergyProduction(this.reactor);
                         }
                     }
                     if (count > 1) {
-                        this.generation += temp_generation;
-                        this.rad_generation += temp_rad_generation;
+                        this.generation += (int) temp_generation;
+                        this.rad_generation += (int) temp_rad_generation;
                     }
                 }
                 if (component.getItem().updatableItem() && !list1.contains(component)) {
@@ -283,7 +283,9 @@ public class LogicReactor {
             logicComponentList.forEach(logicComponent -> this.reactor.setItemAt(logicComponent.getX(), logicComponent.getY()));
             this.reactor.setUpdate();
         }
-
+        if (this.getMaxHeat() > this.reactor.getMaxHeat() * 1.15) {
+            this.reactor.setHeat(this.reactor.getHeat() * 0.5);
+        }
         if (!this.rodsList.isEmpty()) {
             this.reactor.setOutput(this.generation);
         } else {

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=creator_schedules": {
+      "model": "industrialupgrade:block/basemachine/creator_schedules"
+    },
+    "facing=south,type=creator_schedules": {
+      "model": "industrialupgrade:block/basemachine/creator_schedules",
+      "y": 180
+    },
+    "facing=west,type=creator_schedules": {
+      "model": "industrialupgrade:block/basemachine/creator_schedules",
+      "y": 270
+    },
+    "facing=east,type=creator_schedules": {
+      "model": "industrialupgrade:block/basemachine/creator_schedules",
+      "y": 90
+    },
+    "facing=north,type=creator_schedules_active": {
+      "model": "industrialupgrade:block/basemachine/creator_schedules"
+    },
+    "facing=south,type=creator_schedules_active": {
+      "model": "industrialupgrade:block/basemachine/creator_schedules",
+      "y": 180
+    },
+    "facing=west,type=creator_schedules_active": {
+      "model": "industrialupgrade:block/basemachine/creator_schedules",
+      "y": 270
+    },
+    "facing=east,type=creator_schedules_active": {
+      "model": "industrialupgrade:block/basemachine/creator_schedules",
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=imp_comb_pump": {
+      "model": "industrialupgrade:block/basemachine/imp_comb_pump"
+    },
+    "facing=south,type=imp_comb_pump": {
+      "model": "industrialupgrade:block/basemachine/imp_comb_pump",
+      "y": 180
+    },
+    "facing=west,type=imp_comb_pump": {
+      "model": "industrialupgrade:block/basemachine/imp_comb_pump",
+      "y": 270
+    },
+    "facing=east,type=imp_comb_pump": {
+      "model": "industrialupgrade:block/basemachine/imp_comb_pump",
+      "y": 90
+    },
+    "facing=north,type=imp_comb_pump_active": {
+      "model": "industrialupgrade:block/basemachine/imp_comb_pump_active"
+    },
+    "facing=south,type=imp_comb_pump_active": {
+      "model": "industrialupgrade:block/basemachine/imp_comb_pump_active",
+      "y": 180
+    },
+    "facing=west,type=imp_comb_pump_active": {
+      "model": "industrialupgrade:block/basemachine/imp_comb_pump_active",
+      "y": 270
+    },
+    "facing=east,type=imp_comb_pump_active": {
+      "model": "industrialupgrade:block/basemachine/imp_comb_pump_active",
+      "y": 90
+    }
+  }
+}

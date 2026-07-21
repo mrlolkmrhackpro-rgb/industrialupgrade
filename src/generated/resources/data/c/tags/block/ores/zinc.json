@@ -1,0 +1,8 @@
+{
+  "values": [
+    "industrialupgrade:baseore/zinc",
+    "industrialupgrade:blockspace/charon_zinc",
+    "industrialupgrade:asteroidore3/asteroid_zinc_ore",
+    "industrialupgrade:deepore/deep_zinc_ore"
+  ]
+}

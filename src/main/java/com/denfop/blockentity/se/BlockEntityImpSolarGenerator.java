@@ -1,0 +1,49 @@
+package com.denfop.blockentity.se;
+
+
+import com.denfop.config.ModConfig;
+import com.denfop.IUItem;
+import com.denfop.api.blockentity.MultiBlockEntity;
+import com.denfop.blockentity.base.BlockEntitySolarGeneratorEnergy;
+import com.denfop.blocks.BlockTileEntity;
+import com.denfop.blocks.mechanism.BlockImpSolarEnergyEntity;
+import com.denfop.componets.EnumTypeStyle;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+
+import java.util.Collections;
+import java.util.List;
+
+public class BlockEntityImpSolarGenerator extends BlockEntitySolarGeneratorEnergy {
+
+
+    private static final List<AABB> aabbs = Collections.singletonList(new AABB(-0.2, 0.0D, -0.2, 1.2, 2.0D,
+            1.2
+    ));
+
+    public BlockEntityImpSolarGenerator(BlockPos pos, BlockState state) {
+
+        super(ModConfig.mechanismDouble("advanced_solar_energy_generator_generation_multiplier", 4.0D), BlockImpSolarEnergyEntity.imp_se_gen, pos, state);
+
+    }
+
+    public MultiBlockEntity getTeBlock() {
+        return BlockImpSolarEnergyEntity.imp_se_gen;
+    }
+
+    public BlockTileEntity getBlock() {
+        return IUItem.imp_se_generator.getBlock();
+    }
+
+    @Override
+    public EnumTypeStyle getStyle() {
+        return EnumTypeStyle.IMPROVED;
+    }
+
+
+    public List<AABB> getAabbs(boolean forCollision) {
+        return aabbs;
+    }
+
+}

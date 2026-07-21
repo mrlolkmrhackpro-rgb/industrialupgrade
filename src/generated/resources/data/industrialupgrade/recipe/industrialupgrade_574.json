@@ -1,0 +1,31 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "tag": "c:plates/bloodstone"
+    },
+    "B": {
+      "item": "industrialupgrade:adv_spectral_box"
+    },
+    "C": {
+      "item": "industrialupgrade:module_schedule"
+    },
+    "D": {
+      "tag": "c:doubleplate/germanium"
+    },
+    "E": {
+      "item": "industrialupgrade:alloycasing/ferromanganese"
+    }
+  },
+  "pattern": [
+    "ABA",
+    "DCD",
+    "EBE"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:entitymodules/module_mob"
+  },
+  "show_notification": false
+}

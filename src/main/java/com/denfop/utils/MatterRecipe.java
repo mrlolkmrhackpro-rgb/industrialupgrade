@@ -1,8 +1,7 @@
 package com.denfop.utils;
 
-import com.denfop.api.item.IEnergyItem;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
+import com.denfop.api.item.energy.EnergyItem;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -38,31 +37,11 @@ public class MatterRecipe {
     }
 
     public static boolean areItemStackTagsEqual(ItemStack stackA, ItemStack stackB) {
-        if (stackA.isEmpty() && stackB.isEmpty()) {
-            return true;
-        } else if (!stackA.isEmpty() && !stackB.isEmpty()) {
-            if (stackA.getTagCompound() == null && stackB.getTagCompound() != null) {
-                return false;
-            } else {
-                return (stackA.getTagCompound() == null || stackA.getTagCompound().equals(stackB.getTagCompound()));
-            }
-        } else {
-            return false;
-        }
+        return true;
     }
 
     public boolean isEqualNbt(@Nullable ItemStack left, @Nullable ItemStack right) {
 
-
-        if (!areItemStackTagsEqual(left, right)) {
-            if (left.hasTagCompound() && !right.hasTagCompound() && left.getTagCompound().hasNoTags()) {
-                return true;
-            } else if (!left.hasTagCompound() && right.hasTagCompound() && right.getTagCompound().hasNoTags()) {
-                return true;
-            } else {
-                return !left.hasTagCompound() && !right.hasTagCompound();
-            }
-        }
 
         return true;
     }
@@ -73,15 +52,8 @@ public class MatterRecipe {
         if (left.getItem() != right.getItem()) {
             return false;
         }
-        int damage = left.getItemDamage();
-        int damage1 = right.getItemDamage();
-        if (left.getItem() instanceof IEnergyItem && right.getItem() instanceof IEnergyItem) {
+        if (left.getItem() instanceof EnergyItem && right.getItem() instanceof EnergyItem) {
             return true;
-        }
-        if ((flags & COMPARE_DAMAGE) == COMPARE_DAMAGE && damage != OreDictionary.WILDCARD_VALUE && damage1 != OreDictionary.WILDCARD_VALUE) {
-            if (damage != damage1) {
-                return false;
-            }
         }
 
         if ((flags & COMPARE_NBT) == COMPARE_NBT) {

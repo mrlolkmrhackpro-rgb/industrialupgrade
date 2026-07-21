@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=chemical_plant_controller": {
+      "model": "industrialupgrade:block/chemical_plant/chemical_plant_controller"
+    },
+    "facing=south,type=chemical_plant_controller": {
+      "model": "industrialupgrade:block/chemical_plant/chemical_plant_controller",
+      "y": 180
+    },
+    "facing=west,type=chemical_plant_controller": {
+      "model": "industrialupgrade:block/chemical_plant/chemical_plant_controller",
+      "y": 270
+    },
+    "facing=east,type=chemical_plant_controller": {
+      "model": "industrialupgrade:block/chemical_plant/chemical_plant_controller",
+      "y": 90
+    },
+    "facing=north,type=chemical_plant_controller_active": {
+      "model": "industrialupgrade:block/chemical_plant/chemical_plant_controller"
+    },
+    "facing=south,type=chemical_plant_controller_active": {
+      "model": "industrialupgrade:block/chemical_plant/chemical_plant_controller",
+      "y": 180
+    },
+    "facing=west,type=chemical_plant_controller_active": {
+      "model": "industrialupgrade:block/chemical_plant/chemical_plant_controller",
+      "y": 270
+    },
+    "facing=east,type=chemical_plant_controller_active": {
+      "model": "industrialupgrade:block/chemical_plant/chemical_plant_controller",
+      "y": 90
+    }
+  }
+}

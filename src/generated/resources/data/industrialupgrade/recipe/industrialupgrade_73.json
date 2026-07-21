@@ -1,0 +1,31 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:energy_tools/quantumaxe"
+    },
+    "B": {
+      "item": "industrialupgrade:energy_tools/quantumshovel"
+    },
+    "D": {
+      "item": "industrialupgrade:energy_tools/quantumpickaxe"
+    },
+    "E": {
+      "item": "industrialupgrade:quantumitems3"
+    },
+    "F": {
+      "item": "industrialupgrade:upgrades/overclockerupgrade2"
+    }
+  },
+  "pattern": [
+    "ADB",
+    "F F",
+    "E E"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:energy_tools/vajra"
+  },
+  "show_notification": false
+}

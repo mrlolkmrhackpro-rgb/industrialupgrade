@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=primal_gas_chamber": {
+      "model": "industrialupgrade:block/basemachine/gas_chamber"
+    },
+    "facing=south,type=primal_gas_chamber": {
+      "model": "industrialupgrade:block/basemachine/gas_chamber",
+      "y": 180
+    },
+    "facing=west,type=primal_gas_chamber": {
+      "model": "industrialupgrade:block/basemachine/gas_chamber",
+      "y": 270
+    },
+    "facing=east,type=primal_gas_chamber": {
+      "model": "industrialupgrade:block/basemachine/gas_chamber",
+      "y": 90
+    },
+    "facing=north,type=primal_gas_chamber_active": {
+      "model": "industrialupgrade:block/basemachine/gas_chamber_active"
+    },
+    "facing=south,type=primal_gas_chamber_active": {
+      "model": "industrialupgrade:block/basemachine/gas_chamber_active",
+      "y": 180
+    },
+    "facing=west,type=primal_gas_chamber_active": {
+      "model": "industrialupgrade:block/basemachine/gas_chamber_active",
+      "y": 270
+    },
+    "facing=east,type=primal_gas_chamber_active": {
+      "model": "industrialupgrade:block/basemachine/gas_chamber_active",
+      "y": 90
+    }
+  }
+}

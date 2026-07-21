@@ -1,123 +1,78 @@
 package com.denfop.items;
 
-import com.denfop.Constants;
 import com.denfop.IUCore;
-import com.denfop.Localization;
-import com.denfop.api.IModelRegister;
-import com.denfop.blocks.FluidName;
-import com.denfop.register.Register;
-import com.denfop.world.GenData;
-import com.denfop.world.WorldGenGas;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.text.translation.I18n;
-import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.denfop.api.gassensor.GasSensorClientHooks;
+import com.denfop.network.DistExecutor;
+import com.denfop.tabs.IItemTab;
+import com.denfop.utils.Localization;
+import net.minecraft.Util;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.neoforged.api.distmarker.Dist;
 
-public class ItemGasSensor extends Item implements IModelRegister {
+import java.util.List;
 
-    private final String name;
+public class ItemGasSensor extends Item implements IItemTab {
+    private String nameItem;
 
     public ItemGasSensor() {
-        super();
-        this.setMaxStackSize(1);
-        this.canRepair = false;
-        this.name = "gas_sensor";
-        this.setCreativeTab(IUCore.ItemTab);
-        Register.registerItem((Item) this, IUCore.getIdentifier(name)).setUnlocalizedName(name);
-        IUCore.proxy.addIModelRegister(this);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public static ModelResourceLocation getModelLocation(String name) {
-        final String loc = Constants.MOD_ID +
-                ':' +
-                "tools" + "/" + name;
-
-        return new ModelResourceLocation(loc, null);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public static void registerModel(Item item, int meta, String name) {
-        ModelLoader.setCustomModelResourceLocation(item, meta, getModelLocation(name));
-    }
-
-    public String getUnlocalizedName(ItemStack stack) {
-        return "iu." + super.getUnlocalizedName().substring(5);
+        super(new Item.Properties().stacksTo(1).setNoRepair());
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(
-            final World world,
-            final EntityPlayer player,
-            final EnumHand p_77659_3_
-    ) {
-        if (world.isRemote) {
-            return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(p_77659_3_));
-        }
-        ChunkPos chunkPos = new ChunkPos((int) player.posX >> 4, (int) player.posZ >> 4);
-        boolean empty = true;
-        for (int i = -2; i < 3; i++) {
-            for (int j = -2; j < 3; j++) {
-                final ChunkPos chunkPos1 = new ChunkPos(chunkPos.x + i, chunkPos.z + j);
-                GenData typeGas = WorldGenGas.gasMap.get(chunkPos1);
-                if (typeGas != null) {
-                    empty = false;
-                    String text = "";
-                    switch (typeGas.getTypeGas()) {
-                        case GAS:
-                            text = I18n.translateToLocal(FluidName.fluidgas.getInstance().getUnlocalizedName());
-                            break;
-                        case IODINE:
-                            text = I18n.translateToLocal(FluidName.fluidiodine.getInstance().getUnlocalizedName());
-                            break;
-                        case BROMIDE:
-                            text = I18n.translateToLocal(FluidName.fluidbromine.getInstance().getUnlocalizedName());
-                            break;
-                        case CHLORINE:
-                            text = I18n.translateToLocal(FluidName.fluidchlorum.getInstance().getUnlocalizedName());
-                            break;
-                        case FLUORINE:
-                            text = I18n.translateToLocal(FluidName.fluidfluor.getInstance().getUnlocalizedName());
-                            break;
+    public CreativeModeTab getItemCategory() {
+        return IUCore.EnergyTab;
+    }
 
-                    }
-                    if (typeGas.getX() == 0 && typeGas.getZ() == 0) {
-                        IUCore.proxy.messagePlayer(
-                                player,
-                                "X: " + (chunkPos1.getXStart() + 16) + ", Y:" + (typeGas.getY()) + ", Z: " + (chunkPos1.getZStart() + 16) +
-                                        " " + text
-                        );
-                    } else {
-                        IUCore.proxy.messagePlayer(
-                                player,
-                                "X: " + (typeGas.getX()) + ", Y: " + (typeGas.getY()) + ", Z: " + (typeGas.getZ()) + " --> " + text
-                        );
-                    }
+    @Override
+    public void appendHoverText(ItemStack p_41421_, TooltipContext p_339594_, List<Component> p_41423_, TooltipFlag p_41424_) {
+        super.appendHoverText(p_41421_, p_339594_, p_41423_, p_41424_);
+
+        p_41423_.add(Component.literal(Localization.translate("iu.gas_sensor.info")));
+        p_41423_.add(Component.literal(Localization.translate("iu.gas_sensor.info1")));
+        p_41423_.add(Component.literal(Localization.translate("iu.gas_sensor.info2")));
+    }
+
+    protected String getOrCreateDescriptionId() {
+        if (this.nameItem == null) {
+            StringBuilder pathBuilder = new StringBuilder(Util.makeDescriptionId("iu", BuiltInRegistries.ITEM.getKey(this)));
+            String targetString = "industrialupgrade.";
+            String replacement = "";
+            if (replacement != null) {
+                int index = pathBuilder.indexOf(targetString);
+                while (index != -1) {
+                    pathBuilder.replace(index, index + targetString.length(), replacement);
+                    index = pathBuilder.indexOf(targetString, index + replacement.length());
                 }
             }
-        }
-        if (empty) {
-            IUCore.proxy.messagePlayer(
-                    player,
-                    Localization.translate("iu.empty")
-            );
+            this.nameItem = pathBuilder.toString();
         }
 
-        return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(p_77659_3_));
+        return this.nameItem;
     }
 
     @Override
-    public void registerModels() {
-        registerModel(this, 0, this.name);
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+
+        if (level.dimension() != Level.OVERWORLD) {
+            return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
+        }
+
+        if (level.isClientSide) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> GasSensorClientHooks.open(stack));
+        }
+
+        return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
     }
 
 }

@@ -2,22 +2,24 @@ package com.denfop.network.packet;
 
 import com.denfop.IUCore;
 import com.denfop.network.EncoderHandler;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 import java.io.IOException;
 
 public class PacketItemStackUpdate implements IPacket {
 
+    private CustomPacketBuffer buffer;
+
     public PacketItemStackUpdate() {
 
     }
 
-    public PacketItemStackUpdate(String name, Object o, EntityPlayerMP playerMP) {
-        CustomPacketBuffer buffer = new CustomPacketBuffer();
+    public PacketItemStackUpdate(String name, Object o, ServerPlayer playerMP) {
+        CustomPacketBuffer buffer = new CustomPacketBuffer(playerMP.registryAccess());
         buffer.writeByte(this.getId());
         buffer.writeString(name);
         try {
@@ -25,7 +27,18 @@ public class PacketItemStackUpdate implements IPacket {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        IUCore.network.getServer().sendPacket(buffer, playerMP);
+        this.buffer = buffer;
+        IUCore.network.getServer().sendPacket(this, buffer, playerMP);
+    }
+
+    @Override
+    public CustomPacketBuffer getPacketBuffer() {
+        return buffer;
+    }
+
+    @Override
+    public void setPacketBuffer(CustomPacketBuffer customPacketBuffer) {
+        buffer = customPacketBuffer;
     }
 
     @Override
@@ -34,27 +47,24 @@ public class PacketItemStackUpdate implements IPacket {
     }
 
     @Override
-    public void readPacket(final CustomPacketBuffer is, final EntityPlayer entityPlayer) {
-        if (!entityPlayer.getHeldItem(EnumHand.MAIN_HAND).isEmpty()) {
-            ItemStack stack = entityPlayer.getHeldItem(EnumHand.MAIN_HAND);
+    public void readPacket(final CustomPacketBuffer is, final Player entityPlayer) {
+        if (!entityPlayer.getItemInHand(InteractionHand.MAIN_HAND).isEmpty()) {
+            ItemStack stack = entityPlayer.getItemInHand(InteractionHand.MAIN_HAND);
             if (stack.getItem() instanceof IUpdatableItemStackEvent) {
                 byte[] bytes = new byte[is.writerIndex() - is.readerIndex()];
                 is.readBytes(bytes);
                 if (!(is.readerIndex() < is.writerIndex())) {
-                    IUCore.proxy.requestTick(false, () -> {
-                        World world = IUCore.proxy.getPlayerWorld();
-                        if (world != null && world.provider.getDimension() == entityPlayer.getEntityWorld().provider.getDimension()) {
-                            apply(stack, bytes);
 
-                        }
-                    });
+                    Level world = entityPlayer.level();
+                    apply(stack, bytes, world);
                 }
             }
         }
     }
 
-    private void apply(ItemStack stack, byte[] is) {
-        final CustomPacketBuffer buf = new CustomPacketBuffer();
+
+    private void apply(ItemStack stack, byte[] is, Level world) {
+        final CustomPacketBuffer buf = new CustomPacketBuffer(world.registryAccess());
         buf.writeBytes(is);
 
         ((IUpdatableItemStackEvent) stack.getItem()).updateField(buf.readString(), buf, stack);

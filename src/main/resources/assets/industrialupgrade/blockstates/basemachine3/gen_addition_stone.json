@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=gen_addition_stone": {
+      "model": "industrialupgrade:block/basemachine/gen_addition_stone"
+    },
+    "facing=south,type=gen_addition_stone": {
+      "model": "industrialupgrade:block/basemachine/gen_addition_stone",
+      "y": 180
+    },
+    "facing=west,type=gen_addition_stone": {
+      "model": "industrialupgrade:block/basemachine/gen_addition_stone",
+      "y": 270
+    },
+    "facing=east,type=gen_addition_stone": {
+      "model": "industrialupgrade:block/basemachine/gen_addition_stone",
+      "y": 90
+    },
+    "facing=north,type=gen_addition_stone_active": {
+      "model": "industrialupgrade:block/basemachine/gen_addition_stone_active"
+    },
+    "facing=south,type=gen_addition_stone_active": {
+      "model": "industrialupgrade:block/basemachine/gen_addition_stone_active",
+      "y": 180
+    },
+    "facing=west,type=gen_addition_stone_active": {
+      "model": "industrialupgrade:block/basemachine/gen_addition_stone_active",
+      "y": 270
+    },
+    "facing=east,type=gen_addition_stone_active": {
+      "model": "industrialupgrade:block/basemachine/gen_addition_stone_active",
+      "y": 90
+    }
+  }
+}

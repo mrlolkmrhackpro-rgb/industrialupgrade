@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=antiupgradeblock": {
+      "model": "industrialupgrade:block/basemachine/antiupgradeblock"
+    },
+    "facing=south,type=antiupgradeblock": {
+      "model": "industrialupgrade:block/basemachine/antiupgradeblock",
+      "y": 180
+    },
+    "facing=west,type=antiupgradeblock": {
+      "model": "industrialupgrade:block/basemachine/antiupgradeblock",
+      "y": 270
+    },
+    "facing=east,type=antiupgradeblock": {
+      "model": "industrialupgrade:block/basemachine/antiupgradeblock",
+      "y": 90
+    },
+    "facing=north,type=antiupgradeblock_active": {
+      "model": "industrialupgrade:block/basemachine/antiupgradeblock"
+    },
+    "facing=south,type=antiupgradeblock_active": {
+      "model": "industrialupgrade:block/basemachine/antiupgradeblock",
+      "y": 180
+    },
+    "facing=west,type=antiupgradeblock_active": {
+      "model": "industrialupgrade:block/basemachine/antiupgradeblock",
+      "y": 270
+    },
+    "facing=east,type=antiupgradeblock_active": {
+      "model": "industrialupgrade:block/basemachine/antiupgradeblock",
+      "y": 90
+    }
+  }
+}

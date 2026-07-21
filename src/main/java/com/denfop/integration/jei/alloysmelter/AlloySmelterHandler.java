@@ -1,24 +1,30 @@
 package com.denfop.integration.jei.alloysmelter;
 
 
+import com.denfop.integration.jei.IJeiVariantRecipe;
+import com.denfop.integration.jei.JeiIngredientHelper;
 import com.denfop.api.Recipes;
 import com.denfop.api.recipe.BaseMachineRecipe;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlloySmelterHandler {
+public class AlloySmelterHandler implements IJeiVariantRecipe {
 
     private static final List<AlloySmelterHandler> recipes = new ArrayList<>();
-    public final ItemStack input, input1, output;
+    
+    private List<List<ItemStack>> inputVariants = new ArrayList<>();
+public final ItemStack input, input1, output;
     public final short temperature;
+    private final BaseMachineRecipe container;
 
-    public AlloySmelterHandler(ItemStack input, ItemStack input1, ItemStack output, final short temperature) {
+    public AlloySmelterHandler(ItemStack input, ItemStack input1, ItemStack output, final short temperature, BaseMachineRecipe container) {
         this.input = input;
         this.input1 = input1;
         this.output = output;
         this.temperature = temperature;
+        this.container = container;
     }
 
     public static List<AlloySmelterHandler> getRecipes() {
@@ -28,8 +34,8 @@ public class AlloySmelterHandler {
         return recipes;
     }
 
-    public static AlloySmelterHandler addRecipe(ItemStack input, ItemStack input1, ItemStack output, final short temperature) {
-        AlloySmelterHandler recipe = new AlloySmelterHandler(input, input1, output, temperature);
+    public static AlloySmelterHandler addRecipe(ItemStack input, ItemStack input1, ItemStack output, final short temperature, BaseMachineRecipe container) {
+        AlloySmelterHandler recipe = new AlloySmelterHandler(input, input1, output, temperature, container);
         if (recipes.contains(recipe)) {
             return null;
         }
@@ -42,26 +48,29 @@ public class AlloySmelterHandler {
             return null;
         }
         for (AlloySmelterHandler recipe : recipes) {
-            if (recipe.matchesInput(is)) {
-                return recipe;
-            }
+
+            return recipe;
+
         }
         return null;
     }
 
     public static void initRecipes() {
         for (BaseMachineRecipe container : Recipes.recipes.getRecipeList("alloysmelter")) {
-            addRecipe(
+            JeiIngredientHelper.attachInputVariants(addRecipe(
                     container.input.getInputs().get(0).getInputs().get(0),
                     container.input.getInputs().get(1).getInputs().get(0),
                     container.getOutput().items.get(0),
-                    container.getOutput().metadata.getShort("temperature")
-            );
+                    container.getOutput().metadata.getShort("temperature"), container
+            ), container);
 
 
         }
     }
 
+    public BaseMachineRecipe getContainer() {
+        return container;
+    }
 
     public ItemStack getInput() { // Получатель входного предмета рецепта.
         return input;
@@ -75,8 +84,16 @@ public class AlloySmelterHandler {
         return output.copy();
     }
 
-    public boolean matchesInput(ItemStack is) {
-        return is.isItemEqual(input) || is.isItemEqual(input1);
+
+
+
+    @Override
+    public void setInputVariants(final List<List<ItemStack>> inputVariants) {
+        this.inputVariants = inputVariants == null ? new ArrayList<>() : inputVariants;
     }
 
+    @Override
+    public List<ItemStack> getInputVariants(final int slot, final ItemStack fallback) {
+        return JeiIngredientHelper.getInputVariants(this.inputVariants, slot, fallback);
+    }
 }

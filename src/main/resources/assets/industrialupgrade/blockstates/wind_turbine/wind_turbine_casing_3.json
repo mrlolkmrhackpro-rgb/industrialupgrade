@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=wind_turbine_casing_3": {
+      "model": "industrialupgrade:block/wind_turbine/wind_turbine_casing_3"
+    },
+    "facing=south,type=wind_turbine_casing_3": {
+      "model": "industrialupgrade:block/wind_turbine/wind_turbine_casing_3",
+      "y": 180
+    },
+    "facing=west,type=wind_turbine_casing_3": {
+      "model": "industrialupgrade:block/wind_turbine/wind_turbine_casing_3",
+      "y": 270
+    },
+    "facing=east,type=wind_turbine_casing_3": {
+      "model": "industrialupgrade:block/wind_turbine/wind_turbine_casing_3",
+      "y": 90
+    },
+    "facing=north,type=wind_turbine_casing_3_active": {
+      "model": "industrialupgrade:block/wind_turbine/wind_turbine_casing_3"
+    },
+    "facing=south,type=wind_turbine_casing_3_active": {
+      "model": "industrialupgrade:block/wind_turbine/wind_turbine_casing_3",
+      "y": 180
+    },
+    "facing=west,type=wind_turbine_casing_3_active": {
+      "model": "industrialupgrade:block/wind_turbine/wind_turbine_casing_3",
+      "y": 270
+    },
+    "facing=east,type=wind_turbine_casing_3_active": {
+      "model": "industrialupgrade:block/wind_turbine/wind_turbine_casing_3",
+      "y": 90
+    }
+  }
+}

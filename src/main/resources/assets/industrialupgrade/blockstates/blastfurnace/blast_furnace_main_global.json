@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=blast_furnace_main_global": {
+      "model": "industrialupgrade:block/blastfurnace/blast_furnace_main_global"
+    },
+    "facing=south,type=blast_furnace_main_global": {
+      "model": "industrialupgrade:block/blastfurnace/blast_furnace_main_global",
+      "y": 180
+    },
+    "facing=west,type=blast_furnace_main_global": {
+      "model": "industrialupgrade:block/blastfurnace/blast_furnace_main_global",
+      "y": 270
+    },
+    "facing=east,type=blast_furnace_main_global": {
+      "model": "industrialupgrade:block/blastfurnace/blast_furnace_main_global",
+      "y": 90
+    },
+    "facing=north,type=blast_furnace_main_global_active": {
+      "model": "industrialupgrade:block/blastfurnace/blast_furnace_main_global_active"
+    },
+    "facing=south,type=blast_furnace_main_global_active": {
+      "model": "industrialupgrade:block/blastfurnace/blast_furnace_main_global_active",
+      "y": 180
+    },
+    "facing=west,type=blast_furnace_main_global_active": {
+      "model": "industrialupgrade:block/blastfurnace/blast_furnace_main_global_active",
+      "y": 270
+    },
+    "facing=east,type=blast_furnace_main_global_active": {
+      "model": "industrialupgrade:block/blastfurnace/blast_furnace_main_global_active",
+      "y": 90
+    }
+  }
+}

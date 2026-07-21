@@ -1,0 +1,137 @@
+package com.denfop.blocks.blockitem;
+
+import com.denfop.api.blockentity.MultiBlockEntity;
+import com.denfop.api.multiblock.IMainMultiBlock;
+import com.denfop.api.multiblock.preview.MultiblockPreviewScreens;
+import com.denfop.api.multiblock.preview.TestMultiblockStructures;
+import com.denfop.blockentity.base.FakePlayerSpawner;
+import com.denfop.blocks.BlockTileEntity;
+import com.denfop.blocks.ItemBlockCore;
+import com.denfop.utils.Keyboard;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import static com.denfop.utils.KeyboardClient.armormode;
+
+public class ItemBlockTileEntity<T extends Enum<T> & MultiBlockEntity> extends ItemBlockCore<T> {
+    public final ResourceLocation identifier;
+
+    public ItemBlockTileEntity(BlockTileEntity<T> p_40565_, T element, ResourceLocation identifier) {
+        super(p_40565_, element, new Properties(), element.getCreativeTab());
+        p_40565_.setItem(this);
+        this.identifier = identifier;
+    }
+
+    @Override
+    public void fillItemCategory(CreativeModeTab p_40569_, NonNullList<ItemStack> p_40570_) {
+        if (this.allowedIn(p_40569_) && getElement().hasItem()) {
+            p_40570_.add(new ItemStack(this));
+            if (getElement().hasOtherVersion()) {
+                p_40570_.addAll(getElement().getOtherVersion(new ItemStack(this)));
+            }
+        }
+    }
+
+    @Override
+    public void appendHoverText(ItemStack p_40572_, TooltipContext p_339655_, List<Component> p_40574_, TooltipFlag p_40575_) {
+        MultiBlockEntity block = this.getTeBlock(p_40572_);
+        if (block != null && block.getDummyTe() != null) {
+            List<String> stringList = new LinkedList<>();
+            block.getDummyTe().setLevel(p_339655_.level());
+            if (block.getDummyTe() instanceof IMainMultiBlock block1) {
+                p_40574_.add(
+                        Component.translatable(
+                                "iu.multiblock.open_preview_hint",
+                                Component.translatable("key.keyboard.left.shift"),
+                                armormode.getTranslatedKeyMessage()
+                        )
+                );
+
+                if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) && Keyboard.isKeyDown(armormode.getKey().getValue())) {
+                    MultiblockPreviewScreens.open(
+                            Component.translatable("iu.multiblock.title"),
+                            TestMultiblockStructures.createTestModel(
+                                    block1.getMultiBlockStucture().getItemStackMap(),
+                                    block1.getMultiBlockStucture().getRotationMap()
+                            )
+                    );
+                }
+            }
+            block.getDummyTe().setLevel(p_339655_.level());
+            block.getDummyTe().addInformation(p_40572_, stringList);
+            for (String s : stringList)
+                p_40574_.add(Component.literal(s));
+        }
+    }
+
+
+    public MultiBlockEntity getTeBlock(ItemStack stack) {
+        return stack == null ? null : (!((BlockTileEntity) this.getBlock()).teInfo.getIdMap().isEmpty()) ?
+                (MultiBlockEntity) ((BlockTileEntity) this.getBlock()).getValue() : null;
+    }
+
+
+    @Override
+    public BlockPlaceContext updatePlacementContext(BlockPlaceContext pContext) {
+        BlockPos blockpos = pContext.getClickedPos();
+        Level level = pContext.getLevel();
+        BlockState blockstate = level.getBlockState(blockpos);
+        Block block = this.getBlock();
+        Direction direction = pContext.getClickedFace();
+
+        MultiBlockEntity multiBlockEntity = getTeBlock(pContext.getItemInHand());
+        if (!multiBlockEntity.getDummyTe().canPlace(multiBlockEntity.getDummyTe(), blockpos, level, direction, pContext.getPlayer()))
+            return null;
+        return super.updatePlacementContext(pContext);
+    }
+
+
+    @Override
+    protected BlockState getPlacementState(BlockPlaceContext p_40613_) {
+        BlockState blockstate = this.getBlock().getStateForPlacement(p_40613_);
+        return blockstate != null && this.canPlace(p_40613_, blockstate) ? blockstate : null;
+
+    }
+
+    public String getDescriptionId() {
+        if (this.nameItem == null) {
+            StringBuilder pathBuilder = new StringBuilder(Util.makeDescriptionId("industrialupgrade", BuiltInRegistries.ITEM.getKey(this)));
+            String targetString = "industrialupgrade.";
+            String replacement = "";
+            if (replacement != null) {
+                int index = pathBuilder.indexOf(targetString);
+                while (index != -1) {
+                    pathBuilder.replace(index, index + targetString.length(), replacement);
+                    index = pathBuilder.indexOf(targetString, index + replacement.length());
+                }
+            }
+            this.nameItem = "industrialupgrade." + pathBuilder.toString();
+            if (this.getElement().hasUniqueName()) {
+                this.nameItem = this.getElement().getUniqueName();
+            }
+        }
+
+        return this.nameItem;
+    }
+
+    public boolean placeTeBlock(ItemStack stack, FakePlayerSpawner fakePlayer, Level world, BlockPos pos) {
+        world.setBlock(pos, this.getBlock().defaultBlockState(), 11);
+        this.getBlock().setPlacedBy(world, pos, this.getBlock().defaultBlockState(), fakePlayer, stack);
+        return true;
+    }
+}

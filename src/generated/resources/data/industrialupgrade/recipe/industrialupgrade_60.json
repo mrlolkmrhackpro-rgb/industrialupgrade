@@ -1,0 +1,34 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:crafting_elements/crafting_520_element"
+    },
+    "B": {
+      "item": "industrialupgrade:crafting_elements/crafting_523_element"
+    },
+    "C": {
+      "tag": "c:doubleplate/ferromanganese"
+    },
+    "D": {
+      "item": "minecraft:diamond_pickaxe"
+    },
+    "F": {
+      "item": "industrialupgrade:crafting_elements/crafting_524_element"
+    },
+    "H": {
+      "tag": "c:rods/molybdenum"
+    }
+  },
+  "pattern": [
+    "ADB",
+    "CFC",
+    "CHC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:energy_tools/nanopickaxe"
+  },
+  "show_notification": false
+}

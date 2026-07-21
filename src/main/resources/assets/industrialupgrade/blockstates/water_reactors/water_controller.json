@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=water_controller": {
+      "model": "industrialupgrade:block/basemachine/water_controller"
+    },
+    "facing=south,type=water_controller": {
+      "model": "industrialupgrade:block/basemachine/water_controller",
+      "y": 180
+    },
+    "facing=west,type=water_controller": {
+      "model": "industrialupgrade:block/basemachine/water_controller",
+      "y": 270
+    },
+    "facing=east,type=water_controller": {
+      "model": "industrialupgrade:block/basemachine/water_controller",
+      "y": 90
+    },
+    "facing=north,type=water_controller_active": {
+      "model": "industrialupgrade:block/basemachine/water_controller"
+    },
+    "facing=south,type=water_controller_active": {
+      "model": "industrialupgrade:block/basemachine/water_controller",
+      "y": 180
+    },
+    "facing=west,type=water_controller_active": {
+      "model": "industrialupgrade:block/basemachine/water_controller",
+      "y": 270
+    },
+    "facing=east,type=water_controller_active": {
+      "model": "industrialupgrade:block/basemachine/water_controller",
+      "y": 90
+    }
+  }
+}

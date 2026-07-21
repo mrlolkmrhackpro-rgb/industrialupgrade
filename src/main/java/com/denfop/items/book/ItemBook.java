@@ -1,50 +1,58 @@
 package com.denfop.items.book;
 
-import com.denfop.Constants;
 import com.denfop.IUCore;
-import com.denfop.api.IModelRegister;
-import com.denfop.api.inv.IAdvInventory;
+import com.denfop.api.container.CustomWorldContainer;
+import com.denfop.containermenu.ContainerMenuBeeAnalyzer;
+import com.denfop.datacomponent.ContainerItem;
+import com.denfop.datacomponent.DataComponentsInit;
 import com.denfop.items.IItemStackInventory;
-import com.denfop.register.Register;
+import com.denfop.items.bee.ItemStackBeeAnalyzer;
+import com.denfop.network.packet.CustomPacketBuffer;
+import com.denfop.network.packet.IUpdatableItemStackEvent;
+import com.denfop.tabs.IItemTab;
 import com.denfop.utils.ModUtils;
-import net.minecraft.client.renderer.block.model.ModelBakery;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.Util;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
 
 import javax.annotation.Nonnull;
 
-public class ItemBook extends Item implements IItemStackInventory, IModelRegister {
+public class ItemBook extends Item implements IItemStackInventory, IItemTab, IUpdatableItemStackEvent {
 
 
     private final String internalName;
+    private String nameItem;
 
     public ItemBook(String internalName) {
-
-        this.setCreativeTab(IUCore.ItemTab);
-        this.setMaxStackSize(1);
+        super(new Properties().stacksTo(1));
         this.internalName = internalName;
-        IUCore.proxy.addIModelRegister(this);
-        Register.registerItem((Item) this, IUCore.getIdentifier(internalName)).setUnlocalizedName(internalName);
     }
 
-    @SideOnly(Side.CLIENT)
-    public static ModelResourceLocation getModelLocation1(String name) {
-        final String loc = Constants.MOD_ID +
-                ':' +
-                "book" + "/" + name;
+    protected String getOrCreateDescriptionId() {
+        if (this.nameItem == null) {
+            StringBuilder pathBuilder = new StringBuilder(Util.makeDescriptionId("iu", BuiltInRegistries.ITEM.getKey(this)));
+            String targetString = "industrialupgrade.";
+            String replacement = "";
+            if (replacement != null) {
+                int index = pathBuilder.indexOf(targetString);
+                while (index != -1) {
+                    pathBuilder.replace(index, index + targetString.length(), replacement);
+                    index = pathBuilder.indexOf(targetString, index + replacement.length());
+                }
+            }
+            this.nameItem = pathBuilder.toString();
+        }
 
-        return new ModelResourceLocation(loc, null);
+        return this.nameItem;
     }
 
     @Nonnull
@@ -52,53 +60,94 @@ public class ItemBook extends Item implements IItemStackInventory, IModelRegiste
         return "item." + this.internalName + ".name";
     }
 
-    @SideOnly(Side.CLIENT)
-    public void registerModels(final String name) {
-        ModelLoader.setCustomMeshDefinition(this, stack -> getModelLocation1(name));
-        ModelBakery.registerItemVariants(this, getModelLocation1(name));
+
+    public void save(ItemStack stack, Player player) {
+        ContainerItem containerItem = ContainerItem.getContainer(stack);
+        containerItem = containerItem.updateOpen(stack, true);
+        containerItem.updateSlot(stack, player.getInventory().selected);
     }
 
     @Override
-    public void registerModels() {
-        registerModels(this.internalName);
+    public void inventoryTick(
+            ItemStack stack,
+            Level world,
+            Entity entity,
+            int itemSlot,
+            boolean isSelected
+    ) {
+        super.inventoryTick(stack, world, entity, itemSlot, isSelected);
+
+        if (!(entity instanceof Player)) {
+            return;
+        }
+        Player player = (Player) entity;
+        ContainerItem containerItem = ContainerItem.getContainer(stack);
+
+        if (containerItem.open()) {
+            int slotId = containerItem.slot_inventory();
+            if (slotId != itemSlot && !world.isClientSide && !stack.isEmpty() && player.containerMenu instanceof ContainerMenuBeeAnalyzer) {
+                ItemStackBeeAnalyzer toolbox = ((ContainerMenuBeeAnalyzer) player.containerMenu).base;
+                if (toolbox.isThisContainer(stack)) {
+                    toolbox.saveAsThrown(stack);
+                    player.closeContainer();
+                    containerItem.updateOpen(stack, false);
+                }
+            }
+        }
+
+
     }
 
     @Override
-    public void getSubItems(@Nonnull final CreativeTabs p_150895_1_, @Nonnull final NonNullList<ItemStack> var3) {
-        if (this.isInCreativeTab(p_150895_1_)) {
-            final ItemStack var4 = new ItemStack(this, 1);
-            var3.add(var4);
-        }
-    }
-
-    @Nonnull
-    public ActionResult<ItemStack> onItemRightClick(@Nonnull World world, @Nonnull EntityPlayer player, @Nonnull EnumHand hand) {
-
-        if (IUCore.proxy.isSimulating()) {
-            player.openGui(IUCore.instance, 1, world, (int) player.posX, (int) player.posY, (int) player.posZ);
-            return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
-
-        }
-
-        return new ActionResult<>(EnumActionResult.PASS, player.getHeldItem(hand));
-    }
-
-    public boolean onDroppedByPlayer(@Nonnull ItemStack stack, EntityPlayer player) {
-
-        if (!player.getEntityWorld().isRemote && !ModUtils.isEmpty(stack) && player.openContainer instanceof ContainerBook) {
-            ItemStackBook toolbox = ((ContainerBook) player.openContainer).base;
+    public boolean onDroppedByPlayer(@Nonnull ItemStack stack, @Nonnull Player player) {
+        if (!player.level().isClientSide && !stack.isEmpty() && player.containerMenu instanceof ContainerMenuBeeAnalyzer) {
+            ItemStackBeeAnalyzer toolbox = ((ContainerMenuBeeAnalyzer) player.containerMenu).base;
             if (toolbox.isThisContainer(stack)) {
-                toolbox.saveAsThrown(stack);
-                player.closeScreen();
+                toolbox.saveAndThrow(stack);
+                player.closeContainer();
             }
         }
         return true;
     }
 
+    @Override
+    @Nonnull
+    public InteractionResultHolder<ItemStack> use(@Nonnull Level world, @Nonnull Player player, @Nonnull InteractionHand hand) {
+        ItemStack stack = ModUtils.get(player, hand);
+        BlockHitResult blockhitresult = getPlayerPOVHitResult(world, player, ClipContext.Fluid.SOURCE_ONLY);
+        if (!player.level().isClientSide && world.getBlockEntity(blockhitresult.getBlockPos()) == null) {
+            save(stack, player);
 
-    public IAdvInventory getInventory(EntityPlayer player, ItemStack stack) {
-        return new ItemStackBook(player, stack);
+            CustomPacketBuffer growingBuffer = new CustomPacketBuffer(player.registryAccess());
+
+            growingBuffer.writeByte(1);
+
+            growingBuffer.flip();
+            player.openMenu(getInventory(player, player.getItemInHand(hand)), buf -> buf.writeBytes(growingBuffer));
+        }
+
+        return InteractionResultHolder.success(player.getItemInHand(hand));
+
     }
 
 
+    @Override
+    public CustomWorldContainer getInventory(Player player, ItemStack stack) {
+        return new ItemStackBook(player, stack);
+    }
+
+    @Override
+    public CreativeModeTab getItemCategory() {
+        return IUCore.ItemTab;
+    }
+
+    @Override
+    public void updateField(String name, CustomPacketBuffer buffer, ItemStack stack) {
+
+    }
+
+    @Override
+    public void updateEvent(int event, ItemStack stack) {
+        stack.set(DataComponentsInit.MODE, event);
+    }
 }

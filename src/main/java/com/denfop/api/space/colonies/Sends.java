@@ -1,18 +1,14 @@
 package com.denfop.api.space.colonies;
 
-import com.denfop.api.space.IAsteroid;
-import com.denfop.api.space.IBody;
-import com.denfop.api.space.IPlanet;
-import com.denfop.api.space.ISatellite;
-import com.denfop.api.space.SpaceInit;
-import com.denfop.api.space.SpaceNet;
+import com.denfop.api.space.*;
 import com.denfop.api.space.colonies.api.IColony;
 import com.denfop.api.space.research.api.IRocketLaunchPad;
 import com.denfop.utils.Timer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -50,42 +46,42 @@ public class Sends {
         this.timerToPlanet = new Timer(seconds / (4 + dop));
     }
 
+    public Sends(CompoundTag tagCompound, HolderLookup.Provider p_323640_) {
+        this.uuid = tagCompound.getUUID("uuid");
+        this.body = SpaceNet.instance.getBodyFromName(tagCompound.getString("body"));
+        this.timerToPlanet = new Timer(tagCompound.getCompound("time"));
+        ListTag nbtTagList = tagCompound.getList("items", 10);
+        this.stacks.clear();
+        for (int i = 0; i < nbtTagList.size(); i++) {
+            this.stacks.add(ItemStack.parseOptional(p_323640_, nbtTagList.getCompound(i)));
+        }
+        ListTag nbtTagList1 = tagCompound.getList("fluids", 10);
+        this.fluidStacks.clear();
+        for (int i = 0; i < nbtTagList1.size(); i++) {
+            this.fluidStacks.add(FluidStack.parseOptional(p_323640_, nbtTagList1.getCompound(i)));
+        }
+
+    }
+
     public IBody getBody() {
         return body;
     }
 
-    public Sends(NBTTagCompound tagCompound) {
-        this.uuid = tagCompound.getUniqueId("uuid");
-        this.body = SpaceNet.instance.getBodyFromName(tagCompound.getString("body"));
-        this.timerToPlanet = new Timer(tagCompound.getCompoundTag("time"));
-        NBTTagList nbtTagList = tagCompound.getTagList("items", 10);
-        this.stacks.clear();
-        for (int i = 0; i < nbtTagList.tagCount(); i++) {
-            this.stacks.add(new ItemStack(nbtTagList.getCompoundTagAt(i)));
-        }
-        NBTTagList nbtTagList1 = tagCompound.getTagList("fluids", 10);
-        this.fluidStacks.clear();
-        for (int i = 0; i < nbtTagList1.tagCount(); i++) {
-            this.fluidStacks.add(FluidStack.loadFluidStackFromNBT(nbtTagList1.getCompoundTagAt(i)));
-        }
-
-    }
-
-    public NBTTagCompound writeToNbt() {
-        NBTTagCompound tagCompound = new NBTTagCompound();
-        tagCompound.setUniqueId("uuid", uuid);
-        tagCompound.setString("body", body.getName());
-        tagCompound.setTag("time", this.timerToPlanet.writeNBT(new NBTTagCompound()));
-        NBTTagList nbtTagList = new NBTTagList();
+    public CompoundTag writeToNbt(HolderLookup.Provider p_323640_) {
+        CompoundTag tagCompound = new CompoundTag();
+        tagCompound.putUUID("uuid", uuid);
+        tagCompound.putString("body", body.getName());
+        tagCompound.put("time", this.timerToPlanet.writeNBT(new CompoundTag()));
+        ListTag nbtTagList = new ListTag();
         for (ItemStack stack : stacks) {
-            nbtTagList.appendTag(stack.serializeNBT());
+            nbtTagList.add(stack.save(p_323640_));
         }
-        tagCompound.setTag("items", nbtTagList);
-        NBTTagList nbtTagList1 = new NBTTagList();
+        tagCompound.put("items", nbtTagList);
+        ListTag nbtTagList1 = new ListTag();
         for (FluidStack fluidStack : fluidStacks) {
-            nbtTagList1.appendTag(fluidStack.writeToNBT(new NBTTagCompound()));
+            nbtTagList1.add(fluidStack.save(p_323640_));
         }
-        tagCompound.setTag("fluids", nbtTagList1);
+        tagCompound.put("fluids", nbtTagList1);
         return tagCompound;
     }
 

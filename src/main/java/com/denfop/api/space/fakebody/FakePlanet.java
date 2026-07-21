@@ -1,27 +1,25 @@
 package com.denfop.api.space.fakebody;
 
-import com.denfop.api.space.BaseResource;
-import com.denfop.api.space.IBaseResource;
-import com.denfop.api.space.IBody;
-import com.denfop.api.space.IPlanet;
-import com.denfop.api.space.SpaceInit;
-import com.denfop.api.space.SpaceNet;
+import com.denfop.api.space.*;
 import com.denfop.api.space.rovers.Rovers;
 import com.denfop.api.space.rovers.api.IRovers;
 import com.denfop.api.space.rovers.api.IRoversItem;
 import com.denfop.api.space.rovers.enums.EnumTypeUpgrade;
 import com.denfop.api.space.upgrades.SpaceUpgradeSystem;
-import com.denfop.blocks.FluidName;
 import com.denfop.utils.Timer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
+import static com.denfop.api.space.BaseSpaceSystem.fluidToLevel;
 
 public class FakePlanet implements IFakePlanet {
 
@@ -41,7 +39,8 @@ public class FakePlanet implements IFakePlanet {
         this.spaceOperation = spaceOperation;
         this.data = data;
         int seconds =
-                (int) ((Math.abs(planet.getDistance() - SpaceInit.earth.getDistance()) / (SpaceInit.mars.getDistance() - SpaceInit.earth.getDistance())) * (12 * 60 * 0.8));
+                (int) ((Math.abs(planet.getDistance() - SpaceInit.earth.getDistance()) / (SpaceInit.mars.getDistance() - SpaceInit.earth.getDistance())) * (12 * 60 * 0.5));
+        seconds += planet.getSystem().getDistanceFromSolar() * 60 * 60;
         if (SpaceUpgradeSystem.system.hasModules(
                 EnumTypeUpgrade.ENGINE,
                 rovers.getItemStack()
@@ -52,36 +51,27 @@ public class FakePlanet implements IFakePlanet {
             ).number;
             seconds = (int) (seconds * (1 - (engine * 0.125D)));
         }
-        FluidStack fluidStack = rovers.getItem().getFluidHandler(rovers.getItemStack()).drain(1, false);
-        double coef = 1;
-        if (fluidStack.getFluid().equals(FluidName.fluiddimethylhydrazine.getInstance())) {
-            coef = 3;
-        }
-        if (fluidStack.getFluid().equals(FluidName.fluiddecane.getInstance())) {
-            coef = 4.4;
-        }
-        if (fluidStack.getFluid().equals(FluidName.fluidxenon.getInstance())) {
-            coef = 7.5;
-        }
+        FluidStack fluidStack = rovers.getItem().getFluidHandler(rovers.getItemStack()).drain(1, IFluidHandler.FluidAction.SIMULATE);
+        double coef = BaseSpaceSystem.rocketFuelCoef.get(fluidToLevel.get(fluidStack.getFluid()));
         seconds = (int) (seconds / coef);
         this.timerToPlanet = new Timer(seconds);
         this.timerFromPlanet = new Timer(seconds);
         timerFromPlanet.setCanWork(false);
     }
 
-    public FakePlanet(final NBTTagCompound nbtTagCompound) {
-        player = nbtTagCompound.getUniqueId("uuid");
+    public FakePlanet(final CompoundTag nbtTagCompound, HolderLookup.Provider lookupProvider) {
+        player = nbtTagCompound.getUUID("uuid");
         this.planet = (IPlanet) SpaceNet.instance.getBodyFromName(nbtTagCompound.getString("body"));
         this.data = SpaceNet.instance.getFakeSpaceSystem().getDataFromUUID(player).get(planet);
-        ItemStack stack = new ItemStack(nbtTagCompound.getCompoundTag("rover"));
+        ItemStack stack = ItemStack.parseOptional(lookupProvider, nbtTagCompound.getCompound("rover"));
         this.rovers = new Rovers((IRoversItem) stack.getItem(), stack);
-        this.timerToPlanet = new Timer(nbtTagCompound.getCompoundTag("timerTo"));
-        this.timerFromPlanet = new Timer(nbtTagCompound.getCompoundTag("timerFrom"));
-        this.spaceOperation = new SpaceOperation(this.planet, nbtTagCompound.getCompoundTag("operation"));
-        final NBTTagList tagList = nbtTagCompound.getTagList("baseResource", 10);
-        for (int i = 0; i < tagList.tagCount(); i++) {
-            NBTTagCompound tagCompound = tagList.getCompoundTagAt(i);
-            IBaseResource baseResource = new BaseResource(tagCompound);
+        this.timerToPlanet = new Timer(nbtTagCompound.getCompound("timerTo"));
+        this.timerFromPlanet = new Timer(nbtTagCompound.getCompound("timerFrom"));
+        this.spaceOperation = new SpaceOperation(this.planet, nbtTagCompound.getCompound("operation"));
+        final ListTag tagList = nbtTagCompound.getList("baseResource", 10);
+        for (int i = 0; i < tagList.size(); i++) {
+            CompoundTag tagCompound = tagList.getCompound(i);
+            IBaseResource baseResource = new BaseResource(tagCompound, lookupProvider);
             iBaseResourceList.add(baseResource);
         }
         SpaceUpgradeSystem.system.updateListFromNBT(rovers.getItem(), rovers.getItemStack());
@@ -122,20 +112,20 @@ public class FakePlanet implements IFakePlanet {
     }
 
     @Override
-    public NBTTagCompound writeNBTTagCompound(final NBTTagCompound nbtTagCompound) {
-        nbtTagCompound.setUniqueId("uuid", player);
-        nbtTagCompound.setString("body", planet.getName());
-        nbtTagCompound.setTag("rover", this.rovers.getItemStack().writeToNBT(new NBTTagCompound()));
-        nbtTagCompound.setTag("timerTo", timerToPlanet.writeNBT(new NBTTagCompound()));
-        nbtTagCompound.setTag("timerFrom", timerFromPlanet.writeNBT(new NBTTagCompound()));
-        nbtTagCompound.setTag("operation", spaceOperation.writeTag(new NBTTagCompound()));
-        NBTTagList tagList = new NBTTagList();
+    public CompoundTag writeNBTTagCompound(final CompoundTag nbtTagCompound, HolderLookup.Provider p_323640_) {
+        nbtTagCompound.putUUID("uuid", player);
+        nbtTagCompound.putString("body", planet.getName());
+        nbtTagCompound.put("rover", this.rovers.getItemStack().save(p_323640_));
+        nbtTagCompound.put("timerTo", timerToPlanet.writeNBT(new CompoundTag()));
+        nbtTagCompound.put("timerFrom", timerFromPlanet.writeNBT(new CompoundTag()));
+        nbtTagCompound.put("operation", spaceOperation.writeTag(new CompoundTag()));
+        ListTag tagList = new ListTag();
         for (IBaseResource baseResource : iBaseResourceList) {
-            NBTTagCompound nbt = new NBTTagCompound();
-            baseResource.writeNBTTag(nbt);
-            tagList.appendTag(nbt);
+            CompoundTag nbt = new CompoundTag();
+            baseResource.writeNBTTag(nbt, p_323640_);
+            tagList.add(nbt);
         }
-        nbtTagCompound.setTag("baseResource", tagList);
+        nbtTagCompound.put("baseResource", tagList);
         return nbtTagCompound;
     }
 

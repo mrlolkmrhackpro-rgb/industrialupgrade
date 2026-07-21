@@ -1,44 +1,54 @@
 package com.denfop.network.packet;
 
 import com.denfop.IUCore;
+import com.denfop.blockentity.base.BlockEntityBase;
 import com.denfop.componets.AbstractComponent;
 import com.denfop.network.DecoderHandler;
 import com.denfop.network.EncoderHandler;
-import com.denfop.tiles.base.TileEntityBlock;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import java.io.IOException;
 
 public class PacketAbstractComponent implements IPacket {
 
 
+    private CustomPacketBuffer buffer;
+
     public PacketAbstractComponent() {
     }
 
     public PacketAbstractComponent(
-            TileEntityBlock te,
+            BlockEntityBase te,
             String componentName,
-            EntityPlayerMP player,
+            ServerPlayer player,
             CustomPacketBuffer data
     ) {
-        CustomPacketBuffer buffer = new CustomPacketBuffer(64);
+        CustomPacketBuffer buffer = new CustomPacketBuffer(64, player.registryAccess());
         try {
             buffer.writeByte(this.getId());
-            EncoderHandler.encode(buffer, te.getPos(), false);
+            EncoderHandler.encode(buffer, te.getBlockPos(), false);
             buffer.writeString(componentName);
             buffer.writeBytes(data);
         } catch (IOException var7) {
             throw new RuntimeException(var7);
         }
-        buffer.flip();
-        IUCore.network.getServer().sendPacket(buffer, player);
+        this.buffer = buffer;
+        IUCore.network.getServer().sendPacket(this, player);
+    }
+
+    @Override
+    public CustomPacketBuffer getPacketBuffer() {
+        return buffer;
+    }
+
+    @Override
+    public void setPacketBuffer(CustomPacketBuffer customPacketBuffer) {
+        buffer = customPacketBuffer;
     }
 
     @Override
@@ -47,8 +57,8 @@ public class PacketAbstractComponent implements IPacket {
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public void readPacket(final CustomPacketBuffer is, final EntityPlayer entityPlayer) {
+    @OnlyIn(Dist.CLIENT)
+    public void readPacket(final CustomPacketBuffer is, final Player entityPlayer) {
         final BlockPos pos1;
         try {
             pos1 = DecoderHandler.decode(is, BlockPos.class);
@@ -57,33 +67,29 @@ public class PacketAbstractComponent implements IPacket {
         }
         String componentName = is.readString();
 
-
         final byte[] data = new byte[is.writerIndex() - is.readerIndex()];
         is.readBytes(data);
-        IUCore.proxy.requestTick(false, () -> {
-            World world = Minecraft.getMinecraft().world;
+        BlockEntity teRaw = entityPlayer.level().getBlockEntity(pos1);
+        if (teRaw instanceof BlockEntityBase) {
+            BlockEntityBase tile = (BlockEntityBase) teRaw;
+            AbstractComponent component = tile.getComp(componentName);
 
-            TileEntity teRaw = world.getTileEntity(pos1);
-            if (teRaw instanceof TileEntityBlock) {
-                TileEntityBlock tile = (TileEntityBlock) teRaw;
-                AbstractComponent component = tile.getComp(componentName);
+            if (component != null) {
+                try {
 
-                if (component != null) {
-                    try {
-
-                        component.onNetworkUpdate(new CustomPacketBuffer(data));
-                    } catch (IOException var6) {
-                        throw new RuntimeException(var6);
-                    }
+                    component.onNetworkUpdate(new CustomPacketBuffer(data, is.registryAccess()));
+                } catch (IOException var6) {
+                    throw new RuntimeException(var6);
                 }
             }
-
-        });
+        }
     }
+
 
     @Override
     public EnumTypePacket getPacketType() {
         return EnumTypePacket.SERVER;
     }
+
 
 }

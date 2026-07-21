@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=smeltery_furnace": {
+      "model": "industrialupgrade:block/smeltery/smeltery_furnace"
+    },
+    "facing=south,type=smeltery_furnace": {
+      "model": "industrialupgrade:block/smeltery/smeltery_furnace",
+      "y": 180
+    },
+    "facing=west,type=smeltery_furnace": {
+      "model": "industrialupgrade:block/smeltery/smeltery_furnace",
+      "y": 270
+    },
+    "facing=east,type=smeltery_furnace": {
+      "model": "industrialupgrade:block/smeltery/smeltery_furnace",
+      "y": 90
+    },
+    "facing=north,type=smeltery_furnace_active": {
+      "model": "industrialupgrade:block/smeltery/smeltery_furnace_active"
+    },
+    "facing=south,type=smeltery_furnace_active": {
+      "model": "industrialupgrade:block/smeltery/smeltery_furnace_active",
+      "y": 180
+    },
+    "facing=west,type=smeltery_furnace_active": {
+      "model": "industrialupgrade:block/smeltery/smeltery_furnace_active",
+      "y": 270
+    },
+    "facing=east,type=smeltery_furnace_active": {
+      "model": "industrialupgrade:block/smeltery/smeltery_furnace_active",
+      "y": 90
+    }
+  }
+}

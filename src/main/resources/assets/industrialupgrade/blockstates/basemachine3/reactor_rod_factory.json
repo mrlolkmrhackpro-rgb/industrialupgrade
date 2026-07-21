@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=reactor_rod_factory": {
+      "model": "industrialupgrade:block/basemachine/reactor_rod_factory"
+    },
+    "facing=south,type=reactor_rod_factory": {
+      "model": "industrialupgrade:block/basemachine/reactor_rod_factory",
+      "y": 180
+    },
+    "facing=west,type=reactor_rod_factory": {
+      "model": "industrialupgrade:block/basemachine/reactor_rod_factory",
+      "y": 270
+    },
+    "facing=east,type=reactor_rod_factory": {
+      "model": "industrialupgrade:block/basemachine/reactor_rod_factory",
+      "y": 90
+    },
+    "facing=north,type=reactor_rod_factory_active": {
+      "model": "industrialupgrade:block/basemachine/reactor_rod_factory_active"
+    },
+    "facing=south,type=reactor_rod_factory_active": {
+      "model": "industrialupgrade:block/basemachine/reactor_rod_factory_active",
+      "y": 180
+    },
+    "facing=west,type=reactor_rod_factory_active": {
+      "model": "industrialupgrade:block/basemachine/reactor_rod_factory_active",
+      "y": 270
+    },
+    "facing=east,type=reactor_rod_factory_active": {
+      "model": "industrialupgrade:block/basemachine/reactor_rod_factory_active",
+      "y": 90
+    }
+  }
+}

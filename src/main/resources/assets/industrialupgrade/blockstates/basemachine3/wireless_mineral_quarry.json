@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=wireless_mineral_quarry": {
+      "model": "industrialupgrade:block/basemachine/wireless_mineral_quarry"
+    },
+    "facing=south,type=wireless_mineral_quarry": {
+      "model": "industrialupgrade:block/basemachine/wireless_mineral_quarry",
+      "y": 180
+    },
+    "facing=west,type=wireless_mineral_quarry": {
+      "model": "industrialupgrade:block/basemachine/wireless_mineral_quarry",
+      "y": 270
+    },
+    "facing=east,type=wireless_mineral_quarry": {
+      "model": "industrialupgrade:block/basemachine/wireless_mineral_quarry",
+      "y": 90
+    },
+    "facing=north,type=wireless_mineral_quarry_active": {
+      "model": "industrialupgrade:block/basemachine/wireless_mineral_quarry_active"
+    },
+    "facing=south,type=wireless_mineral_quarry_active": {
+      "model": "industrialupgrade:block/basemachine/wireless_mineral_quarry_active",
+      "y": 180
+    },
+    "facing=west,type=wireless_mineral_quarry_active": {
+      "model": "industrialupgrade:block/basemachine/wireless_mineral_quarry_active",
+      "y": 270
+    },
+    "facing=east,type=wireless_mineral_quarry_active": {
+      "model": "industrialupgrade:block/basemachine/wireless_mineral_quarry_active",
+      "y": 90
+    }
+  }
+}

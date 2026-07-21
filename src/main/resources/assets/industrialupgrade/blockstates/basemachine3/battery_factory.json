@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=battery_factory": {
+      "model": "industrialupgrade:block/basemachine/battery_factory"
+    },
+    "facing=south,type=battery_factory": {
+      "model": "industrialupgrade:block/basemachine/battery_factory",
+      "y": 180
+    },
+    "facing=west,type=battery_factory": {
+      "model": "industrialupgrade:block/basemachine/battery_factory",
+      "y": 270
+    },
+    "facing=east,type=battery_factory": {
+      "model": "industrialupgrade:block/basemachine/battery_factory",
+      "y": 90
+    },
+    "facing=north,type=battery_factory_active": {
+      "model": "industrialupgrade:block/basemachine/battery_factory_active"
+    },
+    "facing=south,type=battery_factory_active": {
+      "model": "industrialupgrade:block/basemachine/battery_factory_active",
+      "y": 180
+    },
+    "facing=west,type=battery_factory_active": {
+      "model": "industrialupgrade:block/basemachine/battery_factory_active",
+      "y": 270
+    },
+    "facing=east,type=battery_factory_active": {
+      "model": "industrialupgrade:block/basemachine/battery_factory_active",
+      "y": 90
+    }
+  }
+}

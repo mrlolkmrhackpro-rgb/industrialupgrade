@@ -1,20 +1,25 @@
 package com.denfop.componets;
 
-import com.denfop.api.audio.EnumTypeAudio;
-import com.denfop.api.inv.IAdvInventory;
-import com.denfop.api.recipe.*;
+import com.denfop.api.container.CustomWorldContainer;
+import com.denfop.api.recipe.IMultiUpdateTick;
 import com.denfop.api.recipe.InventoryBioMultiRecipes;
 import com.denfop.api.recipe.InventoryOutput;
+import com.denfop.api.recipe.MachineRecipe;
+import com.denfop.api.sound.EnumTypeAudio;
+import com.denfop.blockentity.base.BlockEntityBase;
+import com.denfop.blockentity.base.BlockEntityInventory;
+import com.denfop.blockentity.base.EnumMultiMachine;
+import com.denfop.blockentity.base.IBioMachine;
+import com.denfop.blockentity.mechanism.EnumTypeMachines;
 import com.denfop.network.packet.CustomPacketBuffer;
-import com.denfop.tiles.base.EnumMultiMachine;
-import com.denfop.tiles.base.IBioMachine;
-import com.denfop.tiles.base.TileEntityBlock;
-import com.denfop.tiles.base.TileEntityInventory;
-import com.denfop.tiles.mechanism.EnumTypeMachines;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import java.io.IOException;
 import java.util.List;
@@ -41,16 +46,16 @@ public class BioProcessMultiComponent extends AbstractComponent implements IMult
     private int[] col;
 
     public BioProcessMultiComponent(final IBioMachine parent, final EnumMultiMachine enumMultiMachine) {
-        super((TileEntityBlock) parent);
+        super((BlockEntityBase) parent);
         this.multimachine = parent;
         this.inputSlots = new InventoryBioMultiRecipes(
-                (TileEntityInventory) parent,
+                (BlockEntityInventory) parent,
                 enumMultiMachine.type.recipe,
                 this,
                 enumMultiMachine.sizeWorkingSlot, this
         );
         this.outputSlot = new InventoryOutput(
-                (IAdvInventory<?>) parent,
+                (CustomWorldContainer) parent,
                 enumMultiMachine.sizeWorkingSlot + (enumMultiMachine.output ? 2 : 0)
         );
         this.enumMultiMachine = enumMultiMachine;
@@ -64,23 +69,44 @@ public class BioProcessMultiComponent extends AbstractComponent implements IMult
         this.defaultOperationLength = this.operationChange = this.operationLength =
                 Math.max((int) (enumMultiMachine.lenghtOperation * 1D / speed), 1);
         this.output = new MachineRecipe[sizeWorkingSlot];
-        this.bioFuel = ((TileEntityBlock) parent).getComp(ComponentBioFuelEnergy.class);
-        this.heat = ((TileEntityBlock) parent).getComp(HeatComponent.class);
+        this.bioFuel = ((BlockEntityBase) parent).getComp(ComponentBioFuelEnergy.class);
+        this.heat = ((BlockEntityBase) parent).getComp(HeatComponent.class);
         this.isCentrifuge = enumMultiMachine.type == EnumTypeMachines.Centrifuge;
 
     }
 
     @Override
+    public boolean isClient() {
+        return true;
+    }
+
+    @Override
+    public void updateEntityClient() {
+        super.updateEntityClient();
+        if (this.parent.getActive() && this.parent.getWorld().getGameTime() % 4 == 0) {
+            double x = this.parent.getBlockPos().getX() + 0.5;
+            double y = this.parent.getBlockPos().getY() + 1.1;
+            double z = this.parent.getBlockPos().getZ() + 0.5;
+
+            this.parent.getLevel().addParticle(
+                    new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SLIME_BLOCK.defaultBlockState()),
+                    x, y, z,
+                    0.0, 0.1, 0.0
+            );
+        }
+    }
+
+    @Override
     public void onLoaded() {
         super.onLoaded();
-        if (!this.parent.getWorld().isRemote) {
+        if (!this.parent.getLevel().isClientSide) {
             inputSlots.load();
             this.getsOutputs();
         }
     }
 
     @Override
-    public boolean onBlockActivated(final EntityPlayer player, final EnumHand hand) {
+    public boolean onBlockActivated(final Player player, final InteractionHand hand) {
         return false;
     }
 
@@ -89,8 +115,8 @@ public class BioProcessMultiComponent extends AbstractComponent implements IMult
     }
 
     @Override
-    public void onContainerUpdate(final EntityPlayerMP player) {
-        CustomPacketBuffer buffer = new CustomPacketBuffer(16);
+    public void onContainerUpdate(final ServerPlayer player) {
+        CustomPacketBuffer buffer = new CustomPacketBuffer(16, player.registryAccess());
         buffer.writeInt(this.operationLength);
         for (int i = 0; i < sizeWorkingSlot; i++) {
             buffer.writeInt(this.progress[i]);
@@ -104,7 +130,7 @@ public class BioProcessMultiComponent extends AbstractComponent implements IMult
 
     @Override
     public CustomPacketBuffer updateComponent() {
-        CustomPacketBuffer buffer = new CustomPacketBuffer(16);
+        CustomPacketBuffer buffer = new CustomPacketBuffer(16, parent.getLevel().registryAccess());
         buffer.writeInt(this.operationLength);
         for (int i = 0; i < sizeWorkingSlot; i++) {
             buffer.writeInt(this.progress[i]);
@@ -142,20 +168,20 @@ public class BioProcessMultiComponent extends AbstractComponent implements IMult
             ) && (this.bioFuel.canUseEnergy(energyConsume))) {
                 active = true;
                 if (this.multimachine.getTank() != null) {
-                    if (this.multimachine.getTank().getFluid() == null || this.multimachine.getTank().getFluid().amount < 1000) {
+                    if (this.multimachine.getTank().getFluid().isEmpty() || this.multimachine.getTank().getFluid().getAmount() < 1000) {
                         return;
                     }
                 }
                 if (this.multimachine.getHeat() != null) {
                     if (output.getRecipe().output.metadata.getShort("minHeat") == 0 || output.getRecipe().output.metadata.getShort(
                             "minHeat") > this.heat.getEnergy()) {
-                        if (!(this).heat.need) {
-                            (this).heat.need = true;
+                        if (!(this).heat.buffer.need) {
+                            (this).heat.buffer.need = true;
                         }
                         return;
 
-                    } else if ((this).heat.need) {
-                        (this).heat.need = false;
+                    } else if ((this).heat.buffer.need) {
+                        (this).heat.buffer.need = false;
                     }
                 }
                 if (this.progress[i] == 0) {
@@ -245,11 +271,11 @@ public class BioProcessMultiComponent extends AbstractComponent implements IMult
 
             operateOnce(slotId, output.getRecipe().output.items);
             if (this.multimachine.getTank() != null) {
-                this.multimachine.getTank().drain(1000, true);
+                this.multimachine.getTank().drain(1000, IFluidHandler.FluidAction.EXECUTE);
             }
             if (!this.enumMultiMachine.recipe.equals("recycler")) {
                 if (this.multimachine.getTank() != null) {
-                    if (this.multimachine.getTank().getFluid() == null || this.multimachine.getTank().getFluid().amount < 1000) {
+                    if (this.multimachine.getTank().getFluid().isEmpty() || this.multimachine.getTank().getFluid().getAmount() < 1000) {
                         break;
                     }
                 }
@@ -291,14 +317,14 @@ public class BioProcessMultiComponent extends AbstractComponent implements IMult
     public MachineRecipe getOutput(int slotId) {
         if (enumMultiMachine == null || (
                 enumMultiMachine.type != EnumTypeMachines.COMBRECYCLER && enumMultiMachine.type != EnumTypeMachines.RECYCLER)) {
-            if (this.inputSlots.isEmpty(slotId)) {
+            if (this.inputSlots.get(slotId).isEmpty()) {
                 this.output[slotId] = null;
                 return null;
             }
             this.output[slotId] = this.inputSlots.process(slotId);
             return this.output[slotId];
         } else {
-            if (this.inputSlots.isEmpty(slotId)) {
+            if (this.inputSlots.get(slotId).isEmpty()) {
                 this.output[slotId] = null;
                 return null;
             }

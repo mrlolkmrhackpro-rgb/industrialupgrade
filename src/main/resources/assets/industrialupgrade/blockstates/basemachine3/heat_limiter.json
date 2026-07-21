@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=heat_limiter": {
+      "model": "industrialupgrade:block/basemachine/heat_limiter"
+    },
+    "facing=south,type=heat_limiter": {
+      "model": "industrialupgrade:block/basemachine/heat_limiter",
+      "y": 180
+    },
+    "facing=west,type=heat_limiter": {
+      "model": "industrialupgrade:block/basemachine/heat_limiter",
+      "y": 270
+    },
+    "facing=east,type=heat_limiter": {
+      "model": "industrialupgrade:block/basemachine/heat_limiter",
+      "y": 90
+    },
+    "facing=north,type=heat_limiter_active": {
+      "model": "industrialupgrade:block/basemachine/heat_limiter"
+    },
+    "facing=south,type=heat_limiter_active": {
+      "model": "industrialupgrade:block/basemachine/heat_limiter",
+      "y": 180
+    },
+    "facing=west,type=heat_limiter_active": {
+      "model": "industrialupgrade:block/basemachine/heat_limiter",
+      "y": 270
+    },
+    "facing=east,type=heat_limiter_active": {
+      "model": "industrialupgrade:block/basemachine/heat_limiter",
+      "y": 90
+    }
+  }
+}

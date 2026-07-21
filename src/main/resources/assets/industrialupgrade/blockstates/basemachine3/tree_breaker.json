@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=tree_breaker": {
+      "model": "industrialupgrade:block/basemachine/tree_breaker"
+    },
+    "facing=south,type=tree_breaker": {
+      "model": "industrialupgrade:block/basemachine/tree_breaker",
+      "y": 180
+    },
+    "facing=west,type=tree_breaker": {
+      "model": "industrialupgrade:block/basemachine/tree_breaker",
+      "y": 270
+    },
+    "facing=east,type=tree_breaker": {
+      "model": "industrialupgrade:block/basemachine/tree_breaker",
+      "y": 90
+    },
+    "facing=north,type=tree_breaker_active": {
+      "model": "industrialupgrade:block/basemachine/tree_breaker"
+    },
+    "facing=south,type=tree_breaker_active": {
+      "model": "industrialupgrade:block/basemachine/tree_breaker",
+      "y": 180
+    },
+    "facing=west,type=tree_breaker_active": {
+      "model": "industrialupgrade:block/basemachine/tree_breaker",
+      "y": 270
+    },
+    "facing=east,type=tree_breaker_active": {
+      "model": "industrialupgrade:block/basemachine/tree_breaker",
+      "y": 90
+    }
+  }
+}

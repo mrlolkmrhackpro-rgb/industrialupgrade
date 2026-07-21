@@ -1,10 +1,11 @@
 package com.denfop.api.windsystem;
 
-import net.minecraft.item.ItemStack;
+
+import net.minecraft.world.item.ItemStack;
 
 public interface IWindUpgradeBlock {
 
-    IWindRotor getRotor();
+    WindRotor getRotor();
 
     ItemStack getItemStack();
 

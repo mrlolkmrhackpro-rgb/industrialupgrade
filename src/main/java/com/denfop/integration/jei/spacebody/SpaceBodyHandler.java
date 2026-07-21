@@ -4,8 +4,8 @@ package com.denfop.integration.jei.spacebody;
 import com.denfop.api.space.IBaseResource;
 import com.denfop.api.space.IBody;
 import com.denfop.api.space.SpaceNet;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -61,7 +61,7 @@ public class SpaceBodyHandler {
             for (IBaseResource baseResource : resource) {
                 if (baseResource.getItemStack() != null) {
                     for (ItemStack stack : stacks) {
-                        if (stack.isItemEqual(baseResource.getItemStack())) {
+                        if (stack.is(baseResource.getItemStack().getItem())) {
                             continue cycle;
                         }
                     }

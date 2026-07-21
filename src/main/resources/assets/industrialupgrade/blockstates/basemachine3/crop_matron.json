@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=crop_matron": {
+      "model": "industrialupgrade:block/basemachine/cropmatron"
+    },
+    "facing=south,type=crop_matron": {
+      "model": "industrialupgrade:block/basemachine/cropmatron",
+      "y": 180
+    },
+    "facing=west,type=crop_matron": {
+      "model": "industrialupgrade:block/basemachine/cropmatron",
+      "y": 270
+    },
+    "facing=east,type=crop_matron": {
+      "model": "industrialupgrade:block/basemachine/cropmatron",
+      "y": 90
+    },
+    "facing=north,type=crop_matron_active": {
+      "model": "industrialupgrade:block/basemachine/cropmatron_active"
+    },
+    "facing=south,type=crop_matron_active": {
+      "model": "industrialupgrade:block/basemachine/cropmatron_active",
+      "y": 180
+    },
+    "facing=west,type=crop_matron_active": {
+      "model": "industrialupgrade:block/basemachine/cropmatron_active",
+      "y": 270
+    },
+    "facing=east,type=crop_matron_active": {
+      "model": "industrialupgrade:block/basemachine/cropmatron_active",
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:quarrymodules/for1"
+    },
+    "B": {
+      "tag": "c:doubleplate/tantalum"
+    },
+    "C": {
+      "tag": "c:doubleplate/thallium"
+    }
+  },
+  "pattern": [
+    "CBC",
+    "BAB",
+    "CBC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:spawnermodules/spawner_module"
+  },
+  "show_notification": false
+}

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=night_transformer": {
+      "model": "industrialupgrade:block/basemachine/night_transformer"
+    },
+    "facing=south,type=night_transformer": {
+      "model": "industrialupgrade:block/basemachine/night_transformer",
+      "y": 180
+    },
+    "facing=west,type=night_transformer": {
+      "model": "industrialupgrade:block/basemachine/night_transformer",
+      "y": 270
+    },
+    "facing=east,type=night_transformer": {
+      "model": "industrialupgrade:block/basemachine/night_transformer",
+      "y": 90
+    },
+    "facing=north,type=night_transformer_active": {
+      "model": "industrialupgrade:block/basemachine/night_transformer"
+    },
+    "facing=south,type=night_transformer_active": {
+      "model": "industrialupgrade:block/basemachine/night_transformer",
+      "y": 180
+    },
+    "facing=west,type=night_transformer_active": {
+      "model": "industrialupgrade:block/basemachine/night_transformer",
+      "y": 270
+    },
+    "facing=east,type=night_transformer_active": {
+      "model": "industrialupgrade:block/basemachine/night_transformer",
+      "y": 90
+    }
+  }
+}

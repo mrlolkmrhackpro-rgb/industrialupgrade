@@ -1,0 +1,25 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:crafting_elements/crafting_42_element"
+    },
+    "B": {
+      "tag": "c:casings/osmiridium"
+    },
+    "D": {
+      "item": "industrialupgrade:crafting_elements/crafting_650_element"
+    }
+  },
+  "pattern": [
+    "ABA",
+    "D D",
+    "BBB"
+  ],
+  "result": {
+    "count": 2,
+    "id": "industrialupgrade:crafting_elements/crafting_21_element"
+  },
+  "show_notification": false
+}

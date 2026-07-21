@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=bio_extractor": {
+      "model": "industrialupgrade:block/basemachine/bio_extractor"
+    },
+    "facing=south,type=bio_extractor": {
+      "model": "industrialupgrade:block/basemachine/bio_extractor",
+      "y": 180
+    },
+    "facing=west,type=bio_extractor": {
+      "model": "industrialupgrade:block/basemachine/bio_extractor",
+      "y": 270
+    },
+    "facing=east,type=bio_extractor": {
+      "model": "industrialupgrade:block/basemachine/bio_extractor",
+      "y": 90
+    },
+    "facing=north,type=bio_extractor_active": {
+      "model": "industrialupgrade:block/basemachine/bio_extractor_active"
+    },
+    "facing=south,type=bio_extractor_active": {
+      "model": "industrialupgrade:block/basemachine/bio_extractor_active",
+      "y": 180
+    },
+    "facing=west,type=bio_extractor_active": {
+      "model": "industrialupgrade:block/basemachine/bio_extractor_active",
+      "y": 270
+    },
+    "facing=east,type=bio_extractor_active": {
+      "model": "industrialupgrade:block/basemachine/bio_extractor_active",
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,165 @@
+package com.denfop.containermenu;
+
+import com.denfop.api.menu.VirtualSlot;
+import com.denfop.blockentity.base.BlockEntityInventory;
+import com.denfop.inventory.Inventory;
+import com.denfop.utils.FluidHandlerFix;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class SlotInfo extends Inventory implements VirtualSlot {
+
+
+    List<FluidStack> fluidStackList;
+    private List<ItemStack> listBlack;
+    private List<ItemStack> listWhite;
+    private List<FluidStack> listFluidBlack;
+    private List<FluidStack> listFluidWhite;
+    private boolean fluid;
+
+    public SlotInfo(BlockEntityInventory multiCable, int size, boolean fluid) {
+        super(multiCable, null, size);
+        this.fluid = fluid;
+        this.fluidStackList = new ArrayList<>(Collections.nCopies(this.size(), FluidStack.EMPTY));
+        this.listBlack = new ArrayList<>();
+        this.listWhite = new ArrayList<>();
+    }
+
+    public List<ItemStack> getListBlack() {
+        return listBlack;
+    }
+
+    public List<ItemStack> getListWhite() {
+        return listWhite;
+    }
+
+
+    @Override
+    public void readFromNbt(final CompoundTag nbt, HolderLookup.Provider p_332027_) {
+        super.readFromNbt(nbt, p_332027_);
+        fluid = nbt.getBoolean("fluid");
+        if (this.fluid) {
+            fluidStackList = new ArrayList<>(Collections.nCopies(this.size(), FluidStack.EMPTY));
+
+            for (int i = 0; i < size(); i++) {
+                if (!this.get(i).isEmpty()) {
+                    if (FluidHandlerFix.hasFluidHandler(this.get(i))) {
+                        fluidStackList.set(i, new FluidStack(FluidHandlerFix.getFluidHandler(this.get(i)).drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE).getFluid(), 1));
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public CompoundTag writeToNbt(CompoundTag nbt, HolderLookup.Provider p_332027_) {
+        nbt = super.writeToNbt(nbt, p_332027_);
+        nbt.putBoolean("fluid", isFluid());
+        return nbt;
+    }
+
+    public List<FluidStack> getFluidStackList() {
+        return fluidStackList;
+    }
+
+    public List<FluidStack> getListFluidBlack() {
+        return listFluidBlack == null ? Collections.emptyList() : listFluidBlack;
+    }
+
+    public List<FluidStack> getListFluidWhite() {
+        return listFluidWhite == null ? Collections.emptyList() : listFluidWhite;
+    }
+
+    @Override
+    public void setFluidList(final List<FluidStack> fluidStackList) {
+        this.fluidStackList = fluidStackList;
+        listFluidBlack = this.getFluidStackList().subList(0, 9).stream().filter(fluidStack -> !fluidStack.isEmpty()).collect(Collectors.toList());
+        listFluidWhite =
+                this.getFluidStackList()
+                        .subList(9, this.fluidStackList.size())
+                        .stream()
+                        .filter(fluidStack -> !fluidStack.isEmpty())
+                        .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean canPlaceVirtualItem(int index, ItemStack stack) {
+        return true;
+    }
+
+    public boolean isFluid() {
+        return fluid;
+    }
+
+    public void setFluid(final boolean fluid) {
+        this.fluid = fluid;
+    }
+
+    @Override
+    public boolean canPlaceItem(final int index, final ItemStack stack) {
+        return true;
+    }
+
+    public ItemStack set(int index, ItemStack stack) {
+        if (!stack.isEmpty()) {
+            stack = stack.copy();
+            stack.setCount(1);
+        }
+
+        this.contents.set(index, stack);
+        listBlack.clear();
+        listWhite.clear();
+        this.listBlack = new LinkedList<>();
+        this.listWhite = new LinkedList<>();
+        for (int i = 0; i < size(); i++) {
+            ItemStack itemStack = this.contents.get(i);
+            if (itemStack.isEmpty()) {
+                continue;
+            }
+            if (i < 9) {
+                listBlack.add(itemStack);
+            } else {
+                listWhite.add(itemStack);
+            }
+        }
+
+        this.listBlack = new ArrayList<>(listBlack);
+        this.listWhite = new ArrayList<>(listWhite);
+        this.setChanged();
+        return stack;
+    }
+
+    public void setChanged() {
+        listBlack.clear();
+        listWhite.clear();
+        for (int i = 0; i < size(); i++) {
+            ItemStack itemStack = this.contents.get(i);
+            if (itemStack.isEmpty()) {
+                continue;
+            }
+            if (i < 9) {
+                listBlack.add(itemStack);
+            } else {
+                listWhite.add(itemStack);
+            }
+        }
+    }
+
+    public ItemStack get(int index) {
+        return this.contents.get(index);
+    }
+
+    public ItemStack get() {
+        return this.get(0);
+    }
+
+}

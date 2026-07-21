@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=plant_gardener": {
+      "model": "industrialupgrade:block/basemachine/plant_gardener"
+    },
+    "facing=south,type=plant_gardener": {
+      "model": "industrialupgrade:block/basemachine/plant_gardener",
+      "y": 180
+    },
+    "facing=west,type=plant_gardener": {
+      "model": "industrialupgrade:block/basemachine/plant_gardener",
+      "y": 270
+    },
+    "facing=east,type=plant_gardener": {
+      "model": "industrialupgrade:block/basemachine/plant_gardener",
+      "y": 90
+    },
+    "facing=north,type=plant_gardener_active": {
+      "model": "industrialupgrade:block/basemachine/plant_gardener"
+    },
+    "facing=south,type=plant_gardener_active": {
+      "model": "industrialupgrade:block/basemachine/plant_gardener",
+      "y": 180
+    },
+    "facing=west,type=plant_gardener_active": {
+      "model": "industrialupgrade:block/basemachine/plant_gardener",
+      "y": 270
+    },
+    "facing=east,type=plant_gardener_active": {
+      "model": "industrialupgrade:block/basemachine/plant_gardener",
+      "y": 90
+    }
+  }
+}

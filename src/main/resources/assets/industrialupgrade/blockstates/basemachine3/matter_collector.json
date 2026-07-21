@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=matter_collector": {
+      "model": "industrialupgrade:block/basemachine/matter_collector"
+    },
+    "facing=south,type=matter_collector": {
+      "model": "industrialupgrade:block/basemachine/matter_collector",
+      "y": 180
+    },
+    "facing=west,type=matter_collector": {
+      "model": "industrialupgrade:block/basemachine/matter_collector",
+      "y": 270
+    },
+    "facing=east,type=matter_collector": {
+      "model": "industrialupgrade:block/basemachine/matter_collector",
+      "y": 90
+    },
+    "facing=north,type=matter_collector_active": {
+      "model": "industrialupgrade:block/basemachine/matter_collector_active"
+    },
+    "facing=south,type=matter_collector_active": {
+      "model": "industrialupgrade:block/basemachine/matter_collector_active",
+      "y": 180
+    },
+    "facing=west,type=matter_collector_active": {
+      "model": "industrialupgrade:block/basemachine/matter_collector_active",
+      "y": 270
+    },
+    "facing=east,type=matter_collector_active": {
+      "model": "industrialupgrade:block/basemachine/matter_collector_active",
+      "y": 90
+    }
+  }
+}

@@ -1,59 +1,76 @@
 package com.denfop.componets;
 
 import com.denfop.IUItem;
-import com.denfop.Localization;
-import com.denfop.api.pollution.IPollutionMechanism;
-import com.denfop.api.pollution.PollutionSoilLoadEvent;
-import com.denfop.api.pollution.PollutionSoilUnLoadEvent;
+import com.denfop.api.pollution.soil.PollutionSoilLoadEvent;
+import com.denfop.api.pollution.soil.PollutionSoilUnLoadEvent;
+import com.denfop.blockentity.base.BlockEntityInventory;
 import com.denfop.network.packet.CustomPacketBuffer;
-import com.denfop.tiles.base.TileEntityInventory;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraftforge.common.MinecraftForge;
+import com.denfop.utils.Localization;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.common.NeoForge;
+import org.joml.Vector3f;
 
 import java.io.IOException;
 import java.util.List;
 
-public class SoilPollutionComponent extends AbstractComponent implements IPollutionMechanism {
+public class SoilPollutionComponent extends AbstractComponent {
 
-    private double pollution;
+    private PollutionMechanism pollution;
     private double default_pollution;
     private ChunkPos chunkPos;
-
     private double percent = 1;
 
-    public SoilPollutionComponent(final TileEntityInventory parent, double pollution) {
+    public SoilPollutionComponent(final BlockEntityInventory parent, double pollution) {
         super(parent);
-        this.pollution = pollution;
+        this.pollution = new PollutionMechanism(new ChunkPos(parent.pos));
         this.default_pollution = pollution;
+    }
+
+    public static void spawnSoilPollution(Level level, BlockPos pos, RandomSource random) {
+        if (!(level instanceof ServerLevel server)) return;
+
+        double x = pos.getX() + 0.5;
+        double y = pos.getY() + 0.1;
+        double z = pos.getZ() + 0.5;
+
+        if (random.nextFloat() < 0.3f) {
+            Vector3f dirtyColor = new Vector3f(0.2f, 0.4f, 0.1f);
+            server.sendParticles(new DustParticleOptions(dirtyColor, 0.8f),
+                    x, y, z, 2, 0.02, 0.005, 0.02, 0.001);
+        }
     }
 
     @Override
     public void addInformation(final ItemStack stack, final List<String> tooltip) {
         super.addInformation(stack, tooltip);
-        if (this.parent != null && this.parent.getWorld() == null) {
+        if (this.parent != null ) {
             tooltip.add(Localization.translate("iu.pollution.soil.info") + " " + String.format(
                     "%.2f",
                     default_pollution
-            ) + Localization.translate("iu" +
-                    ".pollution.soil.info1"));
+            ) + Localization.translate("iu.pollution.soil.info1"));
         }
     }
 
     @Override
-    public NBTTagCompound writeToNbt() {
-        NBTTagCompound tagCompound = super.writeToNbt();
-        tagCompound.setDouble("percent", percent);
+    public CompoundTag writeToNbt() {
+        CompoundTag tagCompound = super.writeToNbt();
+        tagCompound.putDouble("percent", percent);
         return tagCompound;
     }
 
     @Override
-    public void readFromNbt(final NBTTagCompound nbt) {
+    public void readFromNbt(final CompoundTag nbt) {
         super.readFromNbt(nbt);
         percent = nbt.getDouble("percent");
     }
@@ -63,17 +80,17 @@ public class SoilPollutionComponent extends AbstractComponent implements IPollut
     }
 
     @Override
-    public boolean canUsePurifier(final EntityPlayer player) {
+    public boolean canUsePurifier(final Player player) {
         return this.percent != 1;
     }
 
     public ItemStack getItemStackUpgrade() {
         if (this.percent == 0) {
             this.percent = 0.5;
-            return new ItemStack(IUItem.antisoilpollution1);
+            return new ItemStack(IUItem.antisoilpollution1.getItem());
         } else {
             this.percent = 1;
-            return new ItemStack(IUItem.antisoilpollution);
+            return new ItemStack(IUItem.antisoilpollution.getItem());
         }
     }
 
@@ -81,20 +98,20 @@ public class SoilPollutionComponent extends AbstractComponent implements IPollut
     public List<ItemStack> getDrops() {
         final List<ItemStack> ret = super.getDrops();
         if (this.percent == 0) {
-            ret.add(new ItemStack(IUItem.antisoilpollution1));
-            ret.add(new ItemStack(IUItem.antisoilpollution));
+            ret.add(new ItemStack(IUItem.antisoilpollution1.getItem()));
+            ret.add(new ItemStack(IUItem.antisoilpollution.getItem()));
         } else if (percent == 0.5) {
-            ret.add(new ItemStack(IUItem.antisoilpollution));
+            ret.add(new ItemStack(IUItem.antisoilpollution.getItem()));
         }
         return ret;
     }
 
     @Override
-    public boolean onBlockActivated(final EntityPlayer player, final EnumHand hand) {
-        if (!this.parent.getWorld().isRemote) {
-            ItemStack stack = player.getHeldItem(hand);
+    public boolean onBlockActivated(final Player player, final InteractionHand hand) {
+        if (!this.parent.getLevel().isClientSide) {
+            ItemStack stack = player.getItemInHand(hand);
             Item item = stack.getItem();
-            if (percent == 1 && item == IUItem.antisoilpollution) {
+            if (percent == 1 && item == IUItem.antisoilpollution.getItem()) {
                 stack.shrink(1);
                 percent = 0.5;
                 if (this.parent.getActive()) {
@@ -102,7 +119,7 @@ public class SoilPollutionComponent extends AbstractComponent implements IPollut
                 } else {
                     this.setPollution(0);
                 }
-            } else if (percent == 0.5 && item == IUItem.antisoilpollution1) {
+            } else if (percent == 0.5 && item == IUItem.antisoilpollution1.getItem()) {
                 stack.shrink(1);
                 percent = 0;
                 if (this.parent.getActive()) {
@@ -118,6 +135,9 @@ public class SoilPollutionComponent extends AbstractComponent implements IPollut
     @Override
     public void updateEntityServer() {
         super.updateEntityServer();
+        if (this.parent.getWorld().getGameTime() % 20 == 0 && this.parent.getActive()) {
+            spawnSoilPollution(parent.getWorld(), parent.getPos(), parent.getWorld().random);
+        }
         if (this.parent.getActive()) {
             this.setPollution(this.default_pollution * percent);
         } else {
@@ -126,20 +146,14 @@ public class SoilPollutionComponent extends AbstractComponent implements IPollut
     }
 
     public void onLoaded() {
-
-
-        if (!this.parent.getWorld().isRemote && this.parent.getWorld().provider.getDimension() == 0) {
-
-            MinecraftForge.EVENT_BUS.post(new PollutionSoilLoadEvent(this.parent.getWorld(), this));
-
-
+        if (!this.parent.getLevel().isClientSide && this.parent.getLevel().dimension() == Level.OVERWORLD) {
+            NeoForge.EVENT_BUS.post(new PollutionSoilLoadEvent(this.parent.getLevel(), pollution));
         }
-
     }
 
-    public void onContainerUpdate(EntityPlayerMP player) {
-        CustomPacketBuffer buffer = new CustomPacketBuffer(16);
-        buffer.writeDouble(this.pollution);
+    public void onContainerUpdate(ServerPlayer player) {
+        CustomPacketBuffer buffer = new CustomPacketBuffer(16, player.registryAccess());
+        buffer.writeDouble(this.pollution.pollution);
         buffer.writeDouble(this.default_pollution);
         buffer.writeDouble(this.percent);
         buffer.flip();
@@ -148,31 +162,38 @@ public class SoilPollutionComponent extends AbstractComponent implements IPollut
 
     public CustomPacketBuffer updateComponent() {
         final CustomPacketBuffer buffer = super.updateComponent();
-        buffer.writeDouble(this.pollution);
+        buffer.writeDouble(this.pollution.pollution);
         buffer.writeDouble(this.default_pollution);
         buffer.writeDouble(this.percent);
         return buffer;
     }
 
     public void onNetworkUpdate(CustomPacketBuffer is) throws IOException {
-
-        this.pollution = is.readDouble();
+        this.pollution.pollution = is.readDouble();
         this.default_pollution = is.readDouble();
         this.percent = is.readDouble();
-
     }
 
     public double getDefault_pollution() {
         return default_pollution;
     }
 
+    public double getPercent() {
+        return percent;
+    }
+
+    public double getCurrentContribution() {
+        return this.pollution.pollution;
+    }
+
+    public boolean isEffectivelyActive() {
+        return this.parent != null && this.parent.getActive() && this.getCurrentContribution() > 0;
+    }
+
     @Override
     public void onUnloaded() {
-        if (!this.parent.getWorld().isRemote && this.parent.getWorld().provider.getDimension() == 0) {
-
-            MinecraftForge.EVENT_BUS.post(new PollutionSoilUnLoadEvent(this.parent.getWorld(), this));
-
-
+        if (!this.parent.getLevel().isClientSide && this.parent.getLevel().dimension() == Level.OVERWORLD) {
+            NeoForge.EVENT_BUS.post(new PollutionSoilUnLoadEvent(this.parent.getLevel(), pollution));
         }
     }
 
@@ -181,28 +202,13 @@ public class SoilPollutionComponent extends AbstractComponent implements IPollut
         return true;
     }
 
-    @Override
-    public ChunkPos getChunkPos() {
-        if (this.chunkPos == null) {
-            chunkPos = new ChunkPos(this.getParent().getPos());
-        }
-        return chunkPos;
-    }
-
-    @Override
-    public double getPollution() {
-        return pollution;
-    }
-
     public void setPollution(double pollution) {
-        if (this.pollution != pollution) {
-            if (!this.parent.getWorld().isRemote && this.parent.getWorld().provider.getDimension() == 0) {
-                MinecraftForge.EVENT_BUS.post(new PollutionSoilUnLoadEvent(this.parent.getWorld(), this));
-                this.pollution = pollution * percent;
-                MinecraftForge.EVENT_BUS.post(new PollutionSoilLoadEvent(this.parent.getWorld(), this));
-
+        if (this.pollution.pollution != pollution) {
+            if (!this.parent.getLevel().isClientSide && this.parent.getLevel().dimension() == Level.OVERWORLD) {
+                NeoForge.EVENT_BUS.post(new PollutionSoilUnLoadEvent(this.parent.getLevel(), this.pollution));
+                this.pollution.pollution = pollution * percent;
+                NeoForge.EVENT_BUS.post(new PollutionSoilLoadEvent(this.parent.getLevel(), this.pollution));
             }
         }
     }
-
 }

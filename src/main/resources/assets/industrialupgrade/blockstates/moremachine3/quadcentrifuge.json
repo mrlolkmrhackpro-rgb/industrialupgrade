@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=quadcentrifuge": {
+      "model": "industrialupgrade:block/moremachine3/quadcentrifuge"
+    },
+    "facing=south,type=quadcentrifuge": {
+      "model": "industrialupgrade:block/moremachine3/quadcentrifuge",
+      "y": 180
+    },
+    "facing=west,type=quadcentrifuge": {
+      "model": "industrialupgrade:block/moremachine3/quadcentrifuge",
+      "y": 270
+    },
+    "facing=east,type=quadcentrifuge": {
+      "model": "industrialupgrade:block/moremachine3/quadcentrifuge",
+      "y": 90
+    },
+    "facing=north,type=quadcentrifuge_active": {
+      "model": "industrialupgrade:block/moremachine3/quadcentrifuge_active"
+    },
+    "facing=south,type=quadcentrifuge_active": {
+      "model": "industrialupgrade:block/moremachine3/quadcentrifuge_active",
+      "y": 180
+    },
+    "facing=west,type=quadcentrifuge_active": {
+      "model": "industrialupgrade:block/moremachine3/quadcentrifuge_active",
+      "y": 270
+    },
+    "facing=east,type=quadcentrifuge_active": {
+      "model": "industrialupgrade:block/moremachine3/quadcentrifuge_active",
+      "y": 90
+    }
+  }
+}

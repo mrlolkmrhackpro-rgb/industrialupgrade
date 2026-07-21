@@ -1,0 +1,28 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:crafting_elements/crafting_139_element"
+    },
+    "C": {
+      "item": "industrialupgrade:basemachine/adv_matter"
+    },
+    "D": {
+      "item": "industrialupgrade:crafting_elements/crafting_232_element"
+    },
+    "E": {
+      "item": "industrialupgrade:itemcore/specore"
+    }
+  },
+  "pattern": [
+    "AEA",
+    " C ",
+    "ADA"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:basemachine/imp_matter"
+  },
+  "show_notification": false
+}

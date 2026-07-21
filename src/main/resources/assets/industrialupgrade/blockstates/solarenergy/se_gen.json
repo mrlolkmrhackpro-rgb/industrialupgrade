@@ -1,0 +1,35 @@
+{
+  "variants": {
+    "facing=north,type=se_gen": {
+      "model": "industrialupgrade:block/preobrazovatlsunrays.obj"
+    },
+    "facing=south,type=se_gen": {
+      "model": "industrialupgrade:block/preobrazovatlsunrays.obj",
+      "y": 180
+    },
+    "facing=west,type=se_gen": {
+      "model": "industrialupgrade:block/preobrazovatlsunrays.obj",
+      "y": 270
+    },
+    "facing=east,type=se_gen": {
+      "model": "industrialupgrade:block/preobrazovatlsunrays.obj",
+      "y": 90
+    },
+   
+    "facing=north,type=se_gen_invalid": {
+      "model": "industrialupgrade:block/preobrazovatlsunrays.obj"
+    },
+    "facing=south,type=se_gen_invalid": {
+      "model": "industrialupgrade:block/preobrazovatlsunrays.obj",
+      "y": 180
+    },
+    "facing=west,type=se_gen_invalid": {
+      "model": "industrialupgrade:block/preobrazovatlsunrays.obj",
+      "y": 270
+    },
+    "facing=east,type=se_gen_invalid": {
+      "model": "industrialupgrade:block/preobrazovatlsunrays.obj",
+      "y": 90
+    }
+  }
+}

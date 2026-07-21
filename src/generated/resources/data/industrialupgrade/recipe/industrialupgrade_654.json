@@ -1,0 +1,28 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:energy_tools/spectralpickaxe"
+    },
+    "C": {
+      "item": "industrialupgrade:energy_tools/spectralshovel"
+    },
+    "E": {
+      "item": "industrialupgrade:spectral_box"
+    },
+    "H": {
+      "item": "industrialupgrade:crafting_elements/crafting_525_element"
+    }
+  },
+  "pattern": [
+    "EHE",
+    "AEC",
+    "   "
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:energy_tools/spectraldrill"
+  },
+  "show_notification": false
+}

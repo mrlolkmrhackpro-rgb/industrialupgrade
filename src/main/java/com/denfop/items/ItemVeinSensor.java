@@ -1,88 +1,132 @@
 package com.denfop.items;
 
-import com.denfop.Constants;
 import com.denfop.IUCore;
 import com.denfop.IUItem;
-import com.denfop.Localization;
-import com.denfop.api.IModelRegister;
-import com.denfop.api.inv.IAdvInventory;
-import com.denfop.blocks.BlockApatite;
-import com.denfop.blocks.BlockClassicOre;
-import com.denfop.blocks.BlockHeavyOre;
-import com.denfop.blocks.BlockMineral;
-import com.denfop.blocks.BlockOre;
-import com.denfop.blocks.BlockOres2;
-import com.denfop.blocks.BlockOres3;
-import com.denfop.blocks.BlockPreciousOre;
-import com.denfop.blocks.BlocksRadiationOre;
-import com.denfop.blocks.ISubEnum;
-import com.denfop.items.resource.ItemSubTypes;
+import com.denfop.api.container.CustomWorldContainer;
+import com.denfop.blocks.*;
+import com.denfop.datacomponent.DataComponentsInit;
+import com.denfop.datacomponent.VeinInfo;
 import com.denfop.network.packet.CustomPacketBuffer;
 import com.denfop.network.packet.IUpdatableItemStackEvent;
-import com.denfop.register.Register;
+import com.denfop.utils.KeyboardClient;
+import com.denfop.utils.Localization;
 import com.denfop.utils.ModUtils;
 import com.denfop.utils.Vector2;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.block.model.ModelBakery;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.denfop.world.WorldBaseGen;
+import com.denfop.world.vein.VeinType;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.awt.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
-public class ItemVeinSensor extends ItemSubTypes<ItemVeinSensor.Types> implements IModelRegister, IUpdatableItemStackEvent,
-        IItemStackInventory {
+import static com.denfop.utils.ModUtils.inChanceOre;
+import static com.denfop.world.vein.AlgorithmVein.shellClusterChuncks;
+import static com.denfop.world.vein.VeinType.veinTypeMap;
 
-    protected static final String NAME = "sensor";
+public class ItemVeinSensor<T extends Enum<T> & ISubEnum> extends ItemMain<T> implements IUpdatableItemStackEvent,
+        IItemStackInventory, IProperties {
+    public static final Map<String, Integer> ORE_INDEX_MAP = new HashMap<>();
+    public static Map<BlockState, Integer> dataColors = new HashMap<>();
 
-    public ItemVeinSensor() {
-        super(Types.class);
-        this.setCreativeTab(IUCore.ItemTab);
-        Register.registerItem((Item) this, IUCore.getIdentifier(NAME)).setUnlocalizedName(NAME);
-        IUCore.proxy.addIModelRegister(this);
+    static {
+        ORE_INDEX_MAP.put("magnetite", 0);
+        ORE_INDEX_MAP.put("calaverite", 1);
+        ORE_INDEX_MAP.put("galena", 2);
+        ORE_INDEX_MAP.put("nickelite", 3);
+        ORE_INDEX_MAP.put("pyrite", 4);
+        ORE_INDEX_MAP.put("quartzite", 5);
+        ORE_INDEX_MAP.put("uranite", 6);
+        ORE_INDEX_MAP.put("azurite", 7);
+        ORE_INDEX_MAP.put("rhodonite", 8);
+        ORE_INDEX_MAP.put("alfildit", 9);
+        ORE_INDEX_MAP.put("euxenite", 10);
+        ORE_INDEX_MAP.put("smithsonite", 11);
+        ORE_INDEX_MAP.put("ilmenite", 12);
+        ORE_INDEX_MAP.put("todorokite", 13);
+        ORE_INDEX_MAP.put("ferroaugite", 14);
+        ORE_INDEX_MAP.put("sheelite", 15);
+        ORE_INDEX_MAP.put("oil", 16);
+        ORE_INDEX_MAP.put("arsenopyrite", 17);
+        ORE_INDEX_MAP.put("braggite", 18);
+        ORE_INDEX_MAP.put("wolframite", 19);
+        ORE_INDEX_MAP.put("germanite", 20);
+        ORE_INDEX_MAP.put("coltan", 21);
+        ORE_INDEX_MAP.put("crocoite", 22);
+        ORE_INDEX_MAP.put("xenotime", 23);
+        ORE_INDEX_MAP.put("iridosmine", 24);
+        ORE_INDEX_MAP.put("theoprastite", 25);
+        ORE_INDEX_MAP.put("tetrahedrite", 26);
+        ORE_INDEX_MAP.put("fergusonite", 27);
+        ORE_INDEX_MAP.put("celestine", 28);
+        ORE_INDEX_MAP.put("zircon", 29);
+        ORE_INDEX_MAP.put("crystal", 30);
+        ORE_INDEX_MAP.put("gas", 31);
     }
 
-    @SideOnly(Side.CLIENT)
-    public static ModelResourceLocation getModelLocation1(String name, String extraName) {
-        final String loc;
-        if (!extraName.isEmpty()) {
-            loc = Constants.MOD_ID +
-                    ':' +
-                    "sensor" + "/" + name + "_" + extraName;
+    public ItemVeinSensor(T element) {
+        super(new Item.Properties().stacksTo(1), element);
+        IUCore.proxy.addProperties(this);
+    }
 
-        } else {
-            loc = Constants.MOD_ID +
-                    ':' +
-                    "sensor" + "/" + name;
+    public static Map<Vector2, DataOres> getDataChunk(ChunkAccess chunk) {
 
+        Map<Vector2, DataOres> map = new HashMap<>();
+        for (int x = chunk.getPos().x * 16; x < chunk.getPos().x * 16 + 16; x++) {
+            for (int z = chunk.getPos().z * 16; z < chunk.getPos().z * 16 + 16; z++) {
+                for (int y = 0; y < chunk.getHeight(Heightmap.Types.WORLD_SURFACE, x, z); y++) {
+                    BlockState blockState = chunk.getBlockState(new BlockPos(x, y, z));
+                    int color = getOreColor(blockState);
+                    Vector2 vector2 = new Vector2(x, z);
+                    if (color != 0xFFFFFFFF) {
+                        if (!map.containsKey(vector2)) {
+                            map.put(vector2, new DataOres(blockState, color));
+                        } else {
+                            map.replace(vector2, new DataOres(blockState, color));
+                        }
+                    } else {
+
+                        if (!map.containsKey(vector2)) {
+                            map.put(vector2, new DataOres(blockState, blockState.getMapColor(
+                                    chunk.getLevel(),
+                                    new BlockPos(x, y, z)
+                            ).col | -16777216));
+                        }
+                    }
+                }
+            }
         }
-        return new ModelResourceLocation(loc, null);
+        return map;
     }
 
-    public static int getOreColor(IBlockState state) {
+    public static int getOreColor(BlockState state) {
         Block block = state.getBlock();
+        if (dataColors.containsKey(state)) {
+            return dataColors.get(state);
+        }
         if (block == Blocks.IRON_ORE) {
             return ModUtils.convertRGBcolorToInt(156, 156, 156);
         } else if (block == Blocks.GOLD_ORE) {
@@ -91,18 +135,20 @@ public class ItemVeinSensor extends ItemSubTypes<ItemVeinSensor.Types> implement
             return 0xFF00FFFF;
         } else if (block == Blocks.LAPIS_ORE) {
             return ModUtils.convertRGBcolorToInt(30, 50, 173);
-        } else if (block == Blocks.REDSTONE_ORE || block == Blocks.LIT_REDSTONE_ORE) {
+        } else if (block == Blocks.REDSTONE_ORE) {
             return ModUtils.convertRGBcolorToInt(173, 30, 30);
         } else if (block == Blocks.COAL_ORE) {
             return ModUtils.convertRGBcolorToInt(4, 4, 4);
         } else if (block == Blocks.EMERALD_ORE) {
             return ModUtils.convertRGBcolorToInt(0, 232, 0);
-        } else if (block == Blocks.QUARTZ_ORE) {
+        } else if (block == Blocks.COPPER_ORE) {
+            return ModUtils.convertRGBcolorToInt(255, 144, 0);
+        } else if (block == Blocks.NETHER_QUARTZ_ORE) {
             return ModUtils.convertRGBcolorToInt(223, 223, 223);
-        } else if (block == IUItem.toriyore) {
+        } else if (block == IUItem.toriyore.getBlock(0)) {
             return ModUtils.convertRGBcolorToInt(134, 134, 139);
         } else if (block instanceof BlockClassicOre) {
-            final int meta = block.getMetaFromState(state);
+            final int meta = ((ISubEnum) ((BlockClassicOre) block).getElement()).getId();
             switch (meta) {
                 case 0:
                     return ModUtils.convertRGBcolorToInt(255, 144, 0);
@@ -115,7 +161,7 @@ public class ItemVeinSensor extends ItemSubTypes<ItemVeinSensor.Types> implement
             }
             return ModUtils.convertRGBcolorToInt(4, 4, 4);
         } else if (block instanceof BlocksRadiationOre) {
-            final int meta = block.getMetaFromState(state);
+            final int meta = ((ISubEnum) ((BlocksRadiationOre) block).getElement()).getId();
             switch (meta) {
                 case 0:
                     return ModUtils.convertRGBcolorToInt(120, 152, 183);
@@ -126,7 +172,7 @@ public class ItemVeinSensor extends ItemSubTypes<ItemVeinSensor.Types> implement
             }
             return ModUtils.convertRGBcolorToInt(4, 4, 4);
         } else if (block instanceof BlockPreciousOre) {
-            final int meta = block.getMetaFromState(state);
+            final int meta = ((ISubEnum) ((BlockPreciousOre) block).getElement()).getId();
             switch (meta) {
                 case 0:
                     return ModUtils.convertRGBcolorToInt(251, 140, 119);
@@ -139,7 +185,7 @@ public class ItemVeinSensor extends ItemSubTypes<ItemVeinSensor.Types> implement
             }
             return ModUtils.convertRGBcolorToInt(4, 4, 4);
         } else if (block instanceof BlockOre) {
-            final int meta = block.getMetaFromState(state);
+            final int meta = ((ISubEnum) ((BlockOre) block).getElement()).getId();
             switch (meta) {
                 case 0:
                     return ModUtils.convertRGBcolorToInt(119, 210, 202);
@@ -176,7 +222,7 @@ public class ItemVeinSensor extends ItemSubTypes<ItemVeinSensor.Types> implement
             }
             return ModUtils.convertRGBcolorToInt(4, 4, 4);
         } else if (block instanceof BlockApatite) {
-            final int meta = block.getMetaFromState(state);
+            final int meta = ((ISubEnum) ((BlockApatite) block).getElement()).getId();
             switch (meta) {
                 case 0:
                     return ModUtils.convertRGBcolorToInt(48, 86, 16);
@@ -191,7 +237,7 @@ public class ItemVeinSensor extends ItemSubTypes<ItemVeinSensor.Types> implement
             }
             return ModUtils.convertRGBcolorToInt(4, 4, 4);
         } else if (block instanceof BlockHeavyOre) {
-            final int meta = block.getMetaFromState(state);
+            final int meta = ((ISubEnum) ((BlockHeavyOre) block).getElement()).getId();
             switch (meta) {
                 case 0:
                     return ModUtils.convertRGBcolorToInt(137, 131, 149);
@@ -218,7 +264,7 @@ public class ItemVeinSensor extends ItemSubTypes<ItemVeinSensor.Types> implement
                 case 11:
                     return ModUtils.convertRGBcolorToInt(109, 206, 167);
                 case 12:
-                    return ModUtils.convertRGBcolorToInt(110, 110, 110);
+                    return ModUtils.convertRGBcolorToInt(76, 76, 76);
                 case 13:
                     return ModUtils.convertRGBcolorToInt(198, 147, 64);
                 case 14:
@@ -228,7 +274,7 @@ public class ItemVeinSensor extends ItemSubTypes<ItemVeinSensor.Types> implement
             }
             return ModUtils.convertRGBcolorToInt(4, 4, 4);
         } else if (block instanceof BlockMineral) {
-            final int meta = block.getMetaFromState(state);
+            final int meta = ((ISubEnum) ((BlockMineral) block).getElement()).getId();
             switch (meta) {
                 case 0:
                     return ModUtils.convertRGBcolorToInt(12, 166, 166);
@@ -259,7 +305,7 @@ public class ItemVeinSensor extends ItemSubTypes<ItemVeinSensor.Types> implement
             }
             return ModUtils.convertRGBcolorToInt(4, 4, 4);
         } else if (block instanceof BlockOres3) {
-            final int meta = block.getMetaFromState(state);
+            final int meta = ((ISubEnum) ((BlockOres3) block).getElement()).getId();
             switch (meta) {
                 case 0:
                     return ModUtils.convertRGBcolorToInt(191, 212, 65);
@@ -296,7 +342,7 @@ public class ItemVeinSensor extends ItemSubTypes<ItemVeinSensor.Types> implement
             }
             return ModUtils.convertRGBcolorToInt(4, 4, 4);
         } else if (block instanceof BlockOres2) {
-            final int meta = block.getMetaFromState(state);
+            final int meta = ((ISubEnum) ((BlockOres2) block).getElement()).getId();
             switch (meta) {
                 case 0:
                     return ModUtils.convertRGBcolorToInt(190, 207, 214);
@@ -321,15 +367,20 @@ public class ItemVeinSensor extends ItemSubTypes<ItemVeinSensor.Types> implement
         return 0xFFFFFFFF;
     }
 
-    public IAdvInventory getInventory(EntityPlayer player, ItemStack stack) {
+    @Override
+    public CreativeModeTab getItemCategory() {
+        return IUCore.EnergyTab;
+    }
+
+    public CustomWorldContainer getInventory(Player player, ItemStack stack) {
         Map<Integer, Map<Vector2, DataOres>> map = new HashMap<>();
-        ChunkPos pos = new ChunkPos(new BlockPos(player.posX, player.posY, player.posZ));
+        ChunkPos pos = new ChunkPos(new BlockPos((int) player.getX(), (int) player.getY(), (int) player.getZ()));
         ChunkPos pos2 = new ChunkPos(pos.x - 4, pos.z - 4);
         int i = 0;
         for (int x = -4; x < 5; x++) {
             for (int z = -4; z < 5; z++) {
                 ChunkPos chunkPos = new ChunkPos(pos.x + x, pos.z + z);
-                Chunk chunk = player.getEntityWorld().getChunkFromChunkCoords(chunkPos.x, chunkPos.z);
+                LevelChunk chunk = player.level().getChunk(chunkPos.x, chunkPos.z);
                 Map<Vector2, DataOres> map1 = getDataChunk(chunk);
                 map.put(i, map1);
                 i++;
@@ -339,131 +390,149 @@ public class ItemVeinSensor extends ItemSubTypes<ItemVeinSensor.Types> implement
     }
 
     @Override
-    public void registerModels() {
-        registerModels("sensor");
-    }
-
-    public String getUnlocalizedName() {
-        return "iu." + super.getUnlocalizedName().substring(3);
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void addInformation(
-            final ItemStack stack,
-            @Nullable final World worldIn,
-            final List<String> tooltip,
-            final ITooltipFlag flagIn
-    ) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
-        final NBTTagCompound nbt = ModUtils.nbt(stack);
-        tooltip.add(Localization.translate("iu.sensor.info"));
-
-        if (!nbt.getString("type").equals("")) {
-            String s = nbt.getString("type");
-            if (!s.equals("oil") && !s.equals("gas")) {
-                tooltip.add(Localization.translate("iu.vein_info") + Localization.translate("iu." + s + ".name"));
-            } else {
-                if (!s.equals("gas")) {
-                    tooltip.add(Localization.translate("iu.vein_info") + Localization.translate("iu.oil_vein"));
-                } else {
-                    tooltip.add(Localization.translate("iu.vein_info") + Localization.translate("iu.fluidgas"));
-                }
-
-            }
-            int x = nbt.getInteger("x");
-            int z = nbt.getInteger("z");
-            tooltip.add(Localization.translate("iu.modulewirelles1") + "x: " + x + " z: " + z);
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void registerModels(final String name) {
-        ModelLoader.setCustomMeshDefinition(this, stack -> {
-            final NBTTagCompound nbt = ModUtils.nbt(stack);
-            if (!nbt.getString("type").equals("")) {
-                return getModelLocation1(name, nbt.getString("type"));
-            }
-
-            return getModelLocation1(name, "");
-
-        });
-        String[] mode = {"", "magnetite", "calaverite", "galena", "nickelite", "pyrite", "quartzite", "uranite", "azurite",
-                "rhodonite", "alfildit", "euxenite", "smithsonite", "ilmenite", "todorokite", "ferroaugite", "sheelite",
-                "oil", "arsenopyrite", "braggite", "wolframite", "germanite", "coltan", "crocoite", "xenotime", "iridosmine",
-                "theoprastite", "tetrahedrite", "fergusonite", "celestine", "zircon", "crystal", "gas"};
-        for (final String s : mode) {
-            if (s.equals("")) {
-                ModelBakery.registerItemVariants(this, getModelLocation1(name, s));
-            }
-            ModelBakery.registerItemVariants(this, getModelLocation1(name, s));
-
-        }
-
-    }
-
-    @Nonnull
-    public ActionResult<ItemStack> onItemRightClick(@Nonnull World world, EntityPlayer player, @Nonnull EnumHand hand) {
-
-        if (IUCore.proxy.isSimulating()) {
-            player.openGui(IUCore.instance, 1, world, (int) player.posX, (int) player.posY, (int) player.posZ);
-            return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
-
-        }
-        return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
-    }
-
-    public Map<Vector2, DataOres> getDataChunk(Chunk chunk) {
-
-        Map<Vector2, DataOres> map = new HashMap<>();
-        for (int x = chunk.x * 16; x < chunk.x * 16 + 16; x++) {
-            for (int z = chunk.z * 16; z < chunk.z * 16 + 16; z++) {
-                for (int y = 40; y < chunk.getHeight(new BlockPos(x, 0, z)); y++) {
-                    IBlockState blockState = chunk.getBlockState(x, y, z);
-                    int color = getOreColor(blockState);
-                    Vector2 vector2 = new Vector2(x, z);
-                    if (color != 0xFFFFFFFF) {
-                        if (!map.containsKey(vector2)) {
-                            map.put(vector2, new DataOres(blockState, color));
-                        } else {
-                            map.replace(vector2, new DataOres(blockState, color));
-                        }
-                    } else {
-
-                        if (!map.containsKey(vector2)) {
-                            map.put(vector2, new DataOres(blockState, blockState.getMapColor(
-                                    chunk.getWorld(),
-                                    new BlockPos(x, y, z)
-                            ).colorValue | -16777216));
-                        }
-                    }
-                }
-            }
-        }
-        return map;
-    }
-
-    @Override
     public void updateField(final String name, final CustomPacketBuffer buffer, final ItemStack stack) {
 
     }
 
     @Override
     public void updateEvent(final int event, final ItemStack stack) {
-        final NBTTagCompound nbt = ModUtils.nbt(stack);
-        final List<Integer> list1 = Arrays.stream(nbt.getIntArray("list"))
-                .boxed()
-                .collect(Collectors.toList());
+
+        List<Integer> list1 = stack.getOrDefault(DataComponentsInit.LIST_INTEGER, new ArrayList<>());
+        list1 = new ArrayList<>(list1);
         if (list1.contains(event)) {
             list1.remove((Object) event);
         } else {
             list1.add(event);
         }
-        nbt.setIntArray("list", list1.stream().mapToInt(Integer::intValue).toArray());
+        stack.set(DataComponentsInit.LIST_INTEGER, list1);
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void appendHoverText(
+            final ItemStack stack,
+            @Nullable final Level worldIn,
+            final List<Component> tooltip,
+            final TooltipFlag flagIn
+    ) {
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
+
+        tooltip.add(Component.translatable("iu.sensor.info"));
+        tooltip.add(Component.translatable("iu.scanner_ore.info4"));
+        tooltip.add(Component.translatable("iu.scanner_ore.info4"));
+        tooltip.add(Component.literal(Localization.translate("iu.vein_sensor.info7") + com.denfop.utils.ModUtils.cleanComponentString(KeyboardClient.changemode.getKey().getDisplayName().getString()) + Localization.translate(
+                "iu.changemode_rcm")));
+        tooltip.add(Component.translatable("iu.vein_sensor.info8"));
+        if (stack.has(DataComponentsInit.VEIN_INFO)) {
+            @Nullable VeinInfo info = stack.get(DataComponentsInit.VEIN_INFO);
+            String s = info.type();
+            if (!s.equals("oil") && !s.equals("gas")) {
+                tooltip.add(Component.translatable("iu.vein_info").append(Component.translatable("iu." + s + ".name")));
+            } else {
+                if (!s.equals("gas")) {
+                    tooltip.add(Component.translatable("iu.vein_info").append(Component.translatable("iu.oil_vein")));
+                } else {
+                    tooltip.add(Component.translatable("iu.vein_info").append(Component.translatable("iu.fluidgas")));
+                }
+            }
+
+            int x = info.x();
+            int z = info.z();
+            tooltip.add(Component.translatable("iu.modulewirelles1").append(" x: " + x + " z: " + z));
+        }
+    }
+
+    @Override
+    @Nonnull
+    public InteractionResultHolder<ItemStack> use(@Nonnull Level world, @Nonnull Player player, @Nonnull InteractionHand hand) {
+        ItemStack stack = ModUtils.get(player, hand);
+        if (player.isShiftKeyDown()) {
+            stack.set(DataComponentsInit.LIST_INTEGER, new ArrayList<>());
+            return InteractionResultHolder.success(player.getItemInHand(hand));
+        } else {
+            if (!world.isClientSide) {
+                if (IUCore.keyboard.isChangeKeyDown(player)) {
+                    final List<Integer> list1 = stack.getOrDefault(DataComponentsInit.LIST_INTEGER, new ArrayList<>());
+                    if (!list1.isEmpty()) {
+                        int meta = list1.get(0);
+                        BlockState state = WorldBaseGen.blockStateMap.get(meta);
+                        List<Integer> veinTypes = new LinkedList<>();
+                        for (VeinType vein : WorldBaseGen.veinTypes) {
+                            if ((vein.getHeavyOre() != null && vein.getHeavyOre().getStateMeta(vein.getMeta()) == state) || inChanceOre(
+                                    vein,
+                                    state
+                            )) {
+                                veinTypes.add(vein.getId());
+                            }
+                        }
+
+                        ChunkPos chunkPos1 = new ChunkPos(BlockPos.containing(player.position()));
+                        Set<ChunkPos> chunkPosList = new HashSet<>();
+                        for (int x = -16; x < 17; x++)
+                            for (int z = -16; z < 17; z++) {
+                                chunkPosList.add(new ChunkPos(chunkPos1.x + x, chunkPos1.z + z));
+                            }
+                        for (ChunkPos chunkPos : chunkPosList) {
+                            Map<Integer, Tuple<Color, Integer>> tupleMap = shellClusterChuncks.get(chunkPos.x % 256);
+                            if (tupleMap == null)
+                                continue;
+                            Tuple<Color, Integer> tuple = tupleMap.get(chunkPos.z % 256);
+
+                            if (tuple != null) {
+
+                                VeinType veinType = veinTypeMap.get(tuple.getB());
+                                if (veinTypes.contains(veinType.getId())) {
+                                    final String s = Localization.translate("deposists.jei1") + (veinType.getHeavyOre() != null ?
+                                            com.denfop.utils.ModUtils.cleanComponentString(new ItemStack(veinType.getHeavyOre().getBlock(), 1).getDisplayName().getString()) :
+                                            com.denfop.utils.ModUtils.cleanComponentString(new ItemStack(veinType.getOres().get(0).getBlock().getBlock(), 1
+                                            ).getDisplayName().getString()));
+                                    IUCore.proxy.messagePlayer(
+                                            player,
+                                            Component.literal(
+                                                    "X: " + (chunkPos.getMinBlockX() + 16) +
+                                                            ", Z: " + (chunkPos.getMinBlockZ() + 16) +
+                                                            " " + s
+                                            ).getString()
+                                    );
+                                }
+                            }
+                        }
+                    }
+                    return InteractionResultHolder.success(player.getItemInHand(hand));
+                }
+                CustomPacketBuffer growingBuffer = new CustomPacketBuffer(player.registryAccess());
+
+                growingBuffer.writeByte(1);
+
+                growingBuffer.flip();
+                player.openMenu(getInventory(player, player.getItemInHand(hand)), buf -> buf.writeBytes(growingBuffer));
+
+
+                return InteractionResultHolder.success(player.getItemInHand(hand));
+
+            }
+        }
+        return InteractionResultHolder.pass(player.getItemInHand(hand));
+    }
+
+    @Override
+    public String[] properties() {
+        return new String[]{"type"};
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public float getItemProperty(ItemStack itemStack, ClientLevel level, LivingEntity entity, int p174679, String property) {
+        if (itemStack.has(DataComponentsInit.VEIN_INFO)) {
+            String type = itemStack.get(DataComponentsInit.VEIN_INFO).type();
+            return ORE_INDEX_MAP.get(type);
+        }
+        return -1;
     }
 
     public enum Types implements ISubEnum {
-        sensor(0);
+        sensor(0),
+        ;
 
         private final String name;
         private final int ID;
@@ -481,9 +550,13 @@ public class ItemVeinSensor extends ItemSubTypes<ItemVeinSensor.Types> implement
             return this.name;
         }
 
+        @Override
+        public String getMainPath() {
+            return "sensor";
+        }
+
         public int getId() {
             return this.ID;
         }
     }
-
 }

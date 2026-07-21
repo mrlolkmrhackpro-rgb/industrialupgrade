@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=limiter": {
+      "model": "industrialupgrade:block/basemachine/limiter"
+    },
+    "facing=south,type=limiter": {
+      "model": "industrialupgrade:block/basemachine/limiter",
+      "y": 180
+    },
+    "facing=west,type=limiter": {
+      "model": "industrialupgrade:block/basemachine/limiter",
+      "y": 270
+    },
+    "facing=east,type=limiter": {
+      "model": "industrialupgrade:block/basemachine/limiter",
+      "y": 90
+    },
+    "facing=north,type=limiter_active": {
+      "model": "industrialupgrade:block/basemachine/limiter"
+    },
+    "facing=south,type=limiter_active": {
+      "model": "industrialupgrade:block/basemachine/limiter",
+      "y": 180
+    },
+    "facing=west,type=limiter_active": {
+      "model": "industrialupgrade:block/basemachine/limiter",
+      "y": 270
+    },
+    "facing=east,type=limiter_active": {
+      "model": "industrialupgrade:block/basemachine/limiter",
+      "y": 90
+    }
+  }
+}

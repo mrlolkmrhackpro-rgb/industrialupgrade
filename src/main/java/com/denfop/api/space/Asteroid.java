@@ -1,6 +1,7 @@
 package com.denfop.api.space;
 
-import net.minecraft.util.ResourceLocation;
+
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +87,7 @@ public class Asteroid implements IAsteroid {
 
     @Override
     public double getOrbitPeriod() {
-        return time;
+        return 0.5;
     }
 
     @Override
@@ -106,7 +107,7 @@ public class Asteroid implements IAsteroid {
 
     @Override
     public double getDistance() {
-        return distance;
+        return minLocation;
     }
 
     @Override

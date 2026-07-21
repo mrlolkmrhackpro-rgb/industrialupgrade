@@ -1,0 +1,22 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "industrialupgrade:module_schedule"
+    },
+    "C": {
+      "item": "industrialupgrade:energy/purifier"
+    }
+  },
+  "pattern": [
+    "   ",
+    " C ",
+    " B "
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:additionmodule/purifier"
+  },
+  "show_notification": false
+}

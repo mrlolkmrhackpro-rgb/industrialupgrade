@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=quad_handlerho": {
+      "model": "industrialupgrade:block/basemachine/quad_handlerho"
+    },
+    "facing=south,type=quad_handlerho": {
+      "model": "industrialupgrade:block/basemachine/quad_handlerho",
+      "y": 180
+    },
+    "facing=west,type=quad_handlerho": {
+      "model": "industrialupgrade:block/basemachine/quad_handlerho",
+      "y": 270
+    },
+    "facing=east,type=quad_handlerho": {
+      "model": "industrialupgrade:block/basemachine/quad_handlerho",
+      "y": 90
+    },
+    "facing=north,type=quad_handlerho_active": {
+      "model": "industrialupgrade:block/basemachine/quad_handlerho_active"
+    },
+    "facing=south,type=quad_handlerho_active": {
+      "model": "industrialupgrade:block/basemachine/quad_handlerho_active",
+      "y": 180
+    },
+    "facing=west,type=quad_handlerho_active": {
+      "model": "industrialupgrade:block/basemachine/quad_handlerho_active",
+      "y": 270
+    },
+    "facing=east,type=quad_handlerho_active": {
+      "model": "industrialupgrade:block/basemachine/quad_handlerho_active",
+      "y": 90
+    }
+  }
+}

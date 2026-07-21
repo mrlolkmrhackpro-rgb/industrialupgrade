@@ -1,0 +1,35 @@
+{
+  "variants": {
+    "facing=north,type=se_gen": {
+      "model": "industrialupgrade:block/solarenergy/se_gen"
+    },
+    "facing=south,type=se_gen": {
+      "model": "industrialupgrade:block/solarenergy/se_gen",
+      "y": 180
+    },
+    "facing=west,type=se_gen": {
+      "model": "industrialupgrade:block/solarenergy/se_gen",
+      "y": 270
+    },
+    "facing=east,type=se_gen": {
+      "model": "industrialupgrade:block/solarenergy/se_gen",
+      "y": 90
+    },
+   
+    "facing=north,type=se_gen_invalid": {
+      "model": "industrialupgrade:block/solarenergy/se_gen"
+    },
+    "facing=south,type=se_gen_invalid": {
+      "model": "industrialupgrade:block/solarenergy/se_gen",
+      "y": 180
+    },
+    "facing=west,type=se_gen_invalid": {
+      "model": "industrialupgrade:block/solarenergy/se_gen",
+      "y": 270
+    },
+    "facing=east,type=se_gen_invalid": {
+      "model": "industrialupgrade:block/solarenergy/se_gen",
+      "y": 90
+    }
+  }
+}

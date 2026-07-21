@@ -1,21 +1,27 @@
 package com.denfop.integration.jei.cutting;
 
 
+import com.denfop.integration.jei.IJeiVariantRecipe;
+import com.denfop.integration.jei.JeiIngredientHelper;
 import com.denfop.api.Recipes;
 import com.denfop.api.recipe.BaseMachineRecipe;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CuttingHandler {
+public class CuttingHandler implements IJeiVariantRecipe {
 
     private static final List<CuttingHandler> recipes = new ArrayList<>();
-    private final ItemStack input, output;
+    
+    private List<List<ItemStack>> inputVariants = new ArrayList<>();
+private final ItemStack input, output;
+    private final BaseMachineRecipe container;
 
-    public CuttingHandler(ItemStack input, ItemStack output) {
+    public CuttingHandler(ItemStack input, ItemStack output, BaseMachineRecipe container) {
         this.input = input;
         this.output = output;
+        this.container = container;
     }
 
     public static List<CuttingHandler> getRecipes() {
@@ -25,8 +31,8 @@ public class CuttingHandler {
         return recipes;
     }
 
-    public static CuttingHandler addRecipe(ItemStack input, ItemStack output) {
-        CuttingHandler recipe = new CuttingHandler(input, output);
+    public static CuttingHandler addRecipe(ItemStack input, ItemStack output, BaseMachineRecipe container) {
+        CuttingHandler recipe = new CuttingHandler(input, output, container);
         if (recipes.contains(recipe)) {
             return null;
         }
@@ -49,16 +55,22 @@ public class CuttingHandler {
     public static void initRecipes() {
         for (BaseMachineRecipe container : Recipes.recipes.getRecipeList("cutting")) {
 
-
-            addRecipe(
-                    container.input.getInputs().get(0).getInputs().get(0),
-                    container.getOutput().items.get(0)
-            );
-
+            try {
+                JeiIngredientHelper.attachInputVariants(addRecipe(
+                        container.input.getInputs().get(0).getInputs().get(0),
+                        container.getOutput().items.get(0), container
+                ), container);
+            } catch (Exception e) {
+                System.out.println(2);
+            }
+            ;
 
         }
     }
 
+    public BaseMachineRecipe getContainer() {
+        return container;
+    }
 
     public ItemStack getInput() { // Получатель входного предмета рецепта.
         return input;
@@ -72,4 +84,15 @@ public class CuttingHandler {
         return is.getItem() == input.getItem();
     }
 
+
+
+    @Override
+    public void setInputVariants(final List<List<ItemStack>> inputVariants) {
+        this.inputVariants = inputVariants == null ? new ArrayList<>() : inputVariants;
+    }
+
+    @Override
+    public List<ItemStack> getInputVariants(final int slot, final ItemStack fallback) {
+        return JeiIngredientHelper.getInputVariants(this.inputVariants, slot, fallback);
+    }
 }

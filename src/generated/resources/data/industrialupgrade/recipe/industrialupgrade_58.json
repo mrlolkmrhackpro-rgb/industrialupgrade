@@ -1,0 +1,25 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:upgrades/transformer"
+    },
+    "B": {
+      "item": "industrialupgrade:high_current_converter_to_low"
+    },
+    "D": {
+      "item": "industrialupgrade:wiring/gold1"
+    }
+  },
+  "pattern": [
+    "A A",
+    "DBD",
+    "   "
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:upgrades/transformerupgrade1"
+  },
+  "show_notification": false
+}

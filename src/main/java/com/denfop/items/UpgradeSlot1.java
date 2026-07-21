@@ -1,8 +1,8 @@
 package com.denfop.items;
 
-import com.denfop.api.inv.VirtualSlot;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import com.denfop.api.menu.VirtualSlot;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,7 +17,7 @@ public class UpgradeSlot1 implements VirtualSlot {
 
     @Override
     public ItemStack get(final int index) {
-        return itemStacks.getStackInSlot(index);
+        return itemStacks.getItem(index);
     }
 
     @Override
@@ -37,11 +37,11 @@ public class UpgradeSlot1 implements VirtualSlot {
 
     @Override
     public int size() {
-        return itemStacks.getSizeInventory();
+        return itemStacks.getContainerSize();
     }
 
     @Override
-    public boolean accepts(final int index, final ItemStack stack) {
+    public boolean canPlaceVirtualItem(final int index, final ItemStack stack) {
         return true;
     }
 

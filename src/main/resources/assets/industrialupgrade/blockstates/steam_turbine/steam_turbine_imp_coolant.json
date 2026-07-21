@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=steam_turbine_imp_coolant": {
+      "model": "industrialupgrade:block/steam_turbine/steam_turbine_imp_coolant"
+    },
+    "facing=south,type=steam_turbine_imp_coolant": {
+      "model": "industrialupgrade:block/steam_turbine/steam_turbine_imp_coolant",
+      "y": 180
+    },
+    "facing=west,type=steam_turbine_imp_coolant": {
+      "model": "industrialupgrade:block/steam_turbine/steam_turbine_imp_coolant",
+      "y": 270
+    },
+    "facing=east,type=steam_turbine_imp_coolant": {
+      "model": "industrialupgrade:block/steam_turbine/steam_turbine_imp_coolant",
+      "y": 90
+    },
+    "facing=north,type=steam_turbine_imp_coolant_active": {
+      "model": "industrialupgrade:block/steam_turbine/steam_turbine_imp_coolant"
+    },
+    "facing=south,type=steam_turbine_imp_coolant_active": {
+      "model": "industrialupgrade:block/steam_turbine/steam_turbine_imp_coolant",
+      "y": 180
+    },
+    "facing=west,type=steam_turbine_imp_coolant_active": {
+      "model": "industrialupgrade:block/steam_turbine/steam_turbine_imp_coolant",
+      "y": 270
+    },
+    "facing=east,type=steam_turbine_imp_coolant_active": {
+      "model": "industrialupgrade:block/steam_turbine/steam_turbine_imp_coolant",
+      "y": 90
+    }
+  }
+}

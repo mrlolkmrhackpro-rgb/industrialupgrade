@@ -1,17 +1,20 @@
 package com.denfop.integration.jei.rods_factory;
 
 
+import com.denfop.integration.jei.JeiIngredientHelper;
+import com.denfop.integration.jei.IJeiVariantRecipe;
 import com.denfop.api.Recipes;
 import com.denfop.api.recipe.BaseMachineRecipe;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RodFactoryHandler {
+public class RodFactoryHandler implements IJeiVariantRecipe {
 
     private static final List<RodFactoryHandler> recipes = new ArrayList<>();
     private final ItemStack output;
+    private List<List<ItemStack>> inputVariants = new ArrayList<>();
     private final List<ItemStack> inputs;
 
     public RodFactoryHandler(
@@ -57,26 +60,26 @@ public class RodFactoryHandler {
         for (BaseMachineRecipe container : Recipes.recipes.getRecipeList("reactor_simple_rod")) {
             List<ItemStack> stacks = new ArrayList<>();
             container.input.getInputs().forEach(iInputItemStack -> stacks.add(iInputItemStack.getInputs().get(0)));
-            addRecipe(
+            JeiIngredientHelper.attachInputVariants(addRecipe(
                     stacks,
                     container.getOutput().items.get(0)
-            );
+            ), container);
         }
         for (BaseMachineRecipe container : Recipes.recipes.getRecipeList("reactor_dual_rod")) {
             List<ItemStack> stacks = new ArrayList<>();
             container.input.getInputs().forEach(iInputItemStack -> stacks.add(iInputItemStack.getInputs().get(0)));
-            addRecipe(
+            JeiIngredientHelper.attachInputVariants(addRecipe(
                     stacks,
                     container.getOutput().items.get(0)
-            );
+            ), container);
         }
         for (BaseMachineRecipe container : Recipes.recipes.getRecipeList("reactor_quad_rod")) {
             List<ItemStack> stacks = new ArrayList<>();
             container.input.getInputs().forEach(iInputItemStack -> stacks.add(iInputItemStack.getInputs().get(0)));
-            addRecipe(
+            JeiIngredientHelper.attachInputVariants(addRecipe(
                     stacks,
                     container.getOutput().items.get(0)
-            );
+            ), container);
         }
     }
 
@@ -91,11 +94,20 @@ public class RodFactoryHandler {
 
     public boolean matchesInput(ItemStack is) {
         for (ItemStack input : this.getInputs()) {
-            if (input.isItemEqual(is)) {
-                return true;
-            }
+
         }
         return false;
     }
 
+
+
+    @Override
+    public void setInputVariants(final List<List<ItemStack>> inputVariants) {
+        this.inputVariants = inputVariants == null ? new ArrayList<>() : inputVariants;
+    }
+
+    @Override
+    public List<ItemStack> getInputVariants(final int slot, final ItemStack fallback) {
+        return JeiIngredientHelper.getInputVariants(this.inputVariants, slot, fallback);
+    }
 }

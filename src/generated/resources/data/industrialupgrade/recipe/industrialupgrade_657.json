@@ -1,0 +1,25 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "minecraft:chest"
+    },
+    "B": {
+      "item": "minecraft:leather"
+    },
+    "C": {
+      "item": "industrialupgrade:single_use_battery"
+    }
+  },
+  "pattern": [
+    "BCB",
+    "BAB",
+    "B B"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:bags/iu_bags"
+  },
+  "show_notification": false
+}

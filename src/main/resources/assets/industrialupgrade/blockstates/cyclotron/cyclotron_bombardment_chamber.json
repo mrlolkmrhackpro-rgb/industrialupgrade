@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=cyclotron_bombardment_chamber": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_bombardment_chamber"
+    },
+    "facing=south,type=cyclotron_bombardment_chamber": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_bombardment_chamber",
+      "y": 180
+    },
+    "facing=west,type=cyclotron_bombardment_chamber": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_bombardment_chamber",
+      "y": 270
+    },
+    "facing=east,type=cyclotron_bombardment_chamber": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_bombardment_chamber",
+      "y": 90
+    },
+    "facing=north,type=cyclotron_bombardment_chamber_active": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_bombardment_chamber"
+    },
+    "facing=south,type=cyclotron_bombardment_chamber_active": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_bombardment_chamber",
+      "y": 180
+    },
+    "facing=west,type=cyclotron_bombardment_chamber_active": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_bombardment_chamber",
+      "y": 270
+    },
+    "facing=east,type=cyclotron_bombardment_chamber_active": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_bombardment_chamber",
+      "y": 90
+    }
+  }
+}

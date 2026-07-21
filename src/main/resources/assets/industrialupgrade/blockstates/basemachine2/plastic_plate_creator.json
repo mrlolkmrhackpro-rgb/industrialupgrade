@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=plastic_plate_creator": {
+      "model": "industrialupgrade:block/basemachine/plastic_plate_creator"
+    },
+    "facing=south,type=plastic_plate_creator": {
+      "model": "industrialupgrade:block/basemachine/plastic_plate_creator",
+      "y": 180
+    },
+    "facing=west,type=plastic_plate_creator": {
+      "model": "industrialupgrade:block/basemachine/plastic_plate_creator",
+      "y": 270
+    },
+    "facing=east,type=plastic_plate_creator": {
+      "model": "industrialupgrade:block/basemachine/plastic_plate_creator",
+      "y": 90
+    },
+    "facing=north,type=plastic_plate_creator_active": {
+      "model": "industrialupgrade:block/basemachine/plastic_plate_creator_active"
+    },
+    "facing=south,type=plastic_plate_creator_active": {
+      "model": "industrialupgrade:block/basemachine/plastic_plate_creator_active",
+      "y": 180
+    },
+    "facing=west,type=plastic_plate_creator_active": {
+      "model": "industrialupgrade:block/basemachine/plastic_plate_creator_active",
+      "y": 270
+    },
+    "facing=east,type=plastic_plate_creator_active": {
+      "model": "industrialupgrade:block/basemachine/plastic_plate_creator_active",
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "values": [
+    "industrialupgrade:baseore2/hafnium",
+    "industrialupgrade:blockspace3/oberon_hafnium",
+    "industrialupgrade:asteroidore1/asteroid_hafnium_ore",
+    "industrialupgrade:deepore1/deep_hafnium_ore"
+  ]
+}

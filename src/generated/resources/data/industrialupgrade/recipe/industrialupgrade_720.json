@@ -1,0 +1,31 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:nanobox"
+    },
+    "B": {
+      "item": "industrialupgrade:rotorupgrade_schemes"
+    },
+    "C": {
+      "item": "industrialupgrade:crafting_elements/crafting_285_element"
+    },
+    "D": {
+      "tag": "c:doubleplate/vitalium"
+    },
+    "E": {
+      "item": "industrialupgrade:itemcore/quacore"
+    }
+  },
+  "pattern": [
+    "ADA",
+    "CBC",
+    "DED"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:rotors_upgrade/rotorupgrade14"
+  },
+  "show_notification": false
+}

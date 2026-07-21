@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=radiation_purifier": {
+      "model": "industrialupgrade:block/basemachine/radiation_purifier"
+    },
+    "facing=south,type=radiation_purifier": {
+      "model": "industrialupgrade:block/basemachine/radiation_purifier",
+      "y": 180
+    },
+    "facing=west,type=radiation_purifier": {
+      "model": "industrialupgrade:block/basemachine/radiation_purifier",
+      "y": 270
+    },
+    "facing=east,type=radiation_purifier": {
+      "model": "industrialupgrade:block/basemachine/radiation_purifier",
+      "y": 90
+    },
+    "facing=north,type=radiation_purifier_active": {
+      "model": "industrialupgrade:block/basemachine/radiation_purifier_active"
+    },
+    "facing=south,type=radiation_purifier_active": {
+      "model": "industrialupgrade:block/basemachine/radiation_purifier_active",
+      "y": 180
+    },
+    "facing=west,type=radiation_purifier_active": {
+      "model": "industrialupgrade:block/basemachine/radiation_purifier_active",
+      "y": 270
+    },
+    "facing=east,type=radiation_purifier_active": {
+      "model": "industrialupgrade:block/basemachine/radiation_purifier_active",
+      "y": 90
+    }
+  }
+}

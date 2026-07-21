@@ -1,9 +1,11 @@
 package com.denfop.integration.jei.crops;
 
 
-import com.denfop.api.agriculture.CropNetwork;
-import com.denfop.api.agriculture.ICrop;
-import net.minecraft.item.ItemStack;
+import com.denfop.IUItem;
+import com.denfop.api.crop.CropNetwork;
+import com.denfop.api.crop.ICrop;
+import com.denfop.datacomponent.DataComponentsInit;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +56,22 @@ public class CropCrossoverHandler {
         });
 
 
+    }
+
+    public ItemStack getOutputs() {
+        ItemStack stack = new ItemStack(IUItem.crops.getStack(0));
+        stack.set(DataComponentsInit.CROP, output.getId());
+        return stack;
+    }
+
+    public List<ItemStack> getInputs() {
+        List<ItemStack> itemStackList = new ArrayList<>();
+        inputs.forEach(crop -> {
+            ItemStack stack = new ItemStack(IUItem.crops.getStack(0));
+            stack.set(DataComponentsInit.CROP, crop.getId());
+            itemStackList.add(stack);
+        });
+        return itemStackList;
     }
 
 

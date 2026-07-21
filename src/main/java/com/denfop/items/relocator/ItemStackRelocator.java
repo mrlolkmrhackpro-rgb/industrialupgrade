@@ -1,20 +1,18 @@
 package com.denfop.items.relocator;
 
-import com.denfop.container.ContainerBase;
-import com.denfop.container.ContainerRelocator;
-import com.denfop.container.ContainerRelocatorAddPoint;
-import com.denfop.gui.GuiRelocator;
-import com.denfop.gui.GuiRelocatorAddPoint;
-import com.denfop.invslot.Inventory;
+import com.denfop.containermenu.ContainerMenuBase;
+import com.denfop.containermenu.ContainerMenuRelocator;
+import com.denfop.containermenu.ContainerMenuRelocatorAddPoint;
 import com.denfop.items.ItemStackInventory;
 import com.denfop.network.packet.CustomPacketBuffer;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.denfop.screen.ScreenIndustrialUpgrade;
+import com.denfop.screen.ScreenRelocator;
+import com.denfop.screen.ScreenRelocatorAddPoint;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,18 +22,15 @@ public class ItemStackRelocator extends ItemStackInventory {
     private final boolean sneaking;
     public List<Point> points = new ArrayList<>();
 
-    public ItemStackRelocator(EntityPlayer player, ItemStack stack) {
+    public ItemStackRelocator(Player player, ItemStack stack) {
         super(player, stack, 0);
         this.itemStack1 = stack;
-        this.sneaking = player.isSneaking();
-        if (!player.getEntityWorld().isRemote) {
+        this.sneaking = player.isShiftKeyDown();
+        if (!player.level().isClientSide) {
             points = new ArrayList<>(RelocatorNetwork.instance.getPoints(player));
         }
     }
 
-    public void save() {
-        super.save();
-    }
 
     @Override
     public CustomPacketBuffer writeContainer() {
@@ -50,40 +45,19 @@ public class ItemStackRelocator extends ItemStackInventory {
 
     }
 
-    public ContainerBase<ItemStackRelocator> getGuiContainer(EntityPlayer player) {
+    public ContainerMenuBase<ItemStackRelocator> getGuiContainer(Player player) {
         if (sneaking) {
-            return new ContainerRelocatorAddPoint(this);
+            return new ContainerMenuRelocatorAddPoint(this);
         }
-        return new ContainerRelocator(this);
+        return new ContainerMenuRelocator(this);
     }
 
-    @SideOnly(Side.CLIENT)
-    public GuiScreen getGui(EntityPlayer player, boolean isAdmin) {
+    @OnlyIn(Dist.CLIENT)
+    public ScreenIndustrialUpgrade<ContainerMenuBase<?>> getGui(Player player, ContainerMenuBase<?> isAdmin) {
         if (sneaking) {
-            return new GuiRelocatorAddPoint(getGuiContainer(player));
+            return new ScreenRelocatorAddPoint(isAdmin);
         }
-        return new GuiRelocator(getGuiContainer(player));
-    }
-
-
-    @Override
-    public void addInventorySlot(final Inventory var1) {
-
-    }
-
-
-    @Nonnull
-    public String getName() {
-        return "toolbox";
-    }
-
-    public boolean hasCustomName() {
-        return false;
-    }
-
-
-    public int getStackSizeLimit() {
-        return 64;
+        return new ScreenRelocator(isAdmin);
     }
 
 

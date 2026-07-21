@@ -1,22 +1,22 @@
 package com.denfop.api.windsystem;
 
-import com.denfop.api.gui.EnumTypeSlot;
-import com.denfop.api.gui.ITypeSlot;
-import com.denfop.invslot.Inventory;
+import com.denfop.api.widget.EnumTypeSlot;
+import com.denfop.api.widget.ITypeSlot;
+import com.denfop.blockentity.windturbine.BlockEntityWindTurbineController;
+import com.denfop.inventory.Inventory;
 import com.denfop.items.ItemWindRotor;
-import com.denfop.tiles.windturbine.TileEntityWindTurbineController;
 import com.denfop.utils.DamageHandler;
 import com.denfop.utils.ModUtils;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class InventoryWindTurbineRotor extends Inventory implements ITypeSlot {
 
 
-    private final TileEntityWindTurbineController windGenerator;
+    private final BlockEntityWindTurbineController windGenerator;
 
-    public InventoryWindTurbineRotor(TileEntityWindTurbineController windGenerator) {
+    public InventoryWindTurbineRotor(BlockEntityWindTurbineController windGenerator) {
         super(windGenerator, TypeItemSlot.INPUT, 1);
-        this.setInventoryStackLimit(1);
+        this.setStackSizeLimit(1);
         this.windGenerator = windGenerator;
 
     }
@@ -29,7 +29,7 @@ public class InventoryWindTurbineRotor extends Inventory implements ITypeSlot {
     public int damage(int amount, double chance) {
         int damageApplied = 0;
         if (chance > 0) {
-            if (!(this.windGenerator.getWorld().rand.nextInt(101) <= (int) (chance * 100))) {
+            if (!(this.windGenerator.getWorld().random.nextInt(101) <= (int) (chance * 100))) {
                 return 0;
             }
         }
@@ -38,7 +38,7 @@ public class InventoryWindTurbineRotor extends Inventory implements ITypeSlot {
         ItemWindRotor rotor = (ItemWindRotor) stack.getItem();
         if (!ModUtils.isEmpty(stack)) {
             DamageHandler.damage(stack, amount, null);
-            if (DamageHandler.getDamage(stack) <= DamageHandler.getMaxDamage(stack) * 0.75) {
+            if (DamageHandler.getDamage(stack) >= DamageHandler.getMaxDamage(stack) * 0.25) {
                 this.windGenerator.need_repair = true;
             }
         }
@@ -48,21 +48,21 @@ public class InventoryWindTurbineRotor extends Inventory implements ITypeSlot {
     }
 
     @Override
-    public boolean isItemValidForSlot(final int index, final ItemStack stack) {
+    public boolean canPlaceItem(final int index, final ItemStack stack) {
 
-        return stack.getItem() instanceof ItemWindRotor && ((IWindRotor) stack.getItem()).getLevel() >= 1 && ((IWindRotor) stack.getItem()).getLevel() <= 14;
+        return stack.getItem() instanceof ItemWindRotor && ((WindRotor) stack.getItem()).getLevel() >= 1 && ((WindRotor) stack.getItem()).getLevel() <= 14;
     }
 
     @Override
-    public void put(final int index, final ItemStack content) {
-        super.put(index, content);
+    public ItemStack set(final int index, final ItemStack content) {
+        super.set(index, content);
         this.windGenerator.change();
         if (!content.isEmpty()) {
             this.windGenerator.energy.getEnergy().setSourceTier(this.windGenerator.getRotor().getSourceTier());
         } else {
             this.windGenerator.energy.getEnergy().setSourceTier(1);
         }
-
+        return content;
     }
 
 }

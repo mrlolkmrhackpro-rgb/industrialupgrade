@@ -1,6 +1,5 @@
 package com.denfop.api.space.fakebody;
 
-import com.denfop.ElectricItem;
 import com.denfop.api.space.IBaseResource;
 import com.denfop.api.space.IBody;
 import com.denfop.api.space.SpaceNet;
@@ -9,22 +8,17 @@ import com.denfop.api.space.research.api.IRocketLaunchPad;
 import com.denfop.api.space.rovers.api.IRovers;
 import com.denfop.api.space.rovers.enums.EnumTypeUpgrade;
 import com.denfop.api.space.upgrades.SpaceUpgradeSystem;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
+import com.denfop.utils.ElectricItem;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public class FakeSpaceSystemBase implements IFakeSpaceSystemBase {
 
     private final Map<UUID, List<IFakeBody>> uuidListMap = new HashMap<>();
-    private final Map<UUID, Map<IBody, Data>> dataMap = new HashMap<>();
+    private final HashMap<UUID, Map<IBody, Data>> dataMap = new HashMap<>();
     private final List<FakePlanet> fakePlanetList;
     private final List<FakeSatellite> fakeSatelliteList;
     private final Map<UUID, IResearchTable> MapEntityPlayer;
@@ -35,7 +29,7 @@ public class FakeSpaceSystemBase implements IFakeSpaceSystemBase {
     List<IFakeBody> deletingBody = new LinkedList<>();
 
     public FakeSpaceSystemBase() {
-        MinecraftForge.EVENT_BUS.register(new EventHandlerPlanet());
+        NeoForge.EVENT_BUS.register(new EventHandlerPlanet());
         this.fakePlanetList = new LinkedList<>();
         this.fakeSatelliteList = new LinkedList<>();
         this.rand = new Random();
@@ -176,10 +170,9 @@ public class FakeSpaceSystemBase implements IFakeSpaceSystemBase {
             return;
         }
 
-
         ItemStack itemStack = fakeBody.getRover().getItemStack();
         if (ElectricItem.manager.getCharge(itemStack) < 100 ||
-                fakeBody.getRover().getItem().getFluidHandler(itemStack).drain(2, false) == null) {
+                fakeBody.getRover().getItem().getFluidHandler(itemStack).drain(2, IFluidHandler.FluidAction.SIMULATE).isEmpty()) {
             failOperation(fakeBody, playerId, uuidListMap);
             return;
         }
@@ -337,19 +330,32 @@ public class FakeSpaceSystemBase implements IFakeSpaceSystemBase {
 
     @Override
     public void copyData(final Map<IBody, Data> data, final UUID uniqueID) {
-
-        if (dataMap.containsKey(uniqueID)) {
-            final Map<IBody, Data> dataPlayer = dataMap.get(uniqueID);
-            for (Map.Entry<IBody, Data> dataEntry : data.entrySet()) {
-                Data data1 = dataPlayer.get(dataEntry.getKey());
-                if (data1.getPercent() < dataEntry.getValue().getPercent()) {
-                    data1.setInformation(dataEntry.getValue().getPercent());
-                }
-            }
-        } else {
-            dataMap.put(uniqueID, new HashMap<>(data));
+        if (data == null || data.isEmpty()) {
+            return;
         }
 
+        final Map<IBody, Data> dataPlayer = dataMap.computeIfAbsent(uniqueID, id -> new HashMap<>());
+
+        for (Map.Entry<IBody, Data> entry : data.entrySet()) {
+            final IBody body = entry.getKey();
+            final Data incoming = entry.getValue();
+
+            if (body == null || incoming == null) {
+                continue;
+            }
+
+            final Data existing = dataPlayer.get(body);
+
+            if (existing != null) {
+                if (existing.getPercent() < incoming.getPercent()) {
+                    existing.setInformation(incoming.getPercent());
+                }
+            } else {
+                final Data newData = new Data(uniqueID, body);
+                newData.setInformation(incoming.getPercent());
+                dataPlayer.put(body, newData);
+            }
+        }
     }
 
     private void processTimers(IFakeBody fakeBody) {
@@ -364,7 +370,7 @@ public class FakeSpaceSystemBase implements IFakeSpaceSystemBase {
     private void manageEnergy(IFakeBody fakeBody) {
         ItemStack itemStack = fakeBody.getRover().getItemStack();
         ElectricItem.manager.discharge(itemStack, 100, 14, true, false, false);
-        fakeBody.getRover().getItem().getFluidHandler(itemStack).drain(2, true);
+        fakeBody.getRover().getItem().getFluidHandler(itemStack).drain(2, IFluidHandler.FluidAction.EXECUTE);
 
         int solar = SpaceUpgradeSystem.system.hasModules(EnumTypeUpgrade.SOLAR, itemStack)
                 ? SpaceUpgradeSystem.system.getModules(EnumTypeUpgrade.SOLAR, itemStack).number
@@ -414,7 +420,10 @@ public class FakeSpaceSystemBase implements IFakeSpaceSystemBase {
             }
             fakeBody.getSpaceOperation().setOperation(EnumOperation.SUCCESS);
             if (fakeBody.getTimerTo().getTime() == 0) {
-                fakeBody.getData().addInformation(5);
+                SpaceNet.instance.getFakeSpaceSystem().getDataFromUUID(playerId).computeIfAbsent(fakeBody.getBody(), k -> new Data(
+                        playerId,
+                        fakeBody.getBody()
+                )).addInformation(5);
             }
             removeFakeBody(fakeBody, playerId, uuidListMap);
         }

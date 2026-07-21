@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=imp_gas_controller": {
+      "model": "industrialupgrade:block/gas_reactor/gas_imp_controller"
+    },
+    "facing=south,type=imp_gas_controller": {
+      "model": "industrialupgrade:block/gas_reactor/gas_imp_controller",
+      "y": 180
+    },
+    "facing=west,type=imp_gas_controller": {
+      "model": "industrialupgrade:block/gas_reactor/gas_imp_controller",
+      "y": 270
+    },
+    "facing=east,type=imp_gas_controller": {
+      "model": "industrialupgrade:block/gas_reactor/gas_imp_controller",
+      "y": 90
+    },
+    "facing=north,type=imp_gas_controller_active": {
+      "model": "industrialupgrade:block/gas_reactor/gas_imp_controller"
+    },
+    "facing=south,type=imp_gas_controller_active": {
+      "model": "industrialupgrade:block/gas_reactor/gas_imp_controller",
+      "y": 180
+    },
+    "facing=west,type=imp_gas_controller_active": {
+      "model": "industrialupgrade:block/gas_reactor/gas_imp_controller",
+      "y": 270
+    },
+    "facing=east,type=imp_gas_controller_active": {
+      "model": "industrialupgrade:block/gas_reactor/gas_imp_controller",
+      "y": 90
+    }
+  }
+}

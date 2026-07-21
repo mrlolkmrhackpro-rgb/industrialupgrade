@@ -1,31 +1,37 @@
 package com.denfop.integration.jei.advalloysmelter;
 
 
+import com.denfop.integration.jei.IJeiVariantRecipe;
+import com.denfop.integration.jei.JeiIngredientHelper;
 import com.denfop.api.Recipes;
 import com.denfop.api.recipe.BaseMachineRecipe;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AdvAlloySmelterHandler {
+public class AdvAlloySmelterHandler implements IJeiVariantRecipe {
 
     public static final List<AdvAlloySmelterHandler> recipes = new ArrayList<>();
-    public final ItemStack input, input1, input2, output;
+    
+    private List<List<ItemStack>> inputVariants = new ArrayList<>();
+public final ItemStack input, input1, input2, output;
     public final short temperature;
+    private final BaseMachineRecipe container;
 
     public AdvAlloySmelterHandler(
             ItemStack input,
             ItemStack input1,
             ItemStack input2,
             ItemStack output,
-            final short temperature
-    ) {
+            final short temperature,
+            BaseMachineRecipe container) {
         this.input = input;
         this.input1 = input1;
         this.input2 = input2;
         this.output = output;
         this.temperature = temperature;
+        this.container = container;
     }
 
     public static List<AdvAlloySmelterHandler> getRecipes() {
@@ -40,9 +46,9 @@ public class AdvAlloySmelterHandler {
             ItemStack input1,
             ItemStack input2,
             ItemStack output,
-            final short temperature
-    ) {
-        AdvAlloySmelterHandler recipe = new AdvAlloySmelterHandler(input, input1, input2, output, temperature);
+            final short temperature,
+            BaseMachineRecipe container) {
+        AdvAlloySmelterHandler recipe = new AdvAlloySmelterHandler(input, input1, input2, output, temperature, container);
         if (recipes.contains(recipe)) {
             return null;
         }
@@ -55,22 +61,30 @@ public class AdvAlloySmelterHandler {
             return null;
         }
         for (AdvAlloySmelterHandler recipe : recipes) {
-            if (recipe.matchesInput(is)) {
-                return recipe;
-            }
+            return recipe;
         }
         return null;
     }
 
     public static void initRecipes() {
-        for (BaseMachineRecipe container : Recipes.recipes.getRecipeList("advalloysmelter")) {
-            addRecipe(container.input.getInputs().get(0).getInputs().get(0),
-                    container.input.getInputs().get(1).getInputs().get(0), container.input.getInputs().get(2).getInputs().get(0),
-                    container.getOutput().items.get(0), container.getOutput().metadata.getShort("temperature")
-            );
 
+        for (BaseMachineRecipe container : Recipes.recipes.getRecipeList("advalloysmelter")) {
+            try {
+                JeiIngredientHelper.attachInputVariants(addRecipe(container.input.getInputs().get(0).getInputs().get(0),
+                        container.input.getInputs().get(1).getInputs().get(0), container.input.getInputs().get(2).getInputs().get(0),
+                        container.getOutput().items.get(0), container.getOutput().metadata.getShort("temperature"), container
+                ), container);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+            ;
 
         }
+
+    }
+
+    public BaseMachineRecipe getContainer() {
+        return container;
     }
 
     public ItemStack getInput() { // Получатель входного предмета рецепта.
@@ -89,8 +103,16 @@ public class AdvAlloySmelterHandler {
         return output.copy();
     }
 
-    public boolean matchesInput(ItemStack is) {
-        return is.isItemEqual(input) || is.isItemEqual(input1) || is.isItemEqual(input2);
+
+
+
+    @Override
+    public void setInputVariants(final List<List<ItemStack>> inputVariants) {
+        this.inputVariants = inputVariants == null ? new ArrayList<>() : inputVariants;
     }
 
+    @Override
+    public List<ItemStack> getInputVariants(final int slot, final ItemStack fallback) {
+        return JeiIngredientHelper.getInputVariants(this.inputVariants, slot, fallback);
+    }
 }

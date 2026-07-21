@@ -1,28 +1,22 @@
 package com.denfop.api.space.colonies.api;
 
 import com.denfop.api.space.IBody;
-import com.denfop.api.space.colonies.api.building.IBuildingHouse;
-import com.denfop.api.space.colonies.api.building.IColonyMiningFactory;
-import com.denfop.api.space.colonies.api.building.IColonyStorage;
-import com.denfop.api.space.colonies.api.building.IEntertainment;
-import com.denfop.api.space.colonies.api.building.IFactory;
-import com.denfop.api.space.colonies.api.building.IGenerator;
-import com.denfop.api.space.colonies.api.building.IOxygenFactory;
-import com.denfop.api.space.colonies.api.building.IProtectionBuilding;
-import com.denfop.api.space.colonies.api.building.IStorage;
+import com.denfop.api.space.colonies.api.building.*;
 import com.denfop.api.space.colonies.enums.EnumHouses;
 import com.denfop.api.space.colonies.enums.EnumProblems;
 import com.denfop.network.packet.CustomPacketBuffer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface IColony {
 
-    CustomPacketBuffer writePacket();
+    CustomPacketBuffer writePacket(RegistryAccess registryAccess);
 
     boolean isAuto();
 
@@ -39,6 +33,18 @@ public interface IColony {
     int getExperience();
 
     int getAvailableBuilding();
+
+    short getMaxAvailableFluid();
+
+    short getMaxAvailableItem();
+
+    short getAvailableFluid();
+
+    short getAvailableItem();
+
+    void removeAvailableFluid(int amount);
+
+    void removeAvailableItem(int amount);
 
     int getMaxBuilding();
 
@@ -130,7 +136,7 @@ public interface IColony {
     void addMaxEnergy(int energy);
 
 
-    NBTTagCompound writeNBT(NBTTagCompound tag);
+    CompoundTag writeNBT(CompoundTag tag, HolderLookup.Provider p_323640_);
 
     List<IColonyBuilding> getBuildingList();
 

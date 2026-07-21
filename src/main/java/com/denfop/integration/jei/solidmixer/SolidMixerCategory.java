@@ -1,86 +1,87 @@
 package com.denfop.integration.jei.solidmixer;
 
+import com.denfop.integration.jei.JeiIngredientHelper;
 import com.denfop.Constants;
-import com.denfop.Localization;
-import com.denfop.api.gui.Component;
-import com.denfop.api.gui.EnumTypeComponent;
-import com.denfop.api.gui.GuiComponent;
 import com.denfop.api.recipe.InventoryOutput;
 import com.denfop.api.recipe.InventoryRecipes;
-import com.denfop.blocks.mechanism.BlockBaseMachine3;
+import com.denfop.api.widget.EnumTypeComponent;
+import com.denfop.api.widget.ScreenWidget;
+import com.denfop.api.widget.WidgetDefault;
+import com.denfop.blockentity.mechanism.BlockEntitySolidMixer;
+import com.denfop.blocks.mechanism.BlockBaseMachine3Entity;
 import com.denfop.componets.ComponentProgress;
 import com.denfop.componets.ComponentRenderInventory;
 import com.denfop.componets.EnumTypeComponentSlot;
-import com.denfop.container.ContainerSolidMixer;
-import com.denfop.container.SlotInvSlot;
-import com.denfop.gui.GuiIU;
+import com.denfop.containermenu.ContainerMenuSolidMixer;
+import com.denfop.containermenu.SlotInvSlot;
+import com.denfop.integration.jei.IRecipeCategory;
 import com.denfop.integration.jei.JEICompat;
-import com.denfop.tiles.mechanism.TileEntitySolidMixer;
-import mezz.jei.api.IGuiHelper;
-import mezz.jei.api.gui.IDrawable;
-import mezz.jei.api.gui.IDrawableStatic;
-import mezz.jei.api.gui.IGuiItemStackGroup;
-import mezz.jei.api.gui.IRecipeLayout;
-import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.IRecipeCategory;
+import com.denfop.integration.jei.JeiInform;
+import com.denfop.screen.ScreenMain;
+import com.denfop.utils.Localization;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableStatic;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class SolidMixerCategory extends GuiIU implements IRecipeCategory<SolidMixerRecipeWrapper> {
+public class SolidMixerCategory extends ScreenMain implements IRecipeCategory<SolidMixerHandler> {
 
     private final IDrawableStatic bg;
-    private final ContainerSolidMixer container1;
-    private final GuiComponent progress_bar;
-    private final GuiComponent slots1;
+    private final ContainerMenuSolidMixer container1;
+    private final ScreenWidget progress_bar;
+    private final ScreenWidget slots1;
+    JeiInform jeiInform;
     private int progress = 0;
     private int energy = 0;
 
     public SolidMixerCategory(
-            final IGuiHelper guiHelper
+            IGuiHelper guiHelper, JeiInform jeiInform
     ) {
-        super(((TileEntitySolidMixer) BlockBaseMachine3.solid_mixer.getDummyTe()).getGuiContainer(Minecraft.getMinecraft().player));
-        bg = guiHelper.createDrawable(new ResourceLocation(Constants.MOD_ID, "textures/gui/guimachine" +
+        super(((BlockEntitySolidMixer) BlockBaseMachine3Entity.solid_mixer.getDummyTe()).getGuiContainer(Minecraft.getInstance().player));
+        bg = guiHelper.createDrawable(ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/guimachine" +
                         ".png"), 3, 3, 140,
                 77
         );
+        this.jeiInform = jeiInform;
+        this.title = net.minecraft.network.chat.Component.literal(getTitles());
         this.componentList.clear();
-        this.slots = new GuiComponent(this, 3, 3, getComponent(),
-                new Component<>(new ComponentRenderInventory(EnumTypeComponentSlot.SLOTS__JEI_INPUT))
+        this.slots = new ScreenWidget(this, 3, 3, getComponent(),
+                new WidgetDefault<>(new ComponentRenderInventory(EnumTypeComponentSlot.SLOTS__JEI_INPUT))
         );
-        this.slots1 = new GuiComponent(this, 3, 3, getComponent(),
-                new Component<>(new ComponentRenderInventory(EnumTypeComponentSlot.SLOTS__JEI_OUTPUT))
+        this.slots1 = new ScreenWidget(this, 3, 3, getComponent(),
+                new WidgetDefault<>(new ComponentRenderInventory(EnumTypeComponentSlot.SLOTS__JEI_OUTPUT))
         );
-        this.container1 = (ContainerSolidMixer) this.getContainer();
+        this.container1 = (ContainerMenuSolidMixer) this.getContainer();
         this.componentList.add(slots);
         this.componentList.add(slots1);
-        progress_bar = new GuiComponent(this, 70, 35, EnumTypeComponent.PROCESS,
-                new Component<>(new ComponentProgress(this.container1.base, 0, 100))
+        progress_bar = new ScreenWidget(this, 70, 35, EnumTypeComponent.PROCESS,
+                new WidgetDefault<>(new ComponentProgress(this.container1.base, 0, 100))
         );
         this.componentList.add(progress_bar);
     }
 
-    @Nonnull
     @Override
-    public String getUid() {
-        return BlockBaseMachine3.solid_mixer.getName();
+    public RecipeType<SolidMixerHandler> getRecipeType() {
+        return jeiInform.recipeType;
     }
 
     @Nonnull
     @Override
-    public String getTitle() {
-        return Localization.translate(JEICompat.getBlockStack(BlockBaseMachine3.solid_mixer).getUnlocalizedName());
+    public String getTitles() {
+        return Localization.translate(JEICompat.getBlockStack(BlockBaseMachine3Entity.solid_mixer).getDescriptionId());
     }
 
-
-    @Nonnull
-    @Override
-    public String getModName() {
-        return Constants.MOD_NAME;
-    }
 
     @Nonnull
     @Override
@@ -88,9 +89,8 @@ public class SolidMixerCategory extends GuiIU implements IRecipeCategory<SolidMi
         return bg;
     }
 
-
     @Override
-    public void drawExtras(@Nonnull final Minecraft mc) {
+    public void draw(SolidMixerHandler recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics stack, double mouseX, double mouseY) {
         progress++;
         if (this.energy < 100) {
             energy++;
@@ -100,45 +100,36 @@ public class SolidMixerCategory extends GuiIU implements IRecipeCategory<SolidMi
         if (xScale >= 1) {
             progress = 0;
         }
-        this.slots.drawBackground(-20, -10);
-        this.slots1.drawBackground(-20, -10);
+        this.slots.drawBackground(stack, -20, -10);
+        this.slots1.drawBackground(stack, -20, -10);
 
-        progress_bar.renderBar(-15, 0, xScale);
-        mc.getTextureManager().bindTexture(getTexture());
-
-
+        progress_bar.renderBar(stack, -15, 0, xScale);
     }
 
     @Override
-    public void setRecipe(
-            final IRecipeLayout layout,
-            final SolidMixerRecipeWrapper recipes,
-            @Nonnull final IIngredients ingredients
-    ) {
-        IGuiItemStackGroup isg = layout.getItemStacks();
-
+    public void setRecipe(IRecipeLayoutBuilder builder, SolidMixerHandler recipe, IFocusGroup focuses) {
         final List<SlotInvSlot> slots1 = container1.findClassSlots(InventoryRecipes.class);
-        final List<ItemStack> inputs = recipes.getInputs1();
-        final List<ItemStack> outputs = recipes.getOutputs();
+        final List<ItemStack> inputs = recipe.getInputs();
+        final List<ItemStack> outputs = recipe.getOutputs();
         int i = 0;
         for (; i < inputs.size(); i++) {
-            isg.init(i, true, slots1.get(i).getJeiX() - 20, slots1.get(i).getJeiY() - 10);
-            isg.set(i, inputs.get(i));
+            JeiIngredientHelper.addInputSlot(builder, RecipeIngredientRole.INPUT, slots1.get(i).getJeiX() - 20, slots1.get(i).getJeiY() - 10, recipe, i, inputs.get(i));
+
+
 
         }
         final List<SlotInvSlot> outputSlot = container1.findClassSlots(InventoryOutput.class);
         i = 0;
         for (; i < inputs.size(); i++) {
-            isg.init(i + inputs.size(), true, outputSlot.get(i).getJeiX() - 20, outputSlot.get(i).getJeiY() - 10);
-            isg.set(i + inputs.size(), outputs.get(i));
+            builder.addSlot(RecipeIngredientRole.OUTPUT, outputSlot.get(i).getJeiX() - 20, outputSlot.get(i).getJeiY() - 10).addItemStack(outputs.get(i));
+
 
         }
-
-
     }
 
+
     protected ResourceLocation getTexture() {
-        return new ResourceLocation(Constants.MOD_ID, "textures/gui/guimachine.png");
+        return ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/guimachine.png");
     }
 
 

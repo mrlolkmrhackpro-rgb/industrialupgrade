@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=rna_collector": {
+      "model": "industrialupgrade:block/basemachine/rna_collector"
+    },
+    "facing=south,type=rna_collector": {
+      "model": "industrialupgrade:block/basemachine/rna_collector",
+      "y": 180
+    },
+    "facing=west,type=rna_collector": {
+      "model": "industrialupgrade:block/basemachine/rna_collector",
+      "y": 270
+    },
+    "facing=east,type=rna_collector": {
+      "model": "industrialupgrade:block/basemachine/rna_collector",
+      "y": 90
+    },
+    "facing=north,type=rna_collector_active": {
+      "model": "industrialupgrade:block/basemachine/rna_collector_active"
+    },
+    "facing=south,type=rna_collector_active": {
+      "model": "industrialupgrade:block/basemachine/rna_collector_active",
+      "y": 180
+    },
+    "facing=west,type=rna_collector_active": {
+      "model": "industrialupgrade:block/basemachine/rna_collector_active",
+      "y": 270
+    },
+    "facing=east,type=rna_collector_active": {
+      "model": "industrialupgrade:block/basemachine/rna_collector_active",
+      "y": 90
+    }
+  }
+}

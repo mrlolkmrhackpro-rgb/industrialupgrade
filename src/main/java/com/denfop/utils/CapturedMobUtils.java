@@ -1,128 +1,112 @@
 package com.denfop.utils;
 
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumDyeColor;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.World;
-import net.minecraftforge.event.ForgeEventFactory;
+import com.denfop.datacomponent.DataComponentsInit;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Sheep;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.common.Tags;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 public final class CapturedMobUtils {
-
-    @Nonnull
-    private static final ResourceLocation PIG = new ResourceLocation("pig");
-    @Nullable
-    private final NBTTagCompound entityNbt;
-    @Nonnull
+    public static final Codec<CapturedMobUtils> CODEC = RecordCodecBuilder.create(instance ->
+            instance.group(
+                    ResourceLocation.CODEC.fieldOf("entityId").forGetter(CapturedMobUtils::getEntityId),
+                    Codec.STRING.fieldOf("customName").forGetter(CapturedMobUtils::getCustomName),
+                    Codec.DOUBLE.fieldOf("coefficient").forGetter(CapturedMobUtils::getCoefficient),
+                    Codec.INT.fieldOf("color").forGetter(CapturedMobUtils::getColor),
+                    Codec.STRING.fieldOf("resource").forGetter(CapturedMobUtils::getResource)
+            ).apply(instance, CapturedMobUtils::new
+            )
+    );
+    public static final StreamCodec<RegistryFriendlyByteBuf, CapturedMobUtils> STREAM_CODEC = StreamCodec.of(
+            (buf, value) -> {
+                buf.writeResourceLocation(value.getEntityId());
+                buf.writeBoolean(value.getCustomName() != null);
+                if (value.getCustomName() != null) {
+                    buf.writeUtf(value.getCustomName());
+                }
+                buf.writeDouble(value.getCoefficient());
+                buf.writeInt(value.getColor());
+                buf.writeUtf(value.getResource());
+            },
+            buf -> {
+                ResourceLocation id = buf.readResourceLocation();
+                String name = buf.readBoolean() ? buf.readUtf() : null;
+                double coeff = buf.readDouble();
+                int color = buf.readInt();
+                String resource = buf.readUtf();
+                return new CapturedMobUtils(id, name, coeff, color, resource);
+            }
+    );
+    public static CapturedMobUtils EMPTY = new CapturedMobUtils(ResourceLocation.tryParse("pig"), "", 0, 0, "");
+    public static DataEntities data = new DataEntities();
     private final ResourceLocation entityId;
     @Nullable
     private final String customName;
-    private final String resource;
     private final double coefficient;
-    private int color;
+    private final String resource;
+    private final int color;
 
-    private CapturedMobUtils(@Nonnull EntityLivingBase entity) {
-        ResourceLocation id = EntityList.getKey(entity);
-        this.entityId = id == null ? PIG : id;
-        this.entityNbt = entity.serializeNBT();
+    public CapturedMobUtils(ResourceLocation entityId, @Nullable String customName, double coefficient, int color, String resource) {
+        this.entityId = entityId;
+        this.customName = customName;
+        this.coefficient = coefficient;
+        this.color = color;
+
+        this.resource = resource;
+    }
+
+    private CapturedMobUtils(@Nonnull LivingEntity entity) {
+        this.entityId = EntityType.getKey(entity.getType());
         String name = null;
-        if (entity instanceof EntityLiving) {
-            EntityLiving entLiv = (EntityLiving) entity;
-            if (entLiv.hasCustomName()) {
-                name = entLiv.getCustomNameTag();
+        if (entity instanceof LivingEntity) {
+            if (entity.hasCustomName()) {
+                name = entity.getScoreboardName();
             }
         }
-        this.color = -1;
-        StringBuilder builder = new StringBuilder(this.entityId.toString());
 
-        if (entity instanceof EntitySheep) {
-            this.color = ((EntitySheep) entity).getFleeceColor().getMetadata();
-            builder.append("_").append(((EntitySheep) entity).getFleeceColor().getName());
-
+        if (entity instanceof Sheep) {
+            this.color = ((Sheep) entity).getColor().getId();
+        } else {
+            this.color = -1;
         }
-        if (name != null && name.length() > 0) {
+        if (name != null && !name.isEmpty()) {
             this.customName = name;
         } else {
-            this.customName = null;
+            this.customName = "";
         }
-        this.resource = builder.toString();
         this.coefficient = entity.getMaxHealth() / 40;
-
-    }
-
-    private CapturedMobUtils(@Nonnull NBTTagCompound nbt) {
-        if (nbt.hasKey("entity")) {
-            this.entityNbt = nbt.getCompoundTag("entity").copy();
-        } else if (nbt.hasKey("EntityTag")) {
-            this.entityNbt = nbt.getCompoundTag("EntityTag").copy();
-        } else {
-            this.entityNbt = null;
-        }
-
-        String id;
-
-        id = nbt.getString("entityId");
-        coefficient = nbt.getDouble("coefficient");
-
-        this.entityId = !id.isEmpty() ? new ResourceLocation(id) : PIG;
         StringBuilder builder = new StringBuilder(this.entityId.toString());
-        this.customName = nbt.getString("customName");
-        color = nbt.getInteger("color");
-        if (color >= 0) {
-            builder.append("_").append(EnumDyeColor.byMetadata(color));
+        if (color != -1) {
+            builder.append("_").append(((Sheep) entity).getColor().getName());
         }
         this.resource = builder.toString();
     }
 
-    private CapturedMobUtils(@Nonnull ResourceLocation entityId) {
-        this.entityNbt = null;
-        this.entityId = entityId;
-        this.customName = null;
-        this.resource = this.entityId.toString();
-        coefficient = 1;
-    }
-
-    @Nullable
     public static CapturedMobUtils create(@Nullable Entity entity) {
-        return entity instanceof EntityLivingBase && entity.isEntityAlive() && !entity.world.isRemote && !(entity instanceof EntityPlayer) && !isBlacklisted(
-                entity) ? new CapturedMobUtils((EntityLivingBase) entity) : null;
-    }
-
-    @Nullable
-    public static CapturedMobUtils create(@Nullable ResourceLocation entityId) {
-        return entityId != null && EntityList.isRegistered(entityId) && isRegisteredMob(entityId)
-                ? new CapturedMobUtils(entityId)
-                : null;
-    }
-
-    public static boolean isRegisteredMob(ResourceLocation entityName) {
-        if (entityName == null) {
-            return false;
-        } else {
-            Class<? extends Entity> clazz = EntityList.getClass(entityName);
-            return clazz != null && EntityLiving.class.isAssignableFrom(clazz);
-        }
-    }
-
-    public static boolean containsSoul(@Nullable NBTTagCompound nbt) {
-        return nbt != null && (nbt.hasKey("entity") || nbt.hasKey("entityId") || nbt.hasKey("EntityTag"));
+        return entity instanceof LivingEntity && entity.isAlive() && !entity.level().isClientSide() && !(entity instanceof Player) && !isBlacklisted(
+                entity) ? new CapturedMobUtils((LivingEntity) entity) : CapturedMobUtils.EMPTY;
     }
 
     public static boolean containsSoul(@Nonnull ItemStack stack) {
-        return isValid(stack) && stack.hasTagCompound() && containsSoul(stack.getTagCompound());
+        return isValid(stack) && stack.has(DataComponentsInit.MOB);
     }
 
     public static boolean isValid(@Nonnull ItemStack stack) {
@@ -130,114 +114,97 @@ public final class CapturedMobUtils {
     }
 
     @Nullable
-    public static CapturedMobUtils create(@Nonnull ItemStack stack) {
+    public static CapturedMobUtils create(@Nonnull ItemStack stack, RegistryAccess registryAccess) {
         if (containsSoul(stack)) {
-            assert stack.getTagCompound() != null;
-            return new CapturedMobUtils(stack.getTagCompound());
+            return stack.getOrDefault(DataComponentsInit.MOB, EMPTY);
         } else {
-            return null;
+            return stack.getOrDefault(DataComponentsInit.MOB, EMPTY);
         }
     }
 
-    @Nullable
-    public static CapturedMobUtils create(@Nullable NBTTagCompound nbt) {
-        return containsSoul(nbt) ? new CapturedMobUtils(nbt) : null;
+    public static boolean isBlacklisted(@Nonnull Entity entity) {
+        ResourceLocation entityId = EntityType.getKey(entity.getType());
+        if (entity.getType().is(Tags.EntityTypes.BOSSES))
+            return true;
+        return entityId == null;
     }
 
-    public static boolean isBlacklisted(@Nonnull Entity entity) {
-        ResourceLocation entityId = EntityList.getKey(entity);
-        return entityId == null;
+    public ResourceLocation getEntityId() {
+        return entityId;
+    }
+
+    public @Nullable String getCustomName() {
+        return customName;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CapturedMobUtils that = (CapturedMobUtils) o;
+        return Double.compare(coefficient, that.coefficient) == 0 && color == that.color && Objects.equals(entityId, that.entityId) && Objects.equals(customName, that.customName) && Objects.equals(resource, that.resource);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(entityId, customName, coefficient, resource, color);
     }
 
     public double getCoefficient() {
         return coefficient;
     }
 
-    public String getResource() {
-        return resource;
-    }
 
     @Nonnull
-    public ItemStack toStack(@Nonnull Item item, int meta, int amount) {
-        ItemStack stack = new ItemStack(item, amount, meta);
-        stack.setTagCompound(this.toNbt(null));
-
-
-        return stack;
-    }
-
-    @Nonnull
-    public NBTTagCompound toNbt(@Nullable NBTTagCompound nbt) {
-        NBTTagCompound data = nbt != null ? nbt : new NBTTagCompound();
-        data.setString("entityId", this.entityId.toString());
-        if (this.entityNbt != null) {
-            data.setTag("entity", this.entityNbt.copy());
-        }
-
+    public CompoundTag toNbt(@Nullable CompoundTag nbt) {
+        CompoundTag data = nbt != null ? nbt : new CompoundTag();
+        data.putString("entityId", this.entityId.toString());
         if (this.customName != null) {
-            data.setString("customName", this.customName);
+            data.putString("customName", this.customName);
         }
-        data.setInteger("color", this.color);
-        data.setDouble("coefficient", this.coefficient);
+        data.putInt("color", this.color);
+        data.putDouble("coefficient", this.coefficient);
         return data;
     }
 
     @Nullable
-    public Entity getEntity(@Nullable World world, boolean clone) {
-        return this.getEntity(world, null, null, clone);
+    public Entity getEntity(@Nullable Level world, boolean clone) {
+        return this.getEntity(world, null, clone);
     }
 
     @Nullable
     public Entity getEntity(
-            @Nullable World world,
+            @Nullable Level world,
             @Nullable BlockPos pos,
-            @Nullable DifficultyInstance difficulty,
             boolean clone
     ) {
         if (world == null) {
             return null;
         } else {
-            NBTTagCompound entityNbt_nullchecked = this.entityNbt;
             Entity entity;
-            if (entityNbt_nullchecked == null || !clone) {
-                entity = EntityList.createEntityByIDFromName(this.entityId, world);
-                if (entity == null) {
-                    return null;
-                } else {
-                    if (pos != null) {
-                        entity.setPosition(pos.getX(), pos.getY(), pos.getZ());
-                    }
 
-                    if (entity instanceof EntityLiving) {
-                        if (pos != null && difficulty == null) {
-                            difficulty = world.getDifficultyForLocation(pos);
-                        }
-
-                        if (difficulty != null && (pos == null || !ForgeEventFactory.doSpecialSpawn(
-                                (EntityLiving) entity,
-                                world,
-                                (float) pos.getX(),
-                                (float) pos.getY(),
-                                (float) pos.getZ(),
-                                null
-                        ))) {
-                            ((EntityLiving) entity).onInitialSpawn(difficulty, null);
-                        }
-                    }
-                    if (entity instanceof EntitySheep) {
-                        ((EntitySheep) entity).setFleeceColor(EnumDyeColor.byMetadata(color));
-                    }
-
-                    return entity;
-                }
+            entity = data.createEntityByIDFromName(this.entityId, world);
+            if (entity == null) {
+                return null;
             } else {
-                entity = EntityList.createEntityFromNBT(entityNbt_nullchecked, world);
-                if (entity instanceof EntitySheep) {
-                    ((EntitySheep) entity).setFleeceColor(EnumDyeColor.byMetadata(color));
+                if (pos != null) {
+                    entity.setPos(pos.getX(), pos.getY(), pos.getZ());
                 }
+                if (entity instanceof Sheep) {
+                    ((Sheep) entity).setColor(DyeColor.byId(color));
+                }
+
                 return entity;
             }
+
         }
     }
 
+    public String getResource() {
+        return resource;
+    }
 }

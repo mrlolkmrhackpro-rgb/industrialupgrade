@@ -1,69 +1,65 @@
 package com.denfop.integration.jei.genetic_replicator;
 
 import com.denfop.Constants;
-import com.denfop.Localization;
-import com.denfop.api.gui.Component;
-import com.denfop.api.gui.ComponentEmpty;
-import com.denfop.api.gui.EnumTypeComponent;
-import com.denfop.api.gui.GuiComponent;
-import com.denfop.api.gui.GuiElement;
-import com.denfop.api.gui.TankGauge;
-import com.denfop.blocks.mechanism.BlockBaseMachine3;
-import com.denfop.blocks.mechanism.BlockRefiner;
-import com.denfop.gui.GuiIU;
+import com.denfop.api.widget.*;
+import com.denfop.blockentity.mechanism.BlockEntityOilRefiner;
+import com.denfop.blocks.mechanism.BlockBaseMachine3Entity;
+import com.denfop.blocks.mechanism.BlockRefinerEntity;
+import com.denfop.integration.jei.IRecipeCategory;
 import com.denfop.integration.jei.JEICompat;
-import com.denfop.tiles.mechanism.TileOilRefiner;
-import mezz.jei.api.IGuiHelper;
-import mezz.jei.api.gui.IDrawable;
-import mezz.jei.api.gui.IDrawableStatic;
-import mezz.jei.api.gui.IGuiFluidStackGroup;
-import mezz.jei.api.gui.IRecipeLayout;
-import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.IRecipeCategory;
+import com.denfop.integration.jei.JeiInform;
+import com.denfop.screen.ScreenMain;
+import com.denfop.utils.Localization;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableStatic;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class GeneticReplicatorCategory extends GuiIU implements IRecipeCategory<GeneticReplicatorRecipeWrapper> {
+public class GeneticReplicatorCategory extends ScreenMain implements IRecipeCategory<GeneticReplicatorHandler> {
 
     private final IDrawableStatic bg;
+    private final JeiInform jeiInform;
 
 
     public GeneticReplicatorCategory(
-            final IGuiHelper guiHelper
+            IGuiHelper guiHelper, JeiInform jeiInform
     ) {
-        super(((TileOilRefiner) BlockRefiner.refiner.getDummyTe()).getGuiContainer(Minecraft.getMinecraft().player));
-
-        bg = guiHelper.createDrawable(new ResourceLocation(Constants.MOD_ID, "textures/gui/guimachine" +
+        super(((BlockEntityOilRefiner) BlockRefinerEntity.refiner.getDummyTe()).getGuiContainer(Minecraft.getInstance().player));
+        this.jeiInform = jeiInform;
+        this.title = net.minecraft.network.chat.Component.literal(getTitles());
+        bg = guiHelper.createDrawable(ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/guimachine" +
                         ".png"), 3, 3, 140,
                 77
         );
         this.componentList.clear();
-        this.addElement(TankGauge.createNormal(this, 12, 20, ((TileOilRefiner) container.base).fluidTank1));
-        this.addElement(TankGauge.createNormal(this, 60, 20, ((TileOilRefiner) container.base).fluidTank2));
-        this.addElement(TankGauge.createNormal(this, 108, 20, ((TileOilRefiner) container.base).fluidTank2));
+        this.addWidget(TankWidget.createNormal(this, 12, 20, ((BlockEntityOilRefiner) container.base).fluidTank1));
+        this.addWidget(TankWidget.createNormal(this, 60, 20, ((BlockEntityOilRefiner) container.base).fluidTank2));
+        this.addWidget(TankWidget.createNormal(this, 108, 20, ((BlockEntityOilRefiner) container.base).fluidTank2));
 
     }
+
+    @Override
+    public RecipeType<GeneticReplicatorHandler> getRecipeType() {
+        return jeiInform.recipeType;
+    }
+
 
     @Nonnull
     @Override
-    public String getUid() {
-        return BlockBaseMachine3.genetic_replicator.getName();
+    public String getTitles() {
+        return Localization.translate((JEICompat.getBlockStack(BlockBaseMachine3Entity.genetic_replicator)).getDescriptionId());
     }
 
-    @Nonnull
-    @Override
-    public String getTitle() {
-        return Localization.translate((JEICompat.getBlockStack(BlockBaseMachine3.genetic_replicator)).getUnlocalizedName());
-    }
-
-    @Nonnull
-    @Override
-    public String getModName() {
-        return Constants.MOD_NAME;
-    }
 
     @Nonnull
     @Override
@@ -71,47 +67,30 @@ public class GeneticReplicatorCategory extends GuiIU implements IRecipeCategory<
         return bg;
     }
 
-
     @Override
-    public void drawExtras(final Minecraft mc) {
-
-        new GuiComponent(this, 88, 40, EnumTypeComponent.FLUID_PART1,
-                new Component<>(new ComponentEmpty())
-        ).drawBackground(this.guiLeft, this.guiTop);
-        new GuiComponent(this, 35, 38, EnumTypeComponent.PLUS_BUTTON,
-                new Component<>(new ComponentEmpty())
-        ).drawBackground(this.guiLeft, this.guiTop);
-        for (final GuiElement element : ((List<GuiElement>) this.elements)) {
-            element.drawBackground(this.guiLeft, this.guiTop);
+    public void draw(GeneticReplicatorHandler recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics stack, double mouseX, double mouseY) {
+        new ScreenWidget(this, 88, 40, EnumTypeComponent.FLUID_PART1,
+                new WidgetDefault<>(new EmptyWidget())
+        ).drawBackground(stack, this.guiLeft, this.guiTop);
+        new ScreenWidget(this, 35, 38, EnumTypeComponent.PLUS_BUTTON,
+                new WidgetDefault<>(new EmptyWidget())
+        ).drawBackground(stack, this.guiLeft, this.guiTop);
+        for (final ScreenWidget element : ((List<ScreenWidget>) this.elements)) {
+            element.drawBackground(stack, this.guiLeft, this.guiTop);
         }
-
     }
 
     @Override
-    public void setRecipe(
-            final IRecipeLayout layout,
-            final GeneticReplicatorRecipeWrapper recipes,
-            @Nonnull final IIngredients ingredients
-    ) {
-
-
-        IGuiFluidStackGroup fff = layout.getFluidStacks();
-
-        fff.init(0, true, 16, 24, 12, 47, 10000, true, null);
-        fff.set(0, recipes.getInput());
-
-        fff.init(1, true, 16 + 48, 24, 12, 47, 10000, true, null);
-        fff.set(1, recipes.getInputs().get(1));
-
-
-        fff.init(2, false, 16 + 96, 24, 12, 47, 10000, true, null);
-        fff.set(2, recipes.getOutputs().get(0));
-
+    public void setRecipe(IRecipeLayoutBuilder builder, GeneticReplicatorHandler recipes, IFocusGroup focuses) {
+        builder.addSlot(RecipeIngredientRole.INPUT, 16, 24).setFluidRenderer(12000, true, 12, 47).addFluidStack(recipes.getInput().getFluid(), recipes.getInput().getAmount());
+        builder.addSlot(RecipeIngredientRole.INPUT, 16 + 48, 24).setFluidRenderer(12000, true, 12, 47).addFluidStack(recipes.getOutput().getFluid(), recipes.getOutput().getAmount());
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 16 + 96, 24).setFluidRenderer(12000, true, 12, 47).addFluidStack(recipes.getOutput1().getFluid(), recipes.getOutput1().getAmount());
 
     }
+
 
     protected ResourceLocation getTexture() {
-        return new ResourceLocation(Constants.MOD_ID, "textures/gui/guioilrefiner.png");
+        return ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/guioilrefiner.png");
     }
 
 

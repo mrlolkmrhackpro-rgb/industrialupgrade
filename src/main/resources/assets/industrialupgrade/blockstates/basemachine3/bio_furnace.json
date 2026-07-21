@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=bio_furnace": {
+      "model": "industrialupgrade:block/basemachine/bio_furnace"
+    },
+    "facing=south,type=bio_furnace": {
+      "model": "industrialupgrade:block/basemachine/bio_furnace",
+      "y": 180
+    },
+    "facing=west,type=bio_furnace": {
+      "model": "industrialupgrade:block/basemachine/bio_furnace",
+      "y": 270
+    },
+    "facing=east,type=bio_furnace": {
+      "model": "industrialupgrade:block/basemachine/bio_furnace",
+      "y": 90
+    },
+    "facing=north,type=bio_furnace_active": {
+      "model": "industrialupgrade:block/basemachine/bio_furnace_active"
+    },
+    "facing=south,type=bio_furnace_active": {
+      "model": "industrialupgrade:block/basemachine/bio_furnace_active",
+      "y": 180
+    },
+    "facing=west,type=bio_furnace_active": {
+      "model": "industrialupgrade:block/basemachine/bio_furnace_active",
+      "y": 270
+    },
+    "facing=east,type=bio_furnace_active": {
+      "model": "industrialupgrade:block/basemachine/bio_furnace_active",
+      "y": 90
+    }
+  }
+}

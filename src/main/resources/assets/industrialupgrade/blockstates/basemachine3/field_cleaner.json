@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=field_cleaner": {
+      "model": "industrialupgrade:block/basemachine/field_cleaner"
+    },
+    "facing=south,type=field_cleaner": {
+      "model": "industrialupgrade:block/basemachine/field_cleaner",
+      "y": 180
+    },
+    "facing=west,type=field_cleaner": {
+      "model": "industrialupgrade:block/basemachine/field_cleaner",
+      "y": 270
+    },
+    "facing=east,type=field_cleaner": {
+      "model": "industrialupgrade:block/basemachine/field_cleaner",
+      "y": 90
+    },
+    "facing=north,type=field_cleaner_active": {
+      "model": "industrialupgrade:block/basemachine/field_cleaner"
+    },
+    "facing=south,type=field_cleaner_active": {
+      "model": "industrialupgrade:block/basemachine/field_cleaner",
+      "y": 180
+    },
+    "facing=west,type=field_cleaner_active": {
+      "model": "industrialupgrade:block/basemachine/field_cleaner",
+      "y": 270
+    },
+    "facing=east,type=field_cleaner_active": {
+      "model": "industrialupgrade:block/basemachine/field_cleaner",
+      "y": 90
+    }
+  }
+}

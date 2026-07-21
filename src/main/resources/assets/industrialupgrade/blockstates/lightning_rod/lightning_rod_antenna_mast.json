@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=lightning_rod_antenna_mast": {
+      "model": "industrialupgrade:block/lightning_rod/lightning_rod_antenna_mast"
+    },
+    "facing=south,type=lightning_rod_antenna_mast": {
+      "model": "industrialupgrade:block/lightning_rod/lightning_rod_antenna_mast",
+      "y": 180
+    },
+    "facing=west,type=lightning_rod_antenna_mast": {
+      "model": "industrialupgrade:block/lightning_rod/lightning_rod_antenna_mast",
+      "y": 270
+    },
+    "facing=east,type=lightning_rod_antenna_mast": {
+      "model": "industrialupgrade:block/lightning_rod/lightning_rod_antenna_mast",
+      "y": 90
+    },
+    "facing=north,type=lightning_rod_antenna_mast_active": {
+      "model": "industrialupgrade:block/lightning_rod/lightning_rod_antenna_mast"
+    },
+    "facing=south,type=lightning_rod_antenna_mast_active": {
+      "model": "industrialupgrade:block/lightning_rod/lightning_rod_antenna_mast",
+      "y": 180
+    },
+    "facing=west,type=lightning_rod_antenna_mast_active": {
+      "model": "industrialupgrade:block/lightning_rod/lightning_rod_antenna_mast",
+      "y": 270
+    },
+    "facing=east,type=lightning_rod_antenna_mast_active": {
+      "model": "industrialupgrade:block/lightning_rod/lightning_rod_antenna_mast",
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:quantumitems2"
+    },
+    "B": {
+      "item": "industrialupgrade:adv_spectral_box"
+    },
+    "C": {
+      "tag": "c:plates/mithril"
+    },
+    "D": {
+      "item": "industrialupgrade:energy_tools/quantum_bow"
+    },
+    "E": {
+      "tag": "c:doubleplate/duralumin"
+    }
+  },
+  "pattern": [
+    "ABA",
+    "CDC",
+    "EBE"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:energy_tools/spectral_bow"
+  },
+  "show_notification": false
+}

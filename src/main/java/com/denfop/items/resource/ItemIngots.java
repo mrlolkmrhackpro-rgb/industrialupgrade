@@ -1,58 +1,91 @@
 package com.denfop.items.resource;
 
-import com.denfop.Constants;
 import com.denfop.IUCore;
-import com.denfop.api.IModelRegister;
 import com.denfop.blocks.ISubEnum;
-import com.denfop.register.Register;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.item.Item;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.denfop.datagen.itemtag.IItemTag;
+import com.denfop.items.ItemMain;
+import net.minecraft.Util;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 
 import java.util.Locale;
 
-public class ItemIngots extends ItemSubTypes<ItemIngots.ItemIngotsTypes> implements IModelRegister {
-
-    protected static final String NAME = "itemingots";
-
-    public ItemIngots() {
-        super(ItemIngotsTypes.class);
-        this.setCreativeTab(IUCore.RecourseTab);
-        Register.registerItem((Item) this, IUCore.getIdentifier(NAME)).setUnlocalizedName(NAME);
-        IUCore.proxy.addIModelRegister(this);
+public class ItemIngots<T extends Enum<T> & ISubEnum> extends ItemMain<T> implements IItemTag {
+    public ItemIngots(T element) {
+        super(new Item.Properties(), element);
     }
 
 
-    public String getUnlocalizedName() {
-        return "iu." + super.getUnlocalizedName().substring(3);
+    @Override
+    public Item getItem() {
+        return this;
     }
 
-    @SideOnly(Side.CLIENT)
-    public void registerModel(Item stack, final int meta, final String extraName) {
-        ModelLoader.setCustomModelResourceLocation(
-                this,
-                meta,
-                new ModelResourceLocation(Constants.MOD_ID + ":itemingots/" + ItemIngotsTypes.getFromID(meta).getName(), null)
-        );
+    @Override
+    public CreativeModeTab getItemCategory() {
+        return IUCore.RecourseTab;
+    }
+
+    @Override
+    public String[] getTags() {
+        String name = getElement().getName();
+        switch (this.getElement().getId()) {
+            case 3:
+                name = "tungsten";
+                break;
+            case 9:
+                name = "platinum";
+                break;
+            case 13:
+                name = "electrum";
+                break;
+            case 43:
+                name = "adamantium";
+                break;
+            case 46:
+                name = "meteoric";
+                break;
+            case 47:
+                name = "mithril";
+                break;
+        }
+        return new String[]{"c:ingots/" + name.replace("_ingot", ""), "c:ingots"};
+    }
+
+    protected String getOrCreateDescriptionId() {
+        if (this.nameItem == null) {
+            StringBuilder pathBuilder = new StringBuilder(Util.makeDescriptionId("iu", BuiltInRegistries.ITEM.getKey(this)));
+            String targetString = "industrialupgrade.itemingots";
+            String replacement = "ingot";
+            if (replacement != null) {
+                int index = pathBuilder.indexOf(targetString);
+                while (index != -1) {
+                    pathBuilder.replace(index, index + targetString.length(), replacement);
+                    index = pathBuilder.indexOf(targetString, index + replacement.length());
+                }
+            }
+            this.nameItem = pathBuilder.toString();
+        }
+
+        return this.nameItem;
     }
 
     public enum ItemIngotsTypes implements ISubEnum {
         mikhail_ingot(0),
         aluminium_ingot(1),
-        vanady_ingot(2),
-        wolfram_ingot(3),
+        vanadium_ingot(2),
+        tungsten_ingot(3),
         invar_ingot(4),
         caravky_ingot(5),
         cobalt_ingot(6),
         magnesium_ingot(7),
         nickel_ingot(8),
-        platium_ingot(9),
+        platinum_ingot(9),
         titanium_ingot(10),
         chromium_ingot(11),
         spinel_ingot(12),
-        electrium_ingot(13),
+        electrum_ingot(13),
         silver_ingot(14),
         zinc_ingot(15),
         manganese_ingot(16),
@@ -82,13 +115,12 @@ public class ItemIngots extends ItemSubTypes<ItemIngots.ItemIngotsTypes> impleme
         strontium(40),
         thallium(41),
         zirconium(42),
-        adamantite(43),
+        adamantium(43),
         bloodstone(44),
         draconid(45),
         meteoric_iron(46),
-        mythril(47),
+        mithril(47),
         orichalcum(48),
-
         ;
 
         private final String name;
@@ -107,9 +139,18 @@ public class ItemIngots extends ItemSubTypes<ItemIngots.ItemIngotsTypes> impleme
             return this.name;
         }
 
+        @Override
+        public boolean register() {
+            return this != copper_ingot;
+        }
+
+        @Override
+        public String getMainPath() {
+            return "itemingots";
+        }
+
         public int getId() {
             return this.ID;
         }
     }
-
 }

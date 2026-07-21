@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=primal_wire_insulator_copper": {
+      "model": "industrialupgrade:block/basemachine/primal_wire_insulator_copper"
+    },
+    "facing=south,type=primal_wire_insulator_copper": {
+      "model": "industrialupgrade:block/basemachine/primal_wire_insulator_copper",
+      "y": 180
+    },
+    "facing=west,type=primal_wire_insulator_copper": {
+      "model": "industrialupgrade:block/basemachine/primal_wire_insulator_copper",
+      "y": 270
+    },
+    "facing=east,type=primal_wire_insulator_copper": {
+      "model": "industrialupgrade:block/basemachine/primal_wire_insulator_copper",
+      "y": 90
+    },
+    "facing=north,type=primal_wire_insulator_copper_active": {
+      "model": "industrialupgrade:block/basemachine/primal_wire_insulator_copper"
+    },
+    "facing=south,type=primal_wire_insulator_copper_active": {
+      "model": "industrialupgrade:block/basemachine/primal_wire_insulator_copper",
+      "y": 180
+    },
+    "facing=west,type=primal_wire_insulator_copper_active": {
+      "model": "industrialupgrade:block/basemachine/primal_wire_insulator_copper",
+      "y": 270
+    },
+    "facing=east,type=primal_wire_insulator_copper_active": {
+      "model": "industrialupgrade:block/basemachine/primal_wire_insulator_copper",
+      "y": 90
+    }
+  }
+}

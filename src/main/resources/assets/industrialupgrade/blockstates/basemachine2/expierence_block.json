@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=expierence_block": {
+      "model": "industrialupgrade:block/basemachine/expierence_block"
+    },
+    "facing=south,type=expierence_block": {
+      "model": "industrialupgrade:block/basemachine/expierence_block",
+      "y": 180
+    },
+    "facing=west,type=expierence_block": {
+      "model": "industrialupgrade:block/basemachine/expierence_block",
+      "y": 270
+    },
+    "facing=east,type=expierence_block": {
+      "model": "industrialupgrade:block/basemachine/expierence_block",
+      "y": 90
+    },
+    "facing=north,type=expierence_block_active": {
+      "model": "industrialupgrade:block/basemachine/expierence_block"
+    },
+    "facing=south,type=expierence_block_active": {
+      "model": "industrialupgrade:block/basemachine/expierence_block",
+      "y": 180
+    },
+    "facing=west,type=expierence_block_active": {
+      "model": "industrialupgrade:block/basemachine/expierence_block",
+      "y": 270
+    },
+    "facing=east,type=expierence_block_active": {
+      "model": "industrialupgrade:block/basemachine/expierence_block",
+      "y": 90
+    }
+  }
+}

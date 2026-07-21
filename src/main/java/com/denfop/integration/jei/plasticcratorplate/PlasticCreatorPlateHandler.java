@@ -1,27 +1,33 @@
 package com.denfop.integration.jei.plasticcratorplate;
 
 
+import com.denfop.integration.jei.IJeiVariantRecipe;
+import com.denfop.integration.jei.JeiIngredientHelper;
 import com.denfop.api.Recipes;
 import com.denfop.api.recipe.BaseMachineRecipe;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlasticCreatorPlateHandler {
+public class PlasticCreatorPlateHandler implements IJeiVariantRecipe {
 
     private static final List<PlasticCreatorPlateHandler> recipes = new ArrayList<>();
-    private final FluidStack input2;
+    
+    private List<List<ItemStack>> inputVariants = new ArrayList<>();
+private final FluidStack input2;
     private final ItemStack input, output;
+    private final BaseMachineRecipe container;
 
     public PlasticCreatorPlateHandler(
             ItemStack input, FluidStack input2,
-            ItemStack output
-    ) {
+            ItemStack output,
+            BaseMachineRecipe container) {
         this.input = input;
         this.input2 = input2;
         this.output = output;
+        this.container = container;
     }
 
     public static List<PlasticCreatorPlateHandler> getRecipes() {
@@ -33,9 +39,9 @@ public class PlasticCreatorPlateHandler {
 
     public static PlasticCreatorPlateHandler addRecipe(
             ItemStack input, FluidStack input2,
-            ItemStack output
-    ) {
-        PlasticCreatorPlateHandler recipe = new PlasticCreatorPlateHandler(input, input2, output);
+            ItemStack output,
+            BaseMachineRecipe container) {
+        PlasticCreatorPlateHandler recipe = new PlasticCreatorPlateHandler(input, input2, output, container);
         if (recipes.contains(recipe)) {
             return null;
         }
@@ -58,14 +64,17 @@ public class PlasticCreatorPlateHandler {
     public static void initRecipes() {
         for (BaseMachineRecipe container : Recipes.recipes.getRecipeList("plasticplate")) {
 
-            addRecipe(container.input.getInputs().get(0).getInputs().get(0), container.input.getFluid(),
+            JeiIngredientHelper.attachInputVariants(addRecipe(container.input.getInputs().get(0).getInputs().get(0), container.input.getFluid(),
 
-                    container.getOutput().items.get(0)
-            );
+                    container.getOutput().items.get(0), container
+            ), container);
 
         }
     }
 
+    public BaseMachineRecipe getContainer() {
+        return container;
+    }
 
     public ItemStack getInput() { // Получатель входного предмета рецепта.
         return input;
@@ -80,7 +89,18 @@ public class PlasticCreatorPlateHandler {
     }
 
     public boolean matchesInput(ItemStack is) {
-        return is.isItemEqual(input);
+        return true;
     }
 
+
+
+    @Override
+    public void setInputVariants(final List<List<ItemStack>> inputVariants) {
+        this.inputVariants = inputVariants == null ? new ArrayList<>() : inputVariants;
+    }
+
+    @Override
+    public List<ItemStack> getInputVariants(final int slot, final ItemStack fallback) {
+        return JeiIngredientHelper.getInputVariants(this.inputVariants, slot, fallback);
+    }
 }

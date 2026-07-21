@@ -2,8 +2,8 @@ package com.denfop.integration.jei.gendiesel;
 
 
 import com.denfop.blocks.FluidName;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,11 +52,11 @@ public class GenDieselHandler {
 
     public static void initRecipes() {
 
-        addRecipe(1060000, new FluidStack(FluidName.fluiddizel.getInstance(), 1000));
-        addRecipe(200000, new FluidStack(FluidName.fluida_diesel.getInstance(), 1000));
-        addRecipe(400000, new FluidStack(FluidName.fluidaa_diesel.getInstance(), 1000));
-        addRecipe(800000, new FluidStack(FluidName.fluidaaa_diesel.getInstance(), 1000));
-        addRecipe(1600000, new FluidStack(FluidName.fluidaaaa_diesel.getInstance(), 1000));
+        addRecipe(100000, new FluidStack(FluidName.fluiddiesel.getInstance().get(), 1000));
+        addRecipe(200000, new FluidStack(FluidName.fluida_diesel.getInstance().get(), 1000));
+        addRecipe(400000, new FluidStack(FluidName.fluidaa_diesel.getInstance().get(), 1000));
+        addRecipe(800000, new FluidStack(FluidName.fluidaaa_diesel.getInstance().get(), 1000));
+        addRecipe(1600000, new FluidStack(FluidName.fluidaaaa_diesel.getInstance().get(), 1000));
 
 
     }

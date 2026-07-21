@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=squeezer_12": {
+      "model": "industrialupgrade:block/basemachine/squeezer_12"
+    },
+    "facing=south,type=squeezer_12": {
+      "model": "industrialupgrade:block/basemachine/squeezer_12",
+      "y": 180
+    },
+    "facing=west,type=squeezer_12": {
+      "model": "industrialupgrade:block/basemachine/squeezer_12",
+      "y": 270
+    },
+    "facing=east,type=squeezer_12": {
+      "model": "industrialupgrade:block/basemachine/squeezer_12",
+      "y": 90
+    },
+    "facing=north,type=squeezer2_active": {
+      "model": "industrialupgrade:block/basemachine/squeezer2"
+    },
+    "facing=south,type=squeezer2_active": {
+      "model": "industrialupgrade:block/basemachine/squeezer2",
+      "y": 180
+    },
+    "facing=west,type=squeezer2_active": {
+      "model": "industrialupgrade:block/basemachine/squeezer2",
+      "y": 270
+    },
+    "facing=east,type=squeezer2_active": {
+      "model": "industrialupgrade:block/basemachine/squeezer2",
+      "y": 90
+    }
+  }
+}

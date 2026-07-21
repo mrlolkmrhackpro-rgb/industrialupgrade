@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=item_divider_to_fluid": {
+      "model": "industrialupgrade:block/basemachine/item_divider_to_fluid"
+    },
+    "facing=south,type=item_divider_to_fluid": {
+      "model": "industrialupgrade:block/basemachine/item_divider_to_fluid",
+      "y": 180
+    },
+    "facing=west,type=item_divider_to_fluid": {
+      "model": "industrialupgrade:block/basemachine/item_divider_to_fluid",
+      "y": 270
+    },
+    "facing=east,type=item_divider_to_fluid": {
+      "model": "industrialupgrade:block/basemachine/item_divider_to_fluid",
+      "y": 90
+    },
+    "facing=north,type=item_divider_to_fluid_active": {
+      "model": "industrialupgrade:block/basemachine/item_divider_to_fluid_active"
+    },
+    "facing=south,type=item_divider_to_fluid_active": {
+      "model": "industrialupgrade:block/basemachine/item_divider_to_fluid_active",
+      "y": 180
+    },
+    "facing=west,type=item_divider_to_fluid_active": {
+      "model": "industrialupgrade:block/basemachine/item_divider_to_fluid_active",
+      "y": 270
+    },
+    "facing=east,type=item_divider_to_fluid_active": {
+      "model": "industrialupgrade:block/basemachine/item_divider_to_fluid_active",
+      "y": 90
+    }
+  }
+}

@@ -2,117 +2,101 @@ package com.denfop.integration.jei.aircollector;
 
 import com.denfop.Constants;
 import com.denfop.IUItem;
-import com.denfop.Localization;
-import com.denfop.api.gui.Component;
-import com.denfop.api.gui.ComponentEmpty;
-import com.denfop.api.gui.EnumTypeComponent;
-import com.denfop.api.gui.GuiComponent;
-import com.denfop.api.gui.GuiElement;
-import com.denfop.api.gui.TankGauge;
-import com.denfop.blocks.mechanism.BlockAdvRefiner;
-import com.denfop.blocks.mechanism.BlockBaseMachine3;
-import com.denfop.gui.GuiIU;
-import com.denfop.tiles.mechanism.TileAdvOilRefiner;
-import mezz.jei.api.IGuiHelper;
-import mezz.jei.api.gui.IDrawable;
-import mezz.jei.api.gui.IDrawableStatic;
-import mezz.jei.api.gui.IGuiFluidStackGroup;
-import mezz.jei.api.gui.IRecipeLayout;
-import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.IRecipeCategory;
+import com.denfop.api.widget.*;
+import com.denfop.blockentity.mechanism.BlockEntityAdvOilRefiner;
+import com.denfop.blocks.mechanism.BlockAdvRefinerEntity;
+import com.denfop.integration.jei.IRecipeCategory;
+import com.denfop.integration.jei.JeiInform;
+import com.denfop.recipes.ItemStackHelper;
+import com.denfop.screen.ScreenMain;
+import com.denfop.utils.Localization;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableStatic;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class AirColCategory extends GuiIU implements IRecipeCategory<AirColRecipeWrapper> {
+public class AirColCategory extends ScreenMain implements IRecipeCategory<AirColHandler> {
 
     private final IDrawableStatic bg;
+    private final JeiInform<AirColCategory, AirColHandler> jeiInform;
     private int energy = 0;
 
     public AirColCategory(
-            final IGuiHelper guiHelper
+            final IGuiHelper guiHelper, JeiInform<AirColCategory, AirColHandler> jeiInform
     ) {
-        super(((TileAdvOilRefiner) BlockAdvRefiner.adv_refiner.getDummyTe()).getGuiContainer(Minecraft.getMinecraft().player));
-
-        bg = guiHelper.createDrawable(new ResourceLocation(Constants.MOD_ID, "textures/gui/guimachine" +
+        super(((BlockEntityAdvOilRefiner) BlockAdvRefinerEntity.adv_refiner.getDummyTe()).getGuiContainer(Minecraft.getInstance().player));
+        this.jeiInform = jeiInform;
+        bg = guiHelper.createDrawable(ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/guimachine" +
                         ".png"), 3, 3, 140,
                 77
         );
         this.componentList.clear();
-        this.addElement(TankGauge.createNormal(this, 20, 20, ((TileAdvOilRefiner) container.base).getFluidTank(0)));
-        this.addElement(TankGauge.createNormal(this, 60, 20, ((TileAdvOilRefiner) container.base).getFluidTank(1)));
-        this.addElement(TankGauge.createNormal(this, 100, 20, ((TileAdvOilRefiner) container.base).getFluidTank(2)));
+        this.addWidget(TankWidget.createNormal(this, 20, 20, ((BlockEntityAdvOilRefiner) container.base).getFluidTank(0)));
+        this.addWidget(TankWidget.createNormal(this, 60, 20, ((BlockEntityAdvOilRefiner) container.base).getFluidTank(1)));
+        this.addWidget(TankWidget.createNormal(this, 100, 20, ((BlockEntityAdvOilRefiner) container.base).getFluidTank(2)));
 
+        this.title = net.minecraft.network.chat.Component.literal(getTitles());
+    }
+
+
+    @Override
+    public RecipeType<AirColHandler> getRecipeType() {
+        return jeiInform.recipeType;
     }
 
     @Nonnull
     @Override
-    public String getUid() {
-        return BlockBaseMachine3.aircollector.getName();
+    public String getTitles() {
+        return Localization.translate(ItemStackHelper.fromData(IUItem.basemachine2, 1, 11).getDescriptionId());
     }
 
-    @Nonnull
-    @Override
-    public String getTitle() {
-        return Localization.translate(new ItemStack(IUItem.basemachine2, 1, 11).getUnlocalizedName());
-    }
 
-    @Nonnull
-    @Override
-    public String getModName() {
-        return Constants.MOD_NAME;
-    }
-
+    @SuppressWarnings("removal")
     @Nonnull
     @Override
     public IDrawable getBackground() {
         return bg;
     }
 
+    @Override
+    public IDrawable getIcon() {
+        return null;
+    }
 
     @Override
-    public void drawExtras(final Minecraft mc) {
+    public void setRecipe(IRecipeLayoutBuilder builder, AirColHandler recipes, IFocusGroup focuses) {
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 24, 24).setFluidRenderer(10000, true, 12, 47).addFluidStack(recipes.getOutput().getFluid(), recipes.getOutput().getAmount());
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 64, 24).setFluidRenderer(10000, true, 12, 47).addFluidStack(recipes.getOutput1().getFluid(), recipes.getOutput1().getAmount());
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 104, 24).setFluidRenderer(10000, true, 12, 47).addFluidStack(recipes.getOutput2().getFluid(), recipes.getOutput2().getAmount());
+    }
 
-        new GuiComponent(this, 44, 40, EnumTypeComponent.PLUS_BUTTON,
-                new Component<>(new ComponentEmpty())
-        ).drawBackground(this.guiLeft, this.guiTop);
-        new GuiComponent(this, 84, 40, EnumTypeComponent.PLUS_BUTTON,
-                new Component<>(new ComponentEmpty())
-        ).drawBackground(this.guiLeft, this.guiTop);
-        for (final GuiElement element : ((List<GuiElement>) this.elements)) {
-            element.drawBackground(this.guiLeft, this.guiTop);
+    @Override
+    public void draw(AirColHandler recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics stack, double mouseX, double mouseY) {
+
+        new ScreenWidget(this, 44, 40, EnumTypeComponent.PLUS_BUTTON,
+                new WidgetDefault<>(new EmptyWidget())
+        ).drawBackground(stack, this.guiLeft, this.guiTop);
+        new ScreenWidget(this, 84, 40, EnumTypeComponent.PLUS_BUTTON,
+                new WidgetDefault<>(new EmptyWidget())
+        ).drawBackground(stack, this.guiLeft, this.guiTop);
+        for (final ScreenWidget element : ((List<ScreenWidget>) this.elements)) {
+            element.drawBackground(stack, this.guiLeft, this.guiTop);
         }
-
     }
 
-    @Override
-    public void setRecipe(
-            final IRecipeLayout layout,
-            final AirColRecipeWrapper recipes,
-            @Nonnull final IIngredients ingredients
-    ) {
-
-
-        IGuiFluidStackGroup fff = layout.getFluidStacks();
-
-        fff.init(0, false, 24, 24, 12, 47, 10000, true, null);
-        fff.set(0, recipes.getOutputs().get(0));
-
-        fff.init(1, false, 64, 24, 12, 47, 10000, true, null);
-        fff.set(1, recipes.getOutputs().get(1));
-
-
-        fff.init(2, false, 104, 24, 12, 47, 10000, true, null);
-        fff.set(2, recipes.getOutputs().get(2));
-
-
-    }
 
     protected ResourceLocation getTexture() {
-        return new ResourceLocation(Constants.MOD_ID, "textures/gui/guiaircollector.png");
+        return ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/guiaircollector.png");
     }
 
 

@@ -1,9 +1,10 @@
 package com.denfop.api.space;
 
 import com.denfop.api.space.rovers.enums.EnumTypeRovers;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 public class BaseResource implements IBaseResource {
 
@@ -26,14 +27,7 @@ public class BaseResource implements IBaseResource {
         SpaceNet.instance.addResource(this);
     }
 
-    public BaseResource(
-            FluidStack fluidStack,
-            int minchance,
-            int maxchance,
-            int percentplanet,
-            IBody body,
-            EnumTypeRovers typeRovers
-    ) {
+    public BaseResource(FluidStack fluidStack, int minchance, int maxchance, int percentplanet, IBody body, EnumTypeRovers typeRovers) {
         this.stack = null;
         this.fluidStack = fluidStack;
         this.max = maxchance;
@@ -44,17 +38,17 @@ public class BaseResource implements IBaseResource {
         SpaceNet.instance.addResource(this);
     }
 
-    public BaseResource(NBTTagCompound tagCompound) {
+    public BaseResource(CompoundTag tagCompound, HolderLookup.Provider p_323640_) {
         percentplanet = tagCompound.getByte("percentplanet");
         min = tagCompound.getByte("min");
         max = tagCompound.getByte("max");
         if (tagCompound.getBoolean("hasItem")) {
-            stack = new ItemStack(tagCompound.getCompoundTag("stack"));
+            stack = ItemStack.parseOptional(p_323640_, tagCompound.getCompound("stack"));
         } else {
             stack = null;
         }
         if (tagCompound.getBoolean("hasFluid")) {
-            fluidStack = FluidStack.loadFluidStackFromNBT(tagCompound.getCompoundTag("fluidStack"));
+            fluidStack = FluidStack.parseOptional(p_323640_, tagCompound.getCompound("fluidStack"));
         } else {
             fluidStack = null;
         }
@@ -98,18 +92,18 @@ public class BaseResource implements IBaseResource {
     }
 
     @Override
-    public NBTTagCompound writeNBTTag(final NBTTagCompound tagCompound) {
-        tagCompound.setByte("percentplanet", (byte) percentplanet);
-        tagCompound.setByte("min", (byte) min);
-        tagCompound.setByte("max", (byte) max);
-        tagCompound.setByte("rovers", (byte) typeRovers.ordinal());
-        tagCompound.setBoolean("hasItem", stack != null);
+    public CompoundTag writeNBTTag(final CompoundTag tagCompound, HolderLookup.Provider p_323640_) {
+        tagCompound.putByte("percentplanet", (byte) percentplanet);
+        tagCompound.putByte("min", (byte) min);
+        tagCompound.putByte("max", (byte) max);
+        tagCompound.putByte("rovers", (byte) typeRovers.ordinal());
+        tagCompound.putBoolean("hasItem", stack != null);
         if (stack != null) {
-            tagCompound.setTag("stack", stack.writeToNBT(new NBTTagCompound()));
+            tagCompound.put("stack", stack.save(p_323640_));
         }
-        tagCompound.setBoolean("hasFluid", fluidStack != null);
+        tagCompound.putBoolean("hasFluid", fluidStack != null);
         if (fluidStack != null) {
-            tagCompound.setTag("fluidStack", fluidStack.writeToNBT(new NBTTagCompound()));
+            tagCompound.put("fluidStack", fluidStack.save(p_323640_));
         }
         return tagCompound;
     }

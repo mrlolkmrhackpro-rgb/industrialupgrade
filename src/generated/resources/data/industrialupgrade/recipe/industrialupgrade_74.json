@@ -1,0 +1,31 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:compresscarbon"
+    },
+    "B": {
+      "tag": "c:plates/adamantium"
+    },
+    "C": {
+      "item": "industrialupgrade:energy_tools/nano_saber"
+    },
+    "D": {
+      "item": "minecraft:glowstone"
+    },
+    "E": {
+      "item": "industrialupgrade:battery/lapotron_crystal"
+    }
+  },
+  "pattern": [
+    "AB ",
+    "AC ",
+    "DEB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:energy_tools/itemnanosaber1"
+  },
+  "show_notification": false
+}

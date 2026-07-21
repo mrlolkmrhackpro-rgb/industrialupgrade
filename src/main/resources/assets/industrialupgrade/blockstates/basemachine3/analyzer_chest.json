@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=analyzer_chest": {
+      "model": "industrialupgrade:block/basemachine/analyzer_chest"
+    },
+    "facing=south,type=analyzer_chest": {
+      "model": "industrialupgrade:block/basemachine/analyzer_chest",
+      "y": 180
+    },
+    "facing=west,type=analyzer_chest": {
+      "model": "industrialupgrade:block/basemachine/analyzer_chest",
+      "y": 270
+    },
+    "facing=east,type=analyzer_chest": {
+      "model": "industrialupgrade:block/basemachine/analyzer_chest",
+      "y": 90
+    },
+    "facing=north,type=analyzer_chest_active": {
+      "model": "industrialupgrade:block/basemachine/analyzer_chest"
+    },
+    "facing=south,type=analyzer_chest_active": {
+      "model": "industrialupgrade:block/basemachine/analyzer_chest",
+      "y": 180
+    },
+    "facing=west,type=analyzer_chest_active": {
+      "model": "industrialupgrade:block/basemachine/analyzer_chest",
+      "y": 270
+    },
+    "facing=east,type=analyzer_chest_active": {
+      "model": "industrialupgrade:block/basemachine/analyzer_chest",
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:energy_tools/quantumpickaxe"
+    },
+    "B": {
+      "item": "industrialupgrade:quantumitems6"
+    },
+    "C": {
+      "item": "industrialupgrade:energy_tools/quantumshovel"
+    },
+    "E": {
+      "item": "industrialupgrade:quantumitems6"
+    },
+    "H": {
+      "item": "industrialupgrade:crafting_elements/crafting_509_element"
+    }
+  },
+  "pattern": [
+    "EHE",
+    "ABC",
+    "   "
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:energy_tools/quantumdrill"
+  },
+  "show_notification": false
+}

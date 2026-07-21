@@ -1,27 +1,22 @@
 package com.denfop.api.energy;
 
-import com.denfop.api.sytem.InfoTile;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
+import com.denfop.api.otherenergies.common.InfoTile;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 
 import java.util.List;
 import java.util.Map;
 
-public class EnergyTile implements IEnergyTile {
+public class EnergyTile implements com.denfop.api.energy.interfaces.EnergyTile {
 
     @Override
-    public List<InfoTile<IEnergyTile>> getValidReceivers() {
+    public List<InfoTile<com.denfop.api.energy.interfaces.EnergyTile>> getValidReceivers() {
         return null;
     }
 
-    @Override
-    public TileEntity getTileEntity() {
-        return null;
-    }
 
     @Override
-    public BlockPos getBlockPos() {
+    public BlockPos getPos() {
         return null;
     }
 
@@ -36,17 +31,17 @@ public class EnergyTile implements IEnergyTile {
     }
 
     @Override
-    public void AddTile(final IEnergyTile tile, final EnumFacing dir) {
+    public void AddTile(final com.denfop.api.energy.interfaces.EnergyTile tile, final Direction dir) {
 
     }
 
     @Override
-    public void RemoveTile(final IEnergyTile tile, final EnumFacing dir) {
+    public void RemoveTile(final com.denfop.api.energy.interfaces.EnergyTile tile, final Direction dir) {
 
     }
 
     @Override
-    public Map<EnumFacing, IEnergyTile> getTiles() {
+    public Map<Direction, com.denfop.api.energy.interfaces.EnergyTile> getTiles() {
         return null;
     }
 

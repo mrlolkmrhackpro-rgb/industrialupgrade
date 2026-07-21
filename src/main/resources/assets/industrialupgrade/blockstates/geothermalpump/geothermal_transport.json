@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=geothermal_transport": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_transport"
+    },
+    "facing=south,type=geothermal_transport": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_transport",
+      "y": 180
+    },
+    "facing=west,type=geothermal_transport": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_transport",
+      "y": 270
+    },
+    "facing=east,type=geothermal_transport": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_transport",
+      "y": 90
+    },
+    "facing=north,type=geothermal_transport_active": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_transport"
+    },
+    "facing=south,type=geothermal_transport_active": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_transport",
+      "y": 180
+    },
+    "facing=west,type=geothermal_transport_active": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_transport",
+      "y": 270
+    },
+    "facing=east,type=geothermal_transport_active": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_transport",
+      "y": 90
+    }
+  }
+}

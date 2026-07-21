@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=energy_trash": {
+      "model": "industrialupgrade:block/basemachine/energy_trash"
+    },
+    "facing=south,type=energy_trash": {
+      "model": "industrialupgrade:block/basemachine/energy_trash",
+      "y": 180
+    },
+    "facing=west,type=energy_trash": {
+      "model": "industrialupgrade:block/basemachine/energy_trash",
+      "y": 270
+    },
+    "facing=east,type=energy_trash": {
+      "model": "industrialupgrade:block/basemachine/energy_trash",
+      "y": 90
+    },
+    "facing=north,type=energy_trash_active": {
+      "model": "industrialupgrade:block/basemachine/energy_trash"
+    },
+    "facing=south,type=energy_trash_active": {
+      "model": "industrialupgrade:block/basemachine/energy_trash",
+      "y": 180
+    },
+    "facing=west,type=energy_trash_active": {
+      "model": "industrialupgrade:block/basemachine/energy_trash",
+      "y": 270
+    },
+    "facing=east,type=energy_trash_active": {
+      "model": "industrialupgrade:block/basemachine/energy_trash",
+      "y": 90
+    }
+  }
+}

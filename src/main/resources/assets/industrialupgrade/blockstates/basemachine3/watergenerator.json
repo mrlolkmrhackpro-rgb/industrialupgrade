@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=watergenerator": {
+      "model": "industrialupgrade:block/basemachine/watergenerator"
+    },
+    "facing=south,type=watergenerator": {
+      "model": "industrialupgrade:block/basemachine/watergenerator",
+      "y": 180
+    },
+    "facing=west,type=watergenerator": {
+      "model": "industrialupgrade:block/basemachine/watergenerator",
+      "y": 270
+    },
+    "facing=east,type=watergenerator": {
+      "model": "industrialupgrade:block/basemachine/watergenerator",
+      "y": 90
+    },
+    "facing=north,type=watergenerator_active": {
+      "model": "industrialupgrade:block/basemachine/watergenerator_active"
+    },
+    "facing=south,type=watergenerator_active": {
+      "model": "industrialupgrade:block/basemachine/watergenerator_active",
+      "y": 180
+    },
+    "facing=west,type=watergenerator_active": {
+      "model": "industrialupgrade:block/basemachine/watergenerator_active",
+      "y": 270
+    },
+    "facing=east,type=watergenerator_active": {
+      "model": "industrialupgrade:block/basemachine/watergenerator_active",
+      "y": 90
+    }
+  }
+}

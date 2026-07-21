@@ -1,8 +1,9 @@
 package com.denfop.api.windsystem;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
+
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 public interface IWindMechanism {
 
@@ -14,9 +15,7 @@ public interface IWindMechanism {
 
     void setCoefficient(double coefficient);
 
-    void update();
-
-    IWindRotor getRotor();
+    WindRotor getRotor();
 
     ItemStack getItemStack();
 
@@ -30,7 +29,7 @@ public interface IWindMechanism {
 
     ResourceLocation getRotorRenderTexture();
 
-    EnumFacing getFacing();
+    Direction getFacing();
 
     void change();
 
@@ -55,5 +54,4 @@ public interface IWindMechanism {
     int getMinWindSpeed();
 
     void setWork(boolean work);
-
 }

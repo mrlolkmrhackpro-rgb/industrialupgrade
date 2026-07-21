@@ -1,0 +1,8 @@
+{
+  "values": [
+    "industrialupgrade:baseore2/sulfur",
+    "industrialupgrade:blockspace2/io_sulfur",
+    "industrialupgrade:asteroidore2/asteroid_sulfur_ore",
+    "industrialupgrade:deepore2/deep_sulfur_ore"
+  ]
+}

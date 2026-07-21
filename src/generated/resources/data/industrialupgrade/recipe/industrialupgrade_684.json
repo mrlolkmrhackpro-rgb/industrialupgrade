@@ -1,0 +1,25 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "industrialupgrade:quarrymodules/macerator"
+    },
+    "C": {
+      "tag": "c:doubleplate/vanadoalumite"
+    },
+    "D": {
+      "item": "industrialupgrade:crafting_elements/crafting_124_element"
+    }
+  },
+  "pattern": [
+    " D ",
+    " B ",
+    " C "
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:quarrymodules/comb_macerator"
+  },
+  "show_notification": false
+}

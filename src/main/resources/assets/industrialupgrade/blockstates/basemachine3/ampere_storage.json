@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=ampere_storage": {
+      "model": "industrialupgrade:block/basemachine/ampere_storage"
+    },
+    "facing=south,type=ampere_storage": {
+      "model": "industrialupgrade:block/basemachine/ampere_storage",
+      "y": 180
+    },
+    "facing=west,type=ampere_storage": {
+      "model": "industrialupgrade:block/basemachine/ampere_storage",
+      "y": 270
+    },
+    "facing=east,type=ampere_storage": {
+      "model": "industrialupgrade:block/basemachine/ampere_storage",
+      "y": 90
+    },
+    "facing=north,type=ampere_storage_active": {
+      "model": "industrialupgrade:block/basemachine/ampere_storage"
+    },
+    "facing=south,type=ampere_storage_active": {
+      "model": "industrialupgrade:block/basemachine/ampere_storage",
+      "y": 180
+    },
+    "facing=west,type=ampere_storage_active": {
+      "model": "industrialupgrade:block/basemachine/ampere_storage",
+      "y": 270
+    },
+    "facing=east,type=ampere_storage_active": {
+      "model": "industrialupgrade:block/basemachine/ampere_storage",
+      "y": 90
+    }
+  }
+}

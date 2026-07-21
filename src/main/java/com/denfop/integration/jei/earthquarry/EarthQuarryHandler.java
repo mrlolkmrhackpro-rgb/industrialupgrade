@@ -2,8 +2,9 @@ package com.denfop.integration.jei.earthquarry;
 
 
 import com.denfop.IUItem;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
+import com.denfop.recipes.ItemStackHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +12,8 @@ import java.util.List;
 public class EarthQuarryHandler {
 
     private static final List<EarthQuarryHandler> recipes = new ArrayList<>();
+    public final double chance;
     private final ItemStack input;
-    private final double chance;
     private final ItemStack output;
 
     public EarthQuarryHandler(ItemStack input, double chance, ItemStack output) {
@@ -40,9 +41,9 @@ public class EarthQuarryHandler {
     }
 
     public static void initRecipes() {
-        addRecipe(new ItemStack(Blocks.DIRT), 10, new ItemStack(IUItem.ore2, 1, 1));
-        addRecipe(new ItemStack(Blocks.GRAVEL), 6, new ItemStack(IUItem.ore2, 1, 2));
-        addRecipe(new ItemStack(Blocks.SAND), 20, new ItemStack(IUItem.ore2, 1, 0));
+        addRecipe(new ItemStack(Blocks.DIRT), 10, ItemStackHelper.fromData(IUItem.ore2, 1, 1));
+        addRecipe(new ItemStack(Blocks.GRAVEL), 6, ItemStackHelper.fromData(IUItem.ore2, 1, 2));
+        addRecipe(new ItemStack(Blocks.SAND), 20, ItemStackHelper.fromData(IUItem.ore2, 1, 0));
     }
 
     public double getChance() {

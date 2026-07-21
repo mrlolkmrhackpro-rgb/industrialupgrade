@@ -1,10 +1,17 @@
 package com.denfop.api.recipe;
 
+
 import com.denfop.api.Recipes;
 import com.denfop.recipe.IInputItemStack;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import com.denfop.recipe.InputItemStack;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -18,24 +25,57 @@ public class InputFluid implements IInputFluid {
         this.inputsfluid = Arrays.asList(inputs);
     }
 
-    public InputFluid(ItemStack stack) {
-        this.stack = Recipes.inputFactory.getInput(stack);
-        inputsfluid = Collections.emptyList();
-    }
-
     public InputFluid(String stack) {
         this.stack = Recipes.inputFactory.getInput(stack);
         inputsfluid = Collections.emptyList();
     }
 
-    public InputFluid(String stack, FluidStack... inputs) {
+    public InputFluid(ItemStack stack) {
         this.stack = Recipes.inputFactory.getInput(stack);
-        inputsfluid = Arrays.asList(inputs);
+        inputsfluid = Collections.emptyList();
+    }
+
+    public InputFluid(IInputItemStack stack) {
+        this.stack = Recipes.inputFactory.getInput(stack);
+        inputsfluid = Collections.emptyList();
     }
 
     public InputFluid(ItemStack stack, FluidStack... inputs) {
         this.stack = Recipes.inputFactory.getInput(stack);
         inputsfluid = Arrays.asList(inputs);
+    }
+
+    public InputFluid(IInputItemStack stack, FluidStack... inputs) {
+        this.stack = Recipes.inputFactory.getInput(stack);
+        inputsfluid = Arrays.asList(inputs);
+    }
+
+    public InputFluid(List<FluidStack> inputs) {
+        this.inputsfluid = inputs;
+    }
+
+    public static InputFluid readNBT(CompoundTag tag, RegistryAccess access) {
+        List<FluidStack> fluids = new ArrayList<>();
+        ListTag fluidsTag = tag.getList("Fluids", Tag.TAG_COMPOUND);
+        for (Tag fluidTag : fluidsTag) {
+            if (fluidTag instanceof CompoundTag fluidCompound) {
+                if (!fluidCompound.isEmpty())
+                    fluids.add(FluidStack.parseOptional(access, fluidCompound));
+                else
+                    fluids.add(FluidStack.EMPTY);
+            }
+        }
+
+
+        IInputItemStack stack = null;
+        if (tag.contains("Stack", Tag.TAG_COMPOUND)) {
+            stack = InputItemStack.create(tag.getCompound("Stack"), access);
+        }
+
+        InputFluid inputFluid = new InputFluid(fluids);
+        if (stack != null) inputFluid.setStack(stack);
+
+        return inputFluid;
     }
 
     @Override
@@ -48,5 +88,27 @@ public class InputFluid implements IInputFluid {
         return stack;
     }
 
+    private void setStack(IInputItemStack stack) {
+        this.stack = stack;
+    }
 
+    @Override
+    public CompoundTag writeNBT(RegistryAccess access) {
+        CompoundTag tag = new CompoundTag();
+        ListTag fluidsTag = new ListTag();
+        for (FluidStack fluid : inputsfluid) {
+            CompoundTag fluidTag = new CompoundTag();
+            if (!fluid.isEmpty())
+                fluid.save(access, fluidTag);
+
+            fluidsTag.add(fluidTag);
+        }
+        tag.put("Fluids", fluidsTag);
+
+        if (stack != null) {
+            tag.put("Stack", stack.writeNBT(access));
+        }
+
+        return tag;
+    }
 }

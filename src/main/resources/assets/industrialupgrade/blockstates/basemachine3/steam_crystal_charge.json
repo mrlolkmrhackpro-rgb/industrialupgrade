@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=steam_crystal_charge": {
+      "model": "industrialupgrade:block/basemachine/steam_crystal_charge"
+    },
+    "facing=south,type=steam_crystal_charge": {
+      "model": "industrialupgrade:block/basemachine/steam_crystal_charge",
+      "y": 180
+    },
+    "facing=west,type=steam_crystal_charge": {
+      "model": "industrialupgrade:block/basemachine/steam_crystal_charge",
+      "y": 270
+    },
+    "facing=east,type=steam_crystal_charge": {
+      "model": "industrialupgrade:block/basemachine/steam_crystal_charge",
+      "y": 90
+    },
+    "facing=north,type=steam_crystal_charge_active": {
+      "model": "industrialupgrade:block/basemachine/steam_crystal_charge_active"
+    },
+    "facing=south,type=steam_crystal_charge_active": {
+      "model": "industrialupgrade:block/basemachine/steam_crystal_charge_active",
+      "y": 180
+    },
+    "facing=west,type=steam_crystal_charge_active": {
+      "model": "industrialupgrade:block/basemachine/steam_crystal_charge_active",
+      "y": 270
+    },
+    "facing=east,type=steam_crystal_charge_active": {
+      "model": "industrialupgrade:block/basemachine/steam_crystal_charge_active",
+      "y": 90
+    }
+  }
+}

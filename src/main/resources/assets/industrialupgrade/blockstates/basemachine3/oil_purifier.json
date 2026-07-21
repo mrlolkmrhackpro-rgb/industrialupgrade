@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=oil_purifier": {
+      "model": "industrialupgrade:block/basemachine/oil_purifier"
+    },
+    "facing=south,type=oil_purifier": {
+      "model": "industrialupgrade:block/basemachine/oil_purifier",
+      "y": 180
+    },
+    "facing=west,type=oil_purifier": {
+      "model": "industrialupgrade:block/basemachine/oil_purifier",
+      "y": 270
+    },
+    "facing=east,type=oil_purifier": {
+      "model": "industrialupgrade:block/basemachine/oil_purifier",
+      "y": 90
+    },
+    "facing=north,type=oil_purifier_active": {
+      "model": "industrialupgrade:block/basemachine/oil_purifier_active"
+    },
+    "facing=south,type=oil_purifier_active": {
+      "model": "industrialupgrade:block/basemachine/oil_purifier_active",
+      "y": 180
+    },
+    "facing=west,type=oil_purifier_active": {
+      "model": "industrialupgrade:block/basemachine/oil_purifier_active",
+      "y": 270
+    },
+    "facing=east,type=oil_purifier_active": {
+      "model": "industrialupgrade:block/basemachine/oil_purifier_active",
+      "y": 90
+    }
+  }
+}

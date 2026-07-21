@@ -1,0 +1,25 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:polonium_palladium_composite"
+    },
+    "B": {
+      "item": "industrialupgrade:module_schedule"
+    },
+    "C": {
+      "item": "industrialupgrade:alloydoubleplate/alcled"
+    }
+  },
+  "pattern": [
+    "CCC",
+    "ABA",
+    "A A"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:antiairpollution1"
+  },
+  "show_notification": false
+}

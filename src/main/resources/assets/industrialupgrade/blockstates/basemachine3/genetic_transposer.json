@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=genetic_transposer": {
+      "model": "industrialupgrade:block/basemachine/genetic_transposer"
+    },
+    "facing=south,type=genetic_transposer": {
+      "model": "industrialupgrade:block/basemachine/genetic_transposer",
+      "y": 180
+    },
+    "facing=west,type=genetic_transposer": {
+      "model": "industrialupgrade:block/basemachine/genetic_transposer",
+      "y": 270
+    },
+    "facing=east,type=genetic_transposer": {
+      "model": "industrialupgrade:block/basemachine/genetic_transposer",
+      "y": 90
+    },
+    "facing=north,type=genetic_transposer_active": {
+      "model": "industrialupgrade:block/basemachine/genetic_transposer_active"
+    },
+    "facing=south,type=genetic_transposer_active": {
+      "model": "industrialupgrade:block/basemachine/genetic_transposer_active",
+      "y": 180
+    },
+    "facing=west,type=genetic_transposer_active": {
+      "model": "industrialupgrade:block/basemachine/genetic_transposer_active",
+      "y": 270
+    },
+    "facing=east,type=genetic_transposer_active": {
+      "model": "industrialupgrade:block/basemachine/genetic_transposer_active",
+      "y": 90
+    }
+  }
+}

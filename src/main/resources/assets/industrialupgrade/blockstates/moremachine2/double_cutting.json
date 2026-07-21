@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=double_cutting": {
+      "model": "industrialupgrade:block/moremachine2/double_cutting"
+    },
+    "facing=south,type=double_cutting": {
+      "model": "industrialupgrade:block/moremachine2/double_cutting",
+      "y": 180
+    },
+    "facing=west,type=double_cutting": {
+      "model": "industrialupgrade:block/moremachine2/double_cutting",
+      "y": 270
+    },
+    "facing=east,type=double_cutting": {
+      "model": "industrialupgrade:block/moremachine2/double_cutting",
+      "y": 90
+    },
+    "facing=north,type=double_cutting_active": {
+      "model": "industrialupgrade:block/moremachine2/double_cutting_active"
+    },
+    "facing=south,type=double_cutting_active": {
+      "model": "industrialupgrade:block/moremachine2/double_cutting_active",
+      "y": 180
+    },
+    "facing=west,type=double_cutting_active": {
+      "model": "industrialupgrade:block/moremachine2/double_cutting_active",
+      "y": 270
+    },
+    "facing=east,type=double_cutting_active": {
+      "model": "industrialupgrade:block/moremachine2/double_cutting_active",
+      "y": 90
+    }
+  }
+}

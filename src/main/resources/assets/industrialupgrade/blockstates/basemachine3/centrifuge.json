@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=centrifuge": {
+      "model": "industrialupgrade:block/basemachine/centrifuge"
+    },
+    "facing=south,type=centrifuge": {
+      "model": "industrialupgrade:block/basemachine/centrifuge",
+      "y": 180
+    },
+    "facing=west,type=centrifuge": {
+      "model": "industrialupgrade:block/basemachine/centrifuge",
+      "y": 270
+    },
+    "facing=east,type=centrifuge": {
+      "model": "industrialupgrade:block/basemachine/centrifuge",
+      "y": 90
+    },
+    "facing=north,type=centrifuge_active": {
+      "model": "industrialupgrade:block/basemachine/centrifuge_active"
+    },
+    "facing=south,type=centrifuge_active": {
+      "model": "industrialupgrade:block/basemachine/centrifuge_active",
+      "y": 180
+    },
+    "facing=west,type=centrifuge_active": {
+      "model": "industrialupgrade:block/basemachine/centrifuge_active",
+      "y": 270
+    },
+    "facing=east,type=centrifuge_active": {
+      "model": "industrialupgrade:block/basemachine/centrifuge_active",
+      "y": 90
+    }
+  }
+}

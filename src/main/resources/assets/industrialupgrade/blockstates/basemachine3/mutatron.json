@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=mutatron": {
+      "model": "industrialupgrade:block/basemachine/mutatron"
+    },
+    "facing=south,type=mutatron": {
+      "model": "industrialupgrade:block/basemachine/mutatron",
+      "y": 180
+    },
+    "facing=west,type=mutatron": {
+      "model": "industrialupgrade:block/basemachine/mutatron",
+      "y": 270
+    },
+    "facing=east,type=mutatron": {
+      "model": "industrialupgrade:block/basemachine/mutatron",
+      "y": 90
+    },
+    "facing=north,type=mutatron_active": {
+      "model": "industrialupgrade:block/basemachine/mutatron_active"
+    },
+    "facing=south,type=mutatron_active": {
+      "model": "industrialupgrade:block/basemachine/mutatron_active",
+      "y": 180
+    },
+    "facing=west,type=mutatron_active": {
+      "model": "industrialupgrade:block/basemachine/mutatron_active",
+      "y": 270
+    },
+    "facing=east,type=mutatron_active": {
+      "model": "industrialupgrade:block/basemachine/mutatron_active",
+      "y": 90
+    }
+  }
+}

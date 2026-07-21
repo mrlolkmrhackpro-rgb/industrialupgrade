@@ -1,24 +1,30 @@
 package com.denfop.integration.jei.laser;
 
 
+import com.denfop.integration.jei.IJeiVariantRecipe;
+import com.denfop.integration.jei.JeiIngredientHelper;
 import com.denfop.api.Recipes;
 import com.denfop.api.recipe.BaseMachineRecipe;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LaserHandler {
+public class LaserHandler implements IJeiVariantRecipe {
 
     private static final List<LaserHandler> recipes = new ArrayList<>();
-    private final ItemStack input, output;
+    
+    private List<List<ItemStack>> inputVariants = new ArrayList<>();
+private final ItemStack input, output;
+    private final BaseMachineRecipe container;
 
     public LaserHandler(
             ItemStack input,
-            ItemStack output
-    ) {
+            ItemStack output,
+            BaseMachineRecipe container) {
         this.input = input;
         this.output = output;
+        this.container = container;
     }
 
     public static List<LaserHandler> getRecipes() {
@@ -29,9 +35,9 @@ public class LaserHandler {
     }
 
     public static LaserHandler addRecipe(
-            ItemStack input, ItemStack output
-    ) {
-        LaserHandler recipe = new LaserHandler(input, output);
+            ItemStack input, ItemStack output,
+            BaseMachineRecipe container) {
+        LaserHandler recipe = new LaserHandler(input, output, container);
         if (recipes.contains(recipe)) {
             return null;
         }
@@ -53,15 +59,18 @@ public class LaserHandler {
 
     public static void initRecipes() {
         for (BaseMachineRecipe container : Recipes.recipes.getRecipeList("laser")) {
-            addRecipe(
+            JeiIngredientHelper.attachInputVariants(addRecipe(
                     container.input.getInputs().get(0).getInputs().get(0),
-                    container.getOutput().items.get(0)
-            );
+                    container.getOutput().items.get(0), container
+            ), container);
 
 
         }
     }
 
+    public BaseMachineRecipe getContainer() {
+        return container;
+    }
 
     public ItemStack getInput() { // Получатель входного предмета рецепта.
         return input;
@@ -73,7 +82,18 @@ public class LaserHandler {
     }
 
     public boolean matchesInput(ItemStack is) {
-        return is.isItemEqual(input);
+        return true;
     }
 
+
+
+    @Override
+    public void setInputVariants(final List<List<ItemStack>> inputVariants) {
+        this.inputVariants = inputVariants == null ? new ArrayList<>() : inputVariants;
+    }
+
+    @Override
+    public List<ItemStack> getInputVariants(final int slot, final ItemStack fallback) {
+        return JeiIngredientHelper.getInputVariants(this.inputVariants, slot, fallback);
+    }
 }

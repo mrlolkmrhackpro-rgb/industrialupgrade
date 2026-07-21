@@ -1,23 +1,26 @@
 package com.denfop.integration.jei.solidmatters;
 
 
-import com.denfop.Config;
+import com.denfop.integration.jei.IJeiVariantRecipe;
+import com.denfop.integration.jei.JeiIngredientHelper;
 import com.denfop.api.Recipes;
 import com.denfop.api.recipe.BaseMachineRecipe;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MatterHandler {
+public class MatterHandler implements IJeiVariantRecipe {
 
     private static final List<MatterHandler> recipes = new ArrayList<>();
-    private final ItemStack input;
+    
+    private List<List<ItemStack>> inputVariants = new ArrayList<>();
+private final ItemStack input;
     private final int energy;
 
     public MatterHandler(ItemStack input) {
         this.input = input;
-        this.energy = (int) Config.SolidMatterStorage;
+        this.energy = (int) 5E7D;
     }
 
     public static List<MatterHandler> getRecipes() {
@@ -50,9 +53,9 @@ public class MatterHandler {
 
     public static void initRecipes() {
         for (BaseMachineRecipe container : Recipes.recipes.getRecipeList("matter")) {
-            addRecipe(
+            JeiIngredientHelper.attachInputVariants(addRecipe(
                     container.input.getInputs().get(0).getInputs().get(0)
-            );
+            ), container);
 
 
         }
@@ -68,7 +71,18 @@ public class MatterHandler {
     }
 
     public boolean matchesInput(ItemStack is) {
-        return is.isItemEqual(input);
+        return true;
     }
 
+
+
+    @Override
+    public void setInputVariants(final List<List<ItemStack>> inputVariants) {
+        this.inputVariants = inputVariants == null ? new ArrayList<>() : inputVariants;
+    }
+
+    @Override
+    public List<ItemStack> getInputVariants(final int slot, final ItemStack fallback) {
+        return JeiIngredientHelper.getInputVariants(this.inputVariants, slot, fallback);
+    }
 }

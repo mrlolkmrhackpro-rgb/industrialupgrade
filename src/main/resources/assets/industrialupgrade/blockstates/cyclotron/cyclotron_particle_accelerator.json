@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=cyclotron_particle_accelerator": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_particle_accelerator"
+    },
+    "facing=south,type=cyclotron_particle_accelerator": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_particle_accelerator",
+      "y": 180
+    },
+    "facing=west,type=cyclotron_particle_accelerator": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_particle_accelerator",
+      "y": 270
+    },
+    "facing=east,type=cyclotron_particle_accelerator": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_particle_accelerator",
+      "y": 90
+    },
+    "facing=north,type=cyclotron_particle_accelerator_active": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_particle_accelerator"
+    },
+    "facing=south,type=cyclotron_particle_accelerator_active": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_particle_accelerator",
+      "y": 180
+    },
+    "facing=west,type=cyclotron_particle_accelerator_active": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_particle_accelerator",
+      "y": 270
+    },
+    "facing=east,type=cyclotron_particle_accelerator_active": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_particle_accelerator",
+      "y": 90
+    }
+  }
+}

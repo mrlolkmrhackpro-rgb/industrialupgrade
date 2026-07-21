@@ -1,185 +1,147 @@
 package com.denfop.items.energy;
 
-import com.denfop.Constants;
+
+import com.denfop.config.ModConfig;
 import com.denfop.IUCore;
 import com.denfop.IUItem;
-import com.denfop.blocks.BlockFoam;
 import com.denfop.blocks.FluidName;
+import com.denfop.datacomponent.DataComponentsInit;
 import com.denfop.items.ItemFluidContainer;
-import com.denfop.utils.ModUtils;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.translation.I18n;
-import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.denfop.tabs.IItemTab;
+import com.denfop.utils.Localization;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayDeque;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
-public class ItemSprayer extends ItemFluidContainer {
+public class ItemSprayer extends ItemFluidContainer implements IItemTab {
 
     public ItemSprayer() {
-        super("foam_sprayer", 8000);
-        this.setMaxStackSize(1);
+        super(8000, ModConfig.itemInt("sprayer_capacity", 1));
     }
 
-    private static boolean canPlaceFoam(World world, BlockPos pos, Target target) {
-        if (Objects.requireNonNull(target) == Target.Any) {
-            return IUItem.foam.canPlaceBlockOnSide(world, pos, EnumFacing.DOWN);
+    private static boolean canPlaceFoam(Level world, BlockPos pos, Target target) {
+        if (target == Target.Any) {
+            return world.getBlockState(pos).canBeReplaced();
         } else {
             return false;
         }
-
     }
 
-    public String getItemStackDisplayName(ItemStack stack) {
-        return I18n.translateToLocal(this.getUnlocalizedName(stack).replace("item.", "iu.").replace(".name", ""));
-    }
-
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-        if (this.isInCreativeTab(tab)) {
-            subItems.add(new ItemStack(this));
-            subItems.add(this.getItemStack(FluidName.fluidconstruction_foam));
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
     @Override
-    public void registerModels() {
-        ModelLoader.setCustomModelResourceLocation(
-                this,
-                0,
-                new ModelResourceLocation(Constants.MOD_ID + ":" + "tools" + "/" + "foam_sprayer", null)
-        );
+    public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> list, TooltipFlag tooltipFlag) {
+        super.appendHoverText(stack, level, list, tooltipFlag);
+        list.add(Component.literal(Localization.translate("iu.sprayer.info")));
     }
 
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-        if (IUCore.proxy.isSimulating() && IUCore.keyboard.isChangeKeyDown(player)) {
-            ItemStack stack = ModUtils.get(player, hand);
-            NBTTagCompound nbtData = ModUtils.nbt(stack);
-            int mode = nbtData.getInteger("mode");
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+        if (!world.isClientSide && IUCore.keyboard.isChangeKeyDown(player)) {
+            ItemStack stack = player.getItemInHand(hand);
+            int mode = stack.getOrDefault(DataComponentsInit.MODE, 0);
             mode = mode == 0 ? 1 : 0;
-            nbtData.setInteger("mode", mode);
+            stack.set(DataComponentsInit.MODE, mode);
             String sMode = mode == 0 ? "iu.tooltip.mode.normal" : "iu.tooltip.mode.single";
-            IUCore.proxy.messagePlayer(player, "iu.tooltip.mode", sMode);
+            player.displayClientMessage(Component.translatable("iu.tooltip.mode", sMode), true);
         }
-
-        return super.onItemRightClick(world, player, hand);
+        return super.use(world, player, hand);
     }
 
-    public EnumActionResult onItemUse(
-            EntityPlayer player,
-            World world,
-            BlockPos pos,
-            EnumHand hand,
-            EnumFacing side,
-            float xOffset,
-            float yOffset,
-            float zOffset
-    ) {
-        if (!IUCore.proxy.isSimulating()) {
-            return EnumActionResult.SUCCESS;
-        } else {
-            int maxFoamBlocks = 0;
-            ItemStack stack = ModUtils.get(player, hand);
-            FluidStack fluid = FluidUtil.getFluidContained(stack);
-            if (fluid != null && fluid.amount > 0) {
-                maxFoamBlocks += fluid.amount / this.getFluidPerFoam();
-            }
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        Level world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        Direction side = context.getClickedFace();
+        Player player = context.getPlayer();
+        ItemStack stack = context.getItemInHand();
 
-
-            if (maxFoamBlocks == 0) {
-                return EnumActionResult.FAIL;
-            } else {
-                maxFoamBlocks = Math.min(maxFoamBlocks, this.getMaxFoamBlocks(stack));
-                Target target;
-                if (canPlaceFoam(world, pos, Target.Scaffold)) {
-                    target = Target.Scaffold;
-                } else {
-                    pos = pos.offset(side);
-                    target = Target.Any;
-                }
-
-                Vec3d viewVec = player.getLookVec();
-                EnumFacing playerViewFacing = EnumFacing.getFacingFromVector(
-                        (float) viewVec.x,
-                        (float) viewVec.y,
-                        (float) viewVec.z
-                );
-                int amount = this.sprayFoam(world, pos, playerViewFacing.getOpposite(), target, maxFoamBlocks);
-                amount *= this.getFluidPerFoam();
-                if (amount > 0) {
-                    IFluidHandlerItem handler;
-                    handler = FluidUtil.getFluidHandler(stack);
-
-                    assert handler != null;
-
-                    handler.drain(amount, true);
-                    player.inventory.mainInventory.set(player.inventory.currentItem, handler.getContainer());
-
-                    return EnumActionResult.SUCCESS;
-                } else {
-                    return EnumActionResult.PASS;
-                }
-            }
+        if (world.isClientSide) {
+            return InteractionResult.SUCCESS;
         }
+
+        int maxFoamBlocks = 0;
+        IFluidHandlerItem fs = stack.getCapability(Capabilities.FluidHandler.ITEM, null);
+        FluidStack fluid = fs.getFluidInTank(0);
+        if (!fluid.isEmpty() && fluid.getAmount() > 0) {
+            maxFoamBlocks += fluid.getAmount() / this.getFluidPerFoam();
+        }
+
+        if (maxFoamBlocks == 0) {
+            return InteractionResult.FAIL;
+        }
+
+        maxFoamBlocks = Math.min(maxFoamBlocks, this.getMaxFoamBlocks(stack));
+        Target target = canPlaceFoam(world, pos, Target.Scaffold) ? Target.Scaffold : Target.Any;
+
+        if (target == Target.Any) {
+            pos = pos.relative(side);
+        }
+
+        Vec3 viewVec = player.getLookAngle();
+        Direction playerViewFacing = Direction.getNearest(viewVec.x, viewVec.y, viewVec.z);
+
+        int amount = this.sprayFoam(world, pos, playerViewFacing.getOpposite(), target, maxFoamBlocks);
+        amount *= this.getFluidPerFoam();
+
+        if (amount > 0) {
+            fs.drain(amount, IFluidHandler.FluidAction.EXECUTE);
+            player.getInventory().setItem(player.getInventory().selected, fs.getContainer());
+            return InteractionResult.SUCCESS;
+        }
+        return InteractionResult.PASS;
     }
 
-    public int sprayFoam(World world, BlockPos pos, EnumFacing excludedDir, Target target, int maxFoamBlocks) {
+    public int sprayFoam(Level world, BlockPos pos, Direction excludedDir, Target target, int maxFoamBlocks) {
         if (!canPlaceFoam(world, pos, target)) {
             return 0;
-        } else {
-            Queue<BlockPos> toCheck = new ArrayDeque<>();
-            Set<BlockPos> positions = new HashSet<>();
-            toCheck.add(pos);
+        }
 
-            BlockPos cPos;
-            while ((cPos = toCheck.poll()) != null && positions.size() < maxFoamBlocks) {
-                if (canPlaceFoam(world, cPos, target) && positions.add(cPos)) {
-                    EnumFacing[] var9 = EnumFacing.VALUES;
-                    for (EnumFacing dir : var9) {
-                        if (dir != excludedDir) {
-                            toCheck.add(cPos.offset(dir));
-                        }
+        Queue<BlockPos> toCheck = new ArrayDeque<>();
+        Set<BlockPos> positions = new HashSet<>();
+        toCheck.add(pos);
+
+        BlockPos cPos;
+        while ((cPos = toCheck.poll()) != null && positions.size() < maxFoamBlocks) {
+            if (canPlaceFoam(world, cPos, target) && positions.add(cPos)) {
+                for (Direction dir : Direction.values()) {
+                    if (dir != excludedDir) {
+                        toCheck.add(cPos.relative(dir));
                     }
                 }
             }
-
-            toCheck.clear();
-            int failedPlacements = 0;
-
-            for (final BlockPos targetPos : positions) {
-                if (!world.setBlockState(targetPos, IUItem.foam.getState(BlockFoam.FoamType.reinforced))) {
-                    ++failedPlacements;
-                }
-            }
-
-            return positions.size() - failedPlacements;
         }
+
+        int failedPlacements = 0;
+        for (BlockPos targetPos : positions) {
+            if (!world.setBlock(targetPos, IUItem.foam.getDefaultState(), 3)) {
+                failedPlacements++;
+            }
+        }
+
+        return positions.size() - failedPlacements;
     }
 
     protected int getMaxFoamBlocks(ItemStack stack) {
-        NBTTagCompound nbtData = ModUtils.nbt(stack);
-        return nbtData.getInteger("mode") == 0 ? 10 : 1;
+        return stack.getOrDefault(DataComponentsInit.MODE, 0) == 0 ? 10 : 1;
     }
 
     protected int getFluidPerFoam() {
@@ -188,8 +150,22 @@ public class ItemSprayer extends ItemFluidContainer {
 
 
     public boolean canfill(Fluid fluid) {
-        return fluid == FluidName.fluidconstruction_foam.getInstance();
+        return fluid == FluidName.fluidconstruction_foam.getInstance().get();
     }
+
+    @Override
+    public void fillItemCategory(CreativeModeTab p_41391_, NonNullList<ItemStack> p_41392_) {
+        if (this.allowedIn(p_41391_)) {
+            p_41392_.add(new ItemStack(this));
+            p_41392_.add(this.getItemStack(FluidName.fluidconstruction_foam.getInstance().get()));
+        }
+    }
+
+    @Override
+    public CreativeModeTab getItemCategory() {
+        return IUCore.EnergyTab;
+    }
+
 
     private enum Target {
         Any,
@@ -198,5 +174,6 @@ public class ItemSprayer extends ItemFluidContainer {
         Target() {
         }
     }
+
 
 }

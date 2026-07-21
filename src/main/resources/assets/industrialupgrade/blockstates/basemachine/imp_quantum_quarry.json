@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=imp_quantum_quarry": {
+      "model": "industrialupgrade:block/basemachine/imp_quantum_quarry"
+    },
+    "facing=south,type=imp_quantum_quarry": {
+      "model": "industrialupgrade:block/basemachine/imp_quantum_quarry",
+      "y": 180
+    },
+    "facing=west,type=imp_quantum_quarry": {
+      "model": "industrialupgrade:block/basemachine/imp_quantum_quarry",
+      "y": 270
+    },
+    "facing=east,type=imp_quantum_quarry": {
+      "model": "industrialupgrade:block/basemachine/imp_quantum_quarry",
+      "y": 90
+    },
+    "facing=north,type=imp_quantum_quarry_active": {
+      "model": "industrialupgrade:block/basemachine/imp_quantum_quarry_active"
+    },
+    "facing=south,type=imp_quantum_quarry_active": {
+      "model": "industrialupgrade:block/basemachine/imp_quantum_quarry_active",
+      "y": 180
+    },
+    "facing=west,type=imp_quantum_quarry_active": {
+      "model": "industrialupgrade:block/basemachine/imp_quantum_quarry_active",
+      "y": 270
+    },
+    "facing=east,type=imp_quantum_quarry_active": {
+      "model": "industrialupgrade:block/basemachine/imp_quantum_quarry_active",
+      "y": 90
+    }
+  }
+}

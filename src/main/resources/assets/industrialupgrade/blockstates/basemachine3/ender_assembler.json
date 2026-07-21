@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=ender_assembler": {
+      "model": "industrialupgrade:block/basemachine/ender_assembler"
+    },
+    "facing=south,type=ender_assembler": {
+      "model": "industrialupgrade:block/basemachine/ender_assembler",
+      "y": 180
+    },
+    "facing=west,type=ender_assembler": {
+      "model": "industrialupgrade:block/basemachine/ender_assembler",
+      "y": 270
+    },
+    "facing=east,type=ender_assembler": {
+      "model": "industrialupgrade:block/basemachine/ender_assembler",
+      "y": 90
+    },
+    "facing=north,type=ender_assembler_active": {
+      "model": "industrialupgrade:block/basemachine/ender_assembler"
+    },
+    "facing=south,type=ender_assembler_active": {
+      "model": "industrialupgrade:block/basemachine/ender_assembler",
+      "y": 180
+    },
+    "facing=west,type=ender_assembler_active": {
+      "model": "industrialupgrade:block/basemachine/ender_assembler",
+      "y": 270
+    },
+    "facing=east,type=ender_assembler_active": {
+      "model": "industrialupgrade:block/basemachine/ender_assembler",
+      "y": 90
+    }
+  }
+}

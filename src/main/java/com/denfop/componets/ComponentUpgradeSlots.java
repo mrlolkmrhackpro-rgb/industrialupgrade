@@ -1,7 +1,7 @@
 package com.denfop.componets;
 
-import com.denfop.invslot.InventoryUpgrade;
-import com.denfop.tiles.base.TileEntityInventory;
+import com.denfop.blockentity.base.BlockEntityInventory;
+import com.denfop.inventory.InventoryUpgrade;
 
 public class ComponentUpgradeSlots extends AbstractComponent {
 
@@ -11,7 +11,7 @@ public class ComponentUpgradeSlots extends AbstractComponent {
     protected ComponentProcess componentProcess;
     protected Energy energy;
 
-    public ComponentUpgradeSlots(final TileEntityInventory parent, InventoryUpgrade invSlotUpgrade) {
+    public ComponentUpgradeSlots(final BlockEntityInventory parent, InventoryUpgrade invSlotUpgrade) {
         super(parent);
         this.invSlot = invSlotUpgrade;
     }

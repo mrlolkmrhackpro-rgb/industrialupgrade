@@ -8,7 +8,8 @@ import com.denfop.api.space.colonies.api.building.IStorage;
 import com.denfop.api.space.colonies.enums.EnumProblems;
 import com.denfop.api.space.colonies.enums.EnumTypeBuilding;
 import com.denfop.network.packet.CustomPacketBuffer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 
 public class StorageBuilding extends Building implements IColonyStorage {
 
@@ -39,12 +40,12 @@ public class StorageBuilding extends Building implements IColonyStorage {
         this.getColony().addBuilding(this);
     }
 
-    public StorageBuilding(final NBTTagCompound tag, final IColony colonie) {
+    public StorageBuilding(final CompoundTag tag, HolderLookup.Provider p_323640_, final IColony colonie) {
         super(colonie);
         this.peoples = tag.getByte("people");
         this.energy = 10;
         this.work = tag.getBoolean("work");
-        this.storage = new Storage(tag.getCompoundTag("storage"), this);
+        this.storage = new Storage(tag.getCompound("storage"), p_323640_, this);
         this.getColony().addStorage(this.storage);
         this.getColony().addBuilding(this);
     }
@@ -64,11 +65,11 @@ public class StorageBuilding extends Building implements IColonyStorage {
     }
 
     @Override
-    public NBTTagCompound writeTag(final NBTTagCompound tag) {
-        super.writeTag(tag);
-        tag.setByte("people", this.peoples);
-        tag.setBoolean("work", this.work);
-        tag.setTag("storage", this.getStorage().writeNBT(new NBTTagCompound()));
+    public CompoundTag writeTag(final CompoundTag tag, HolderLookup.Provider p_323640_) {
+        super.writeTag(tag, p_323640_);
+        tag.putByte("people", this.peoples);
+        tag.putBoolean("work", this.work);
+        tag.put("storage", this.getStorage().writeNBT(new CompoundTag(), p_323640_));
         return tag;
     }
 

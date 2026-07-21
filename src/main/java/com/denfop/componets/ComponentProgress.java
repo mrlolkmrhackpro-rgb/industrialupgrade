@@ -1,8 +1,8 @@
 package com.denfop.componets;
 
+import com.denfop.blockentity.base.BlockEntityInventory;
 import com.denfop.network.packet.CustomPacketBuffer;
-import com.denfop.tiles.base.TileEntityInventory;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.io.IOException;
 
@@ -11,13 +11,13 @@ public class ComponentProgress extends AbstractComponent {
     private final short[] progress;
     private short maxValue;
 
-    public ComponentProgress(final TileEntityInventory parent, int col, short max) {
+    public ComponentProgress(final BlockEntityInventory parent, int col, short max) {
         super(parent);
         this.progress = new short[col];
         this.maxValue = max;
     }
 
-    public ComponentProgress(final TileEntityInventory parent, int col, int max) {
+    public ComponentProgress(final BlockEntityInventory parent, int col, int max) {
         super(parent);
         this.progress = new short[col];
         this.maxValue = (short) max;
@@ -76,8 +76,8 @@ public class ComponentProgress extends AbstractComponent {
     }
 
     @Override
-    public void onContainerUpdate(final EntityPlayerMP player) {
-        CustomPacketBuffer buffer = new CustomPacketBuffer(16);
+    public void onContainerUpdate(final ServerPlayer player) {
+        CustomPacketBuffer buffer = new CustomPacketBuffer(16, player.registryAccess());
         buffer.writeShort(progress.length);
         for (final short value : progress) {
             buffer.writeShort(value);
@@ -88,7 +88,7 @@ public class ComponentProgress extends AbstractComponent {
     }
 
     public CustomPacketBuffer updateComponent() {
-        CustomPacketBuffer buffer = new CustomPacketBuffer(16);
+        CustomPacketBuffer buffer = new CustomPacketBuffer(16, parent.registryAccess());
         buffer.writeShort(progress.length);
         for (final short value : progress) {
             buffer.writeShort(value);

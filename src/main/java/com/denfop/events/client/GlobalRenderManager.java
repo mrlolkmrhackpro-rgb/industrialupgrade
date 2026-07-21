@@ -1,110 +1,181 @@
 package com.denfop.events.client;
 
-import com.denfop.gui.GuiIU;
+import com.denfop.mixin.access.LevelRendererAccessor;
+import com.denfop.screen.ScreenMain;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-
+@OnlyIn(Dist.CLIENT)
 public class GlobalRenderManager {
 
+    private static final Map<ResourceKey<Level>, Map<BlockPos, Function<RenderLevelStageEvent, Void>>> globalRenders =
+            new ConcurrentHashMap<>();
+
     public static long tick = 0;
-    public static Map<Integer, Map<BlockPos, Function>> globalRenders = new HashMap<>();
 
     public GlobalRenderManager() {
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
-    public static void addRender(World world, BlockPos pos, Function globalRender) {
-        Map<BlockPos, Function> map = globalRenders.computeIfAbsent(world.provider.getDimension(), k -> new HashMap<>());
-        if (!map.containsKey(pos)) {
-            map.put(pos, globalRender);
-        }
-    }
-
-    public static void removeRender(World world, BlockPos pos) {
-        Map<BlockPos, Function> map = globalRenders.computeIfAbsent(world.provider.getDimension(), k -> new HashMap<>());
-        map.remove(pos);
-    }
-
-    @SubscribeEvent
-    public void onWorldUnload(WorldEvent.Unload event) {
-        if ((event.getWorld()).isRemote) {
+    public static void addRender(Level world, BlockPos pos, Function<RenderLevelStageEvent, Void> globalRender) {
+        if (world == null || pos == null || globalRender == null) {
             return;
         }
-        globalRenders.getOrDefault(event.getWorld().provider.getDimension(), new HashMap<>()).clear();
+
+        if (!world.isClientSide()) {
+            return;
+        }
+
+        globalRenders
+                .computeIfAbsent(world.dimension(), key -> new ConcurrentHashMap<>())
+                .putIfAbsent(pos.immutable(), globalRender);
+    }
+
+    public static void removeRender(Level world, BlockPos pos) {
+        if (world == null || pos == null) {
+            return;
+        }
+
+        ResourceKey<Level> dimension = world.dimension();
+
+        globalRenders.computeIfPresent(dimension, (key, renders) -> {
+            renders.remove(pos);
+            return renders.isEmpty() ? null : renders;
+        });
+    }
+
+    public static void clearAllRenders() {
+        globalRenders.clear();
+        tick = 0;
+    }
+
+    public static void clearDimensionRenders(Level level) {
+        if (level == null) {
+            return;
+        }
+
+        globalRenders.remove(level.dimension());
+
+        if (globalRenders.isEmpty()) {
+            tick = 0;
+        }
     }
 
     @SubscribeEvent
-    @SideOnly(Side.CLIENT)
-    public void onWorldTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase == TickEvent.Phase.END && event.player.getEntityWorld().isRemote && tick != event.player
-                .getEntityWorld()
-                .getWorldTime()) {
-            tick = event.player.getEntityWorld().getWorldTime();
-            GuiScreen guiScreen = Minecraft.getMinecraft().currentScreen;
-            if (guiScreen instanceof GuiIU) {
-                double ticks = 4;
-                while (ticks > 0) {
-                    ((GuiIU<?>) guiScreen).updateTickInterface();
-                    ticks--;
-                }
+    public void onWorldUnload(LevelEvent.Unload event) {
+        if (!(event.getLevel() instanceof Level level)) {
+            return;
+        }
 
+        if (!level.isClientSide()) {
+            return;
+        }
+
+        clearDimensionRenders(level);
+    }
+
+    @SubscribeEvent
+    public void onClientLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
+        clearAllRenders();
+    }
+
+    @SubscribeEvent
+    public void onClientLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
+        clearAllRenders();
+    }
+
+    @SubscribeEvent
+    public void onWorldTick(PlayerTickEvent.Post event) {
+        if (!event.getEntity().level().isClientSide()) {
+            return;
+        }
+
+        long gameTime = event.getEntity().level().getGameTime();
+
+        if (tick == gameTime) {
+            return;
+        }
+
+        tick = gameTime;
+
+        Screen guiScreen = Minecraft.getInstance().screen;
+
+        if (guiScreen instanceof ScreenMain<?> screenMain) {
+            int ticks = 4;
+
+            while (ticks > 0) {
+                screenMain.updateTickInterface();
+                ticks--;
             }
+
+            screenMain.updateTick();
         }
     }
 
     @SubscribeEvent
-    @SideOnly(Side.CLIENT)
+    public void onRenderWorldLast(RenderLevelStageEvent event) {
+        Minecraft mc = Minecraft.getInstance();
+        LocalPlayer player = mc.player;
 
-    public void onRenderWorldLast(RenderWorldLastEvent event) {
-        Minecraft mc = Minecraft.getMinecraft();
-        EntityPlayer player = mc.player;
-
-        if (player == null || mc.world == null) {
+        if (player == null || mc.level == null) {
             return;
         }
+
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
+            return;
+        }
+
+        Map<BlockPos, Function<RenderLevelStageEvent, Void>> renders = globalRenders.get(mc.level.dimension());
+
+        if (renders == null || renders.isEmpty()) {
+            return;
+        }
+
+        PoseStack poseStack = event.getPoseStack();
+        Vec3 camera = event.getCamera().getPosition();
+
+        poseStack.pushPose();
+
         try {
-            for (Map.Entry<Integer, Map<BlockPos, Function>> entry : globalRenders.entrySet()) {
-                if (entry.getKey() == mc.player.getEntityWorld().provider.getDimension()) {
-                    for (Function function : entry.getValue().values()) {
-                        double x = player.lastTickPosX + (player.posX - player.lastTickPosX) * event.getPartialTicks();
-                        double y = player.lastTickPosY + (player.posY - player.lastTickPosY) * event.getPartialTicks();
-                        double z = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * event.getPartialTicks();
+            poseStack.translate(-camera.x, -camera.y, -camera.z);
 
-                        GlStateManager.pushMatrix();
-                        GlStateManager.translate(-x, -y, -z);
-                        if (mc.world.getWorldTime() % 24000 > 13000) {
-                            GlStateManager.enableLighting();
-                        }
-                        GlStateManager.enableDepth();
-                        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-                        function.apply(0);
-                        GlStateManager.disableLighting();
-
-                        GlStateManager.popMatrix();
-                    }
+            for (Function<RenderLevelStageEvent, Void> function : new ArrayList<>(renders.values())) {
+                if (function != null) {
+                    function.apply(event);
                 }
             }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        ;
-    }
 
+            ((LevelRendererAccessor) event.getLevelRenderer())
+                    .getRenderBuffers()
+                    .bufferSource()
+                    .endBatch();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            poseStack.popPose();
+        }
+    }
 }

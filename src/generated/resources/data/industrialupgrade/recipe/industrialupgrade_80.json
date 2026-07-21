@@ -1,0 +1,31 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:crafting_elements/crafting_285_element"
+    },
+    "B": {
+      "item": "industrialupgrade:quantumitems3"
+    },
+    "C": {
+      "tag": "c:plates/adamantium"
+    },
+    "D": {
+      "item": "industrialupgrade:energy_tools/nano_bow"
+    },
+    "E": {
+      "tag": "c:doubleplate/alcled"
+    }
+  },
+  "pattern": [
+    "ABA",
+    "CDC",
+    "EBE"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:energy_tools/quantum_bow"
+  },
+  "show_notification": false
+}

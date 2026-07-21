@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=tropical_hive": {
+      "model": "industrialupgrade:block/hive/tropical_hive"
+    },
+    "facing=south,type=tropical_hive": {
+      "model": "industrialupgrade:block/hive/tropical_hive",
+      "y": 180
+    },
+    "facing=west,type=tropical_hive": {
+      "model": "industrialupgrade:block/hive/tropical_hive",
+      "y": 270
+    },
+    "facing=east,type=tropical_hive": {
+      "model": "industrialupgrade:block/hive/tropical_hive",
+      "y": 90
+    },
+    "facing=north,type=tropical_hive_active": {
+      "model": "industrialupgrade:block/hive/tropical_hive"
+    },
+    "facing=south,type=tropical_hive_active": {
+      "model": "industrialupgrade:block/hive/tropical_hive",
+      "y": 180
+    },
+    "facing=west,type=tropical_hive_active": {
+      "model": "industrialupgrade:block/hive/tropical_hive",
+      "y": 270
+    },
+    "facing=east,type=tropical_hive_active": {
+      "model": "industrialupgrade:block/hive/tropical_hive",
+      "y": 90
+    }
+  }
+}

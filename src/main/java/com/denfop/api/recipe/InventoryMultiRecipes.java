@@ -4,16 +4,15 @@ package com.denfop.api.recipe;
 import com.denfop.IUItem;
 import com.denfop.api.Recipes;
 import com.denfop.api.upgrades.IUpgradeItem;
+import com.denfop.blockentity.base.BlockEntityInventory;
 import com.denfop.componets.ProcessMultiComponent;
-import com.denfop.invslot.Inventory;
+import com.denfop.inventory.Inventory;
 import com.denfop.items.ItemRecipeSchedule;
-import com.denfop.tiles.base.TileEntityInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidTank;
+import com.denfop.recipe.IInputItemStack;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class InventoryMultiRecipes extends Inventory {
 
@@ -28,7 +27,7 @@ public class InventoryMultiRecipes extends Inventory {
     private FluidTank tank;
 
     public InventoryMultiRecipes(
-            final TileEntityInventory base, IBaseRecipe baseRecipe, IMultiUpdateTick tile, int size,
+            final BlockEntityInventory base, IBaseRecipe baseRecipe, IMultiUpdateTick tile, int size,
             ProcessMultiComponent processMultiComponent
     ) {
         super(base, TypeItemSlot.INPUT, size);
@@ -46,7 +45,7 @@ public class InventoryMultiRecipes extends Inventory {
     }
 
     public InventoryMultiRecipes(
-            final TileEntityInventory base, String baseRecipe, IMultiUpdateTick tile, int size,
+            final BlockEntityInventory base, String baseRecipe, IMultiUpdateTick tile, int size,
             ProcessMultiComponent processMultiComponent
     ) {
         this(base, Recipes.recipes.getRecipe(baseRecipe), tile, size, processMultiComponent);
@@ -54,7 +53,7 @@ public class InventoryMultiRecipes extends Inventory {
     }
 
     public InventoryMultiRecipes(
-            final TileEntityInventory base,
+            final BlockEntityInventory base,
             String baseRecipe,
             IMultiUpdateTick tile,
             FluidTank tank,
@@ -64,12 +63,34 @@ public class InventoryMultiRecipes extends Inventory {
         this.tank = tank;
     }
 
+    @Override
+    public boolean hasItemList() {
+        return true;
+    }
+
+    @Override
+    public List<IInputItemStack> getStacks(int index) {
+        List<IInputItemStack> uniqueStacks = new ArrayList<>();
+        Set<IInputItemStack> seenStacks = new HashSet<>();
+
+        for (IInputItemStack input : accepts.stream().map(IRecipeInputStack::getInput).toList()) {
+            boolean isNew = seenStacks.stream().noneMatch(existing ->
+                    existing.equals(input)
+            );
+            if (isNew) {
+                seenStacks.add(input);
+                uniqueStacks.add(input);
+            }
+        }
+        return uniqueStacks;
+    }
+
     public void changeAccepts(ItemStack stack) {
         if (stack.isEmpty()) {
             this.accepts = this.default_accepts;
         } else {
             ItemRecipeSchedule itemRecipeSchedule = (ItemRecipeSchedule) stack.getItem();
-            this.accepts = itemRecipeSchedule.getInputs(this.recipe, stack);
+            this.accepts = itemRecipeSchedule.getInputs(base.getWorld().registryAccess(), this.recipe, stack);
         }
     }
 
@@ -88,8 +109,8 @@ public class InventoryMultiRecipes extends Inventory {
     }
 
     @Override
-    public void put(final int index, final ItemStack content) {
-        super.put(index, content);
+    public ItemStack set(final int index, final ItemStack content) {
+        super.set(index, content);
         if (!recipe.getName().equals("recycler")) {
             final ItemStack input = this.get(index);
             if (input.isEmpty()) {
@@ -113,6 +134,7 @@ public class InventoryMultiRecipes extends Inventory {
 
         }
         this.tile.onUpdate();
+        return content;
     }
 
     public BaseMachineRecipe consume(MachineRecipe recipe) {
@@ -131,7 +153,7 @@ public class InventoryMultiRecipes extends Inventory {
     }
 
     @Override
-    public boolean isItemValidForSlot(final int index, final ItemStack itemStack) {
+    public boolean canPlaceItem(final int index, final ItemStack itemStack) {
         if (recipe.getName().equals("recycler") && !itemStack.isEmpty()) {
             return true;
         }
@@ -156,18 +178,18 @@ public class InventoryMultiRecipes extends Inventory {
 
 
         ItemStack stack = this.get(number);
-        if (!stack.isEmpty() && stack.getCount() >= 1 && this.isItemValidForSlot(
+        if (!stack.isEmpty() && stack.getCount() >= 1 && this.canPlaceItem(
                 number, stack
         ) && (stack.getCount() >= 1 || consumeContainers || !stack
                 .getItem()
-                .hasContainerItem(stack))) {
+                .hasCraftingRemainingItem(stack))) {
             int currentAmount = Math.min(amount, stack.getCount());
             if (!simulate) {
                 if (stack.getCount() == currentAmount) {
-                    if (!consumeContainers && stack.getItem().hasContainerItem(stack)) {
-                        this.put(number, stack.getItem().getContainerItem(stack));
+                    if (!consumeContainers && stack.getItem().hasCraftingRemainingItem(stack)) {
+                        this.set(number, stack.getItem().getCraftingRemainingItem(stack));
                     } else {
-                        this.put(number, null);
+                        this.set(number, null);
                     }
                 } else {
                     stack.setCount(stack.getCount() - currentAmount);

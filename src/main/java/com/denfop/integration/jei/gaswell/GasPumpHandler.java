@@ -2,8 +2,8 @@ package com.denfop.integration.jei.gaswell;
 
 
 import com.denfop.blocks.FluidName;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class GasPumpHandler {
 
     public static void initRecipes() {
 
-        addRecipe(new FluidStack(FluidName.fluidgas.getInstance(), 1000 + rand.nextInt(9001)));
+        addRecipe(new FluidStack(FluidName.fluidgas.getInstance().get(), 1000 + rand.nextInt(9001)));
 
 
     }

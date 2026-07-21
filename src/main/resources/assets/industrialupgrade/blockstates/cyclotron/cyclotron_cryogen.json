@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=cyclotron_cryogen": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_cryogen"
+    },
+    "facing=south,type=cyclotron_cryogen": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_cryogen",
+      "y": 180
+    },
+    "facing=west,type=cyclotron_cryogen": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_cryogen",
+      "y": 270
+    },
+    "facing=east,type=cyclotron_cryogen": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_cryogen",
+      "y": 90
+    },
+    "facing=north,type=cyclotron_cryogen_active": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_cryogen"
+    },
+    "facing=south,type=cyclotron_cryogen_active": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_cryogen",
+      "y": 180
+    },
+    "facing=west,type=cyclotron_cryogen_active": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_cryogen",
+      "y": 270
+    },
+    "facing=east,type=cyclotron_cryogen_active": {
+      "model": "industrialupgrade:block/cyclotron/cyclotron_cryogen",
+      "y": 90
+    }
+  }
+}

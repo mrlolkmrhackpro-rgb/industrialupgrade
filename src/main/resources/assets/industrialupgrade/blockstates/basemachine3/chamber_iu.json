@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=chamber_iu": {
+      "model": "industrialupgrade:block/basemachine/reactor_chamber"
+    },
+    "facing=south,type=chamber_iu": {
+      "model": "industrialupgrade:block/basemachine/reactor_chamber",
+      "y": 180
+    },
+    "facing=west,type=chamber_iu": {
+      "model": "industrialupgrade:block/basemachine/reactor_chamber",
+      "y": 270
+    },
+    "facing=east,type=chamber_iu": {
+      "model": "industrialupgrade:block/basemachine/reactor_chamber",
+      "y": 90
+    },
+    "facing=north,type=chamber_iu_active": {
+      "model": "industrialupgrade:block/basemachine/reactor_chamber"
+    },
+    "facing=south,type=chamber_iu_active": {
+      "model": "industrialupgrade:block/basemachine/reactor_chamber",
+      "y": 180
+    },
+    "facing=west,type=chamber_iu_active": {
+      "model": "industrialupgrade:block/basemachine/reactor_chamber",
+      "y": 270
+    },
+    "facing=east,type=chamber_iu_active": {
+      "model": "industrialupgrade:block/basemachine/reactor_chamber",
+      "y": 90
+    }
+  }
+}

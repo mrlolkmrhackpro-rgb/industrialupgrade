@@ -4,28 +4,48 @@ import com.denfop.network.packet.CustomPacketBuffer;
 import com.denfop.network.packet.EnumTypePacket;
 import com.denfop.network.packet.IPacket;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.network.PacketDistributor;
 
-@SideOnly(Side.CLIENT)
+import java.lang.reflect.InvocationTargetException;
+
+@OnlyIn(Dist.CLIENT)
 public class NetworkManagerClient extends NetworkManager {
 
 
     public NetworkManagerClient() {
+
+
     }
 
+    @Override
+    public void sendPacket(IPacket buffer) {
+        PacketDistributor.sendToServer(makePacket(buffer));
 
-    private void onPacketData(CustomPacketBuffer is, final EntityPlayer player) {
-        if (is.writerIndex() > is.readerIndex()) {
-            byte type = is.readByte();
-            IPacket packet = this.packetMap.get(type);
-            if (packet != null && packet.getPacketType() == EnumTypePacket.SERVER) {
-                packet.readPacket(is, player);
-                is.flip();
-            }
+    }
+
+    public void sendPacket(IPacket packet, Player player, CustomPacketBuffer buffer) {
+        PacketDistributor.sendToServer(makePacket(packet, buffer));
+    }
+
+    public void onPacketData(CustomPacketBuffer is, byte type) {
+        Player player = Minecraft.getInstance().player;
+        IPacket packet = this.packetMap.get(type);
+        try {
+            packet = packet.getClass().getDeclaredConstructor().newInstance();
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+        if (packet != null && packet.getPacketType() == EnumTypePacket.SERVER) {
+            packet.readPacket(is, player);
         }
     }
 
@@ -34,19 +54,6 @@ public class NetworkManagerClient extends NetworkManager {
     }
 
 
-    @SubscribeEvent
-    public void onPacket(ClientCustomPacketEvent event) {
-
-        if (event.getPacket() != null && Minecraft.getMinecraft() != null && Minecraft.getMinecraft().player != null && event
-                .getPacket()
-                .payload() != null) {
-            try {
-                this.onPacketData(new CustomPacketBuffer(event.getPacket().payload()), Minecraft.getMinecraft().player);
-            } catch (Throwable var3) {
-                throw new RuntimeException(var3);
-            }
-        }
+    public void onTickEnd(WorldData worldData) {
     }
-
-
 }

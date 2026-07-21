@@ -1,15 +1,15 @@
 package com.denfop.integration.jei.gas_turbine;
 
 
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluid;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.denfop.tiles.gasturbine.TileEntityGasTurbineController.gasMapValue;
+import static com.denfop.blockentity.gasturbine.BlockEntityGasTurbineController.gasMapValue;
 
 public class GasTurbineHandler {
 

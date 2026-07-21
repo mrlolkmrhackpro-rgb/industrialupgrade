@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=photonic_handlerho": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_handlerho"
+    },
+    "facing=south,type=photonic_handlerho": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_handlerho",
+      "y": 180
+    },
+    "facing=west,type=photonic_handlerho": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_handlerho",
+      "y": 270
+    },
+    "facing=east,type=photonic_handlerho": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_handlerho",
+      "y": 90
+    },
+    "facing=north,type=photonic_handlerho_active": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_handlerho_active"
+    },
+    "facing=south,type=photonic_handlerho_active": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_handlerho_active",
+      "y": 180
+    },
+    "facing=west,type=photonic_handlerho_active": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_handlerho_active",
+      "y": 270
+    },
+    "facing=east,type=photonic_handlerho_active": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_handlerho_active",
+      "y": 90
+    }
+  }
+}

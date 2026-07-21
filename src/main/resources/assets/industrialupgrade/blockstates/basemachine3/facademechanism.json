@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=facademechanism": {
+      "model": "industrialupgrade:block/basemachine/facademechanism"
+    },
+    "facing=south,type=facademechanism": {
+      "model": "industrialupgrade:block/basemachine/facademechanism",
+      "y": 180
+    },
+    "facing=west,type=facademechanism": {
+      "model": "industrialupgrade:block/basemachine/facademechanism",
+      "y": 270
+    },
+    "facing=east,type=facademechanism": {
+      "model": "industrialupgrade:block/basemachine/facademechanism",
+      "y": 90
+    },
+    "facing=north,type=facademechanism_active": {
+      "model": "industrialupgrade:block/basemachine/facademechanism"
+    },
+    "facing=south,type=facademechanism_active": {
+      "model": "industrialupgrade:block/basemachine/facademechanism",
+      "y": 180
+    },
+    "facing=west,type=facademechanism_active": {
+      "model": "industrialupgrade:block/basemachine/facademechanism",
+      "y": 270
+    },
+    "facing=east,type=facademechanism_active": {
+      "model": "industrialupgrade:block/basemachine/facademechanism",
+      "y": 90
+    }
+  }
+}

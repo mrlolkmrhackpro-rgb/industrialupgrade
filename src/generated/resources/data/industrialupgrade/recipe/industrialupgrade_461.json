@@ -1,0 +1,28 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:machines/singular_solar_panel"
+    },
+    "B": {
+      "item": "industrialupgrade:quantumitems4"
+    },
+    "C": {
+      "item": "industrialupgrade:armour/spectral_solar_helmet"
+    },
+    "E": {
+      "item": "industrialupgrade:compresscarbonultra"
+    }
+  },
+  "pattern": [
+    " A ",
+    "ECE",
+    "B B"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:armour/singular_solar_helmet"
+  },
+  "show_notification": false
+}

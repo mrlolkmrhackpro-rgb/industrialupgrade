@@ -1,0 +1,8 @@
+{
+  "values": [
+    "industrialupgrade:baseore/cobalt",
+    "industrialupgrade:blockspace3/mars_cobalt_ore",
+    "industrialupgrade:asteroidore/asteroid_cobalt_ore",
+    "industrialupgrade:deepore/deep_cobalt_ore"
+  ]
+}

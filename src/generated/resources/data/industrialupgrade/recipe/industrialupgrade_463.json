@@ -1,0 +1,28 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:crafting_elements/crafting_138_element"
+    },
+    "C": {
+      "item": "industrialupgrade:simplemachine/generator_matter"
+    },
+    "D": {
+      "item": "industrialupgrade:crafting_elements/crafting_234_element"
+    },
+    "E": {
+      "item": "industrialupgrade:itemcore/quacore"
+    }
+  },
+  "pattern": [
+    "AEA",
+    " C ",
+    "ADA"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:basemachine/adv_matter"
+  },
+  "show_notification": false
+}

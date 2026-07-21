@@ -1,0 +1,31 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:quantumitems2"
+    },
+    "B": {
+      "tag": "c:plates/mithril"
+    },
+    "C": {
+      "item": "industrialupgrade:energy_tools/itemnanosaber1"
+    },
+    "D": {
+      "item": "minecraft:glowstone"
+    },
+    "E": {
+      "item": "industrialupgrade:battery/itembatlamacrystal"
+    }
+  },
+  "pattern": [
+    "AB ",
+    "AC ",
+    "DEB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:energy_tools/itemnanosaber"
+  },
+  "show_notification": false
+}

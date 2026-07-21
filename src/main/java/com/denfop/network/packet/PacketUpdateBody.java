@@ -3,28 +3,31 @@ package com.denfop.network.packet;
 import com.denfop.IUCore;
 import com.denfop.api.space.IBody;
 import com.denfop.api.space.SpaceNet;
+import com.denfop.blockentity.base.BlockEntityBase;
+import com.denfop.blockentity.mechanism.BlockEntityResearchTableSpace;
 import com.denfop.network.DecoderHandler;
 import com.denfop.network.EncoderHandler;
-import com.denfop.tiles.mechanism.TileEntityResearchTableSpace;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.io.IOException;
 
 public class PacketUpdateBody implements IPacket {
 
+    private CustomPacketBuffer buffer;
+
     public PacketUpdateBody() {
 
     }
 
-    public PacketUpdateBody(TileEntityResearchTableSpace tile, IBody body) {
-        CustomPacketBuffer customPacketBuffer = new CustomPacketBuffer();
+    public PacketUpdateBody(BlockEntityResearchTableSpace tile, IBody body) {
+        CustomPacketBuffer customPacketBuffer = new CustomPacketBuffer(tile.getLevel().registryAccess());
         customPacketBuffer.writeByte(getId());
         try {
-            EncoderHandler.encode(customPacketBuffer, tile.getWorld());
-            EncoderHandler.encode(customPacketBuffer, tile.getPos());
+            EncoderHandler.encode(customPacketBuffer, ((BlockEntityBase) tile).getWorld());
+            EncoderHandler.encode(customPacketBuffer, ((BlockEntityBase) tile).getPos());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -33,7 +36,18 @@ public class PacketUpdateBody implements IPacket {
             customPacketBuffer.writeString(body.getName());
         }
         tile.body = body;
-        IUCore.network.getClient().sendPacket(customPacketBuffer);
+        this.buffer = customPacketBuffer;
+        IUCore.network.getClient().sendPacket(this, customPacketBuffer);
+    }
+
+    @Override
+    public CustomPacketBuffer getPacketBuffer() {
+        return buffer;
+    }
+
+    @Override
+    public void setPacketBuffer(CustomPacketBuffer customPacketBuffer) {
+        buffer = customPacketBuffer;
     }
 
     @Override
@@ -42,13 +56,13 @@ public class PacketUpdateBody implements IPacket {
     }
 
     @Override
-    public void readPacket(final CustomPacketBuffer customPacketBuffer, final EntityPlayer entityPlayer) {
+    public void readPacket(final CustomPacketBuffer customPacketBuffer, final Player entityPlayer) {
         try {
-            World world = (World) DecoderHandler.decode(customPacketBuffer);
-            BlockPos blockPos = (BlockPos) DecoderHandler.decode(customPacketBuffer);
-            TileEntity tile = world.getTileEntity(blockPos);
-            if (tile instanceof TileEntityResearchTableSpace) {
-                TileEntityResearchTableSpace tileEntityResearchTableSpace = (TileEntityResearchTableSpace) tile;
+            Level world = (Level) DecoderHandler.decode(customPacketBuffer);
+            BlockPos pos = (BlockPos) DecoderHandler.decode(customPacketBuffer);
+            BlockEntity tile = world.getBlockEntity(pos);
+            if (tile instanceof BlockEntityResearchTableSpace) {
+                BlockEntityResearchTableSpace tileEntityResearchTableSpace = (BlockEntityResearchTableSpace) tile;
                 boolean hasBody = customPacketBuffer.readBoolean();
                 if (hasBody) {
                     tileEntityResearchTableSpace.body = SpaceNet.instance.getBodyFromName(customPacketBuffer.readString());

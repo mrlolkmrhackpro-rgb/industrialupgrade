@@ -1,47 +1,60 @@
 package com.denfop.items.energy;
 
-import com.denfop.ElectricItem;
-import com.denfop.api.item.IEnergyItem;
-import com.denfop.utils.ElectricItemManager;
+import com.denfop.api.item.energy.EnergyItem;
+import com.denfop.utils.ElectricItem;
 import com.denfop.utils.ModUtils;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.Util;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
-public class ItemToolWrenchEnergy extends ItemToolWrench implements IEnergyItem {
+public class ItemToolWrenchEnergy extends ItemToolWrench implements EnergyItem {
 
-    public ItemToolWrenchEnergy() {
-        super("electric_wrench");
-        this.setMaxDamage(27);
-        this.setMaxStackSize(1);
-        this.setNoRepair();
-    }
-
-    public boolean showDurabilityBar(final ItemStack stack) {
-        return true;
-    }
-
-    public int getRGBDurabilityForDisplay(ItemStack stack) {
-        return ModUtils.convertRGBcolorToInt(33, 91, 199);
-    }
-
-    public double getDurabilityForDisplay(ItemStack stack) {
-        return Math.min(
-                Math.max(
-                        1 - ElectricItem.manager.getCharge(stack) / ElectricItem.manager.getMaxCharge(stack),
-                        0.0
-                ),
-                1.0
-        );
-    }
 
     public boolean canTakeDamage(ItemStack stack, int amount) {
         amount *= 100;
         return ElectricItem.manager.getCharge(stack) >= (double) amount;
     }
 
-    public void damage(ItemStack stack, int amount, EntityPlayer player) {
+    public boolean isBarVisible(final ItemStack stack) {
+        return true;
+    }
+
+    public int getBarColor(ItemStack stack) {
+        return ModUtils.convertRGBcolorToInt(33, 91, 199);
+    }
+
+    protected String getOrCreateDescriptionId() {
+        if (this.nameItem == null) {
+            StringBuilder pathBuilder = new StringBuilder(Util.makeDescriptionId("iu", BuiltInRegistries.ITEM.getKey(this)));
+            String targetString = "industrialupgrade.";
+            String replacement = "";
+            if (replacement != null) {
+                int index = pathBuilder.indexOf(targetString);
+                while (index != -1) {
+                    pathBuilder.replace(index, index + targetString.length(), replacement);
+                    index = pathBuilder.indexOf(targetString, index + replacement.length());
+                }
+            }
+            this.nameItem = "item." + pathBuilder.toString().split("\\.")[2];
+        }
+
+        return this.nameItem;
+    }
+
+    public int getBarWidth(ItemStack stack) {
+
+        return 13 - (int) (13.0F * Math.min(
+                Math.max(
+                        1 - ElectricItem.manager.getCharge(stack) / ElectricItem.manager.getMaxCharge(stack),
+                        0.0
+                ),
+                1.0
+        ));
+    }
+
+
+    public void damage(ItemStack stack, int amount, Player player) {
         ElectricItem.manager.use(stack, 100 * amount, player);
     }
 
@@ -60,20 +73,5 @@ public class ItemToolWrenchEnergy extends ItemToolWrench implements IEnergyItem 
     public double getTransferEnergy(ItemStack stack) {
         return 250.0;
     }
-
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-        if (this.isInCreativeTab(tab)) {
-            ElectricItemManager.addChargeVariants(this, subItems);
-        }
-    }
-
-    public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return false;
-    }
-
-    public void setDamage(ItemStack stack, int damage) {
-        this.getDamage(stack);
-    }
-
 
 }

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=recycler_iu": {
+      "model": "industrialupgrade:block/basemachine/recycler"
+    },
+    "facing=south,type=recycler_iu": {
+      "model": "industrialupgrade:block/basemachine/recycler",
+      "y": 180
+    },
+    "facing=west,type=recycler_iu": {
+      "model": "industrialupgrade:block/basemachine/recycler",
+      "y": 270
+    },
+    "facing=east,type=recycler_iu": {
+      "model": "industrialupgrade:block/basemachine/recycler",
+      "y": 90
+    },
+    "facing=north,type=recycler_iu_active": {
+      "model": "industrialupgrade:block/basemachine/recycler_active"
+    },
+    "facing=south,type=recycler_iu_active": {
+      "model": "industrialupgrade:block/basemachine/recycler_active",
+      "y": 180
+    },
+    "facing=west,type=recycler_iu_active": {
+      "model": "industrialupgrade:block/basemachine/recycler_active",
+      "y": 270
+    },
+    "facing=east,type=recycler_iu_active": {
+      "model": "industrialupgrade:block/basemachine/recycler_active",
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=shield": {
+      "model": "industrialupgrade:block/basemachine/shield"
+    },
+    "facing=south,type=shield": {
+      "model": "industrialupgrade:block/basemachine/shield",
+      "y": 180
+    },
+    "facing=west,type=shield": {
+      "model": "industrialupgrade:block/basemachine/shield",
+      "y": 270
+    },
+    "facing=east,type=shield": {
+      "model": "industrialupgrade:block/basemachine/shield",
+      "y": 90
+    },
+    "facing=north,type=shield_active": {
+      "model": "industrialupgrade:block/basemachine/shield"
+    },
+    "facing=south,type=shield_active": {
+      "model": "industrialupgrade:block/basemachine/shield",
+      "y": 180
+    },
+    "facing=west,type=shield_active": {
+      "model": "industrialupgrade:block/basemachine/shield",
+      "y": 270
+    },
+    "facing=east,type=shield_active": {
+      "model": "industrialupgrade:block/basemachine/shield",
+      "y": 90
+    }
+  }
+}

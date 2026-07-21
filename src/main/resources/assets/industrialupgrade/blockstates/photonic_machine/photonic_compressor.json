@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=photonic_compressor": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_compressor"
+    },
+    "facing=south,type=photonic_compressor": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_compressor",
+      "y": 180
+    },
+    "facing=west,type=photonic_compressor": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_compressor",
+      "y": 270
+    },
+    "facing=east,type=photonic_compressor": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_compressor",
+      "y": 90
+    },
+    "facing=north,type=photonic_compressor_active": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_compressor_active"
+    },
+    "facing=south,type=photonic_compressor_active": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_compressor_active",
+      "y": 180
+    },
+    "facing=west,type=photonic_compressor_active": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_compressor_active",
+      "y": 270
+    },
+    "facing=east,type=photonic_compressor_active": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_compressor_active",
+      "y": 90
+    }
+  }
+}

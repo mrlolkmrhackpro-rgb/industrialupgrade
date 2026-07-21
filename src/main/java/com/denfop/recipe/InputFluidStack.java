@@ -1,66 +1,81 @@
 package com.denfop.recipe;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.LoaderState;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import com.denfop.componets.Fluids;
+import com.denfop.utils.FluidHandlerFix;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluid;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+
+import java.util.*;
 
 public class InputFluidStack implements IInputItemStack {
 
     private static volatile FluidHandlerInfo fluidHandlerInfo;
 
     static {
-        fluidHandlerInfo = new FluidHandlerInfo(Collections.emptyList(), LoaderState.PREINITIALIZATION);
+        fluidHandlerInfo = new FluidHandlerInfo(Collections.emptyList());
     }
 
     private final Fluid fluid;
     private final int amount;
 
-    InputFluidStack(Fluid fluid) {
+    public InputFluidStack(Fluid fluid) {
         this(fluid, 1000);
     }
 
-    InputFluidStack(Fluid fluid, int amount) {
+    public InputFluidStack(FluidStack fluid) {
+        this(fluid.getFluid(), fluid.getAmount());
+    }
+
+    public InputFluidStack(Fluid fluid, int amount) {
         this.fluid = fluid;
         this.amount = amount;
+    }
+
+    public InputFluidStack(CompoundTag compoundTag, HolderLookup.Provider provider) {
+        boolean exist = compoundTag.getBoolean("exist");
+        if (exist) {
+            ResourceLocation fluidId = ResourceLocation.parse(compoundTag.getString("Fluid"));
+            this.fluid = BuiltInRegistries.FLUID.get(fluidId);
+            this.amount = compoundTag.getInt("Amount");
+        } else {
+            this.fluid = Fluids.EMPTY;
+            this.amount = 1;
+        }
     }
 
     public static List<ItemStack> getFluidContainer(Fluid fluid) {
         FluidHandlerInfo info = fluidHandlerInfo;
         ArrayList<ItemStack> ret;
         Iterator<Item> var3;
-        if (info.loaderState != LoaderState.AVAILABLE && info.loaderState != Loader.instance().getLoaderState()) {
-            ret = new ArrayList<>();
-            var3 = ForgeRegistries.ITEMS.iterator();
+        ret = new ArrayList<>();
+        var3 = BuiltInRegistries.ITEM.iterator();
 
-            while (var3.hasNext()) {
-                Item item = var3.next();
-                ItemStack stack = new ItemStack(item);
-                IFluidHandlerItem handler = FluidUtil.getFluidHandler(stack);
-                if (handler != null) {
-                    handler.drain(Integer.MAX_VALUE, true);
-                    ItemStack container = handler.getContainer();
-                    if (FluidUtil.getFluidContained(container) == null) {
-                        ret.add(stack);
-                    }
+        while (var3.hasNext()) {
+            Item item = var3.next();
+            ItemStack stack = new ItemStack(item);
+            IFluidHandlerItem handler = FluidHandlerFix.getFluidHandler(stack);
+            if (handler != null) {
+                handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.EXECUTE);
+                ItemStack container = handler.getContainer();
+                if (FluidUtil.getFluidContained(container).orElse(null) == null) {
+                    ret.add(stack);
                 }
             }
-
-            LoaderState state = Loader.instance().hasReachedState(LoaderState.AVAILABLE)
-                    ? LoaderState.AVAILABLE
-                    : Loader.instance().getLoaderState();
-            fluidHandlerInfo = info = new FluidHandlerInfo(Collections.unmodifiableList(ret), state);
         }
+
+
+        fluidHandlerInfo = info = new FluidHandlerInfo(Collections.unmodifiableList(ret));
 
         if (fluid == null) {
             return info.items;
@@ -68,10 +83,10 @@ public class InputFluidStack implements IInputItemStack {
             ret = new ArrayList<>();
 
             for (final ItemStack stack : info.items) {
-                IFluidHandlerItem handler = FluidUtil.getFluidHandler(stack.copy());
-                if (handler != null && handler.fill(new FluidStack(fluid, Integer.MAX_VALUE), true) > 0) {
+                IFluidHandlerItem handler = FluidHandlerFix.getFluidHandler(stack);
+                if (handler != null && handler.fill(new FluidStack(fluid, Integer.MAX_VALUE), IFluidHandler.FluidAction.EXECUTE) > 0) {
                     ItemStack container = handler.getContainer();
-                    if (FluidUtil.getFluidContained(container) != null) {
+                    if (!handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE).isEmpty()) {
                         ret.add(container);
                     }
                 }
@@ -81,22 +96,38 @@ public class InputFluidStack implements IInputItemStack {
         }
     }
 
+    public FluidStack getFluid() {
+        return new FluidStack(fluid, amount);
+    }
+
     public boolean matches(ItemStack subject) {
-        FluidStack fs = FluidUtil.getFluidContained(subject);
-        return fs == null && this.fluid == null || fs != null && fs.getFluid() == this.fluid && fs.amount >= this.amount;
+        Optional<FluidStack> fs1 = FluidUtil.getFluidContained(subject);
+        FluidStack fs = fs1.orElse(null);
+        return fs == null && this.fluid == null || fs != null && fs.getFluid() == this.fluid && fs.getAmount() >= this.amount;
     }
 
     public int getAmount() {
         return 1;
     }
 
-    @Override
-    public void growAmount(final int col) {
-
-    }
-
     public List<ItemStack> getInputs() {
         return getFluidContainer(this.fluid);
+    }
+
+    @Override
+    public boolean hasTag() {
+        return false;
+    }
+
+    @Override
+    public TagKey<Item> getTag() {
+        return null;
+    }
+
+
+    @Override
+    public void growAmount(int count) {
+
     }
 
     public boolean equals(Object obj) {
@@ -104,16 +135,28 @@ public class InputFluidStack implements IInputItemStack {
         return obj != null && this.getClass() == obj.getClass() && (other = (InputFluidStack) obj).fluid == this.fluid && other.amount == this.amount;
     }
 
+    @Override
+    public CompoundTag writeNBT(HolderLookup.Provider provider) {
+        CompoundTag compoundTag = new CompoundTag();
+        compoundTag.putByte("id", (byte) 2);
+        compoundTag.putBoolean("exist", fluid != null && !fluid.equals(Fluids.EMPTY) && amount != 0);
+        if (fluid != null && !fluid.equals(Fluids.EMPTY)) {
+            ResourceLocation fluidId = BuiltInRegistries.FLUID.getKey(fluid);
+            if (fluidId != null) {
+                compoundTag.putString("Fluid", fluidId.toString());
+                compoundTag.putInt("Amount", amount);
+            }
+        }
+        return null;
+    }
+
     private static class FluidHandlerInfo {
 
         final List<ItemStack> items;
-        final LoaderState loaderState;
 
-        FluidHandlerInfo(List<ItemStack> items, LoaderState loaderState) {
+        FluidHandlerInfo(List<ItemStack> items) {
             this.items = items;
-            this.loaderState = loaderState;
         }
 
     }
-
 }

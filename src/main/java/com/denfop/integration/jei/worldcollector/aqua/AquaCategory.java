@@ -1,55 +1,61 @@
 package com.denfop.integration.jei.worldcollector.aqua;
 
+import com.denfop.integration.jei.JeiIngredientHelper;
 import com.denfop.Constants;
 import com.denfop.IUItem;
-import com.denfop.Localization;
-import com.denfop.blocks.mechanism.BlockBaseMachine3;
-import mezz.jei.api.IGuiHelper;
-import mezz.jei.api.gui.IDrawable;
-import mezz.jei.api.gui.IDrawableStatic;
-import mezz.jei.api.gui.IGuiItemStackGroup;
-import mezz.jei.api.gui.IRecipeLayout;
-import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.IRecipeCategory;
+import com.denfop.blockentity.mechanism.BlockEntityEnchanterBooks;
+import com.denfop.blocks.mechanism.BlockBaseMachine3Entity;
+import com.denfop.integration.jei.IRecipeCategory;
+import com.denfop.integration.jei.JeiInform;
+import com.denfop.recipes.ItemStackHelper;
+import com.denfop.screen.ScreenMain;
+import com.denfop.utils.Localization;
+import com.denfop.utils.ModUtils;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableStatic;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nonnull;
 
-public class AquaCategory extends Gui implements IRecipeCategory<AquaWrapper> {
+public class AquaCategory extends ScreenMain implements IRecipeCategory<AquaHandler> {
 
     private final IDrawableStatic bg;
+    JeiInform jeiInform;
     private int progress = 0;
     private int energy = 0;
 
     public AquaCategory(
-            final IGuiHelper guiHelper
+            IGuiHelper guiHelper, JeiInform jeiInform
     ) {
-        bg = guiHelper.createDrawable(new ResourceLocation(Constants.MOD_ID, "textures/gui/guiwaterassembler" +
+        super(((BlockEntityEnchanterBooks) BlockBaseMachine3Entity.enchanter_books.getDummyTe()).getGuiContainer(Minecraft.getInstance().player));
+
+        this.jeiInform = jeiInform;
+        this.title = net.minecraft.network.chat.Component.literal(getTitles());
+        bg = guiHelper.createDrawable(ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/guiwaterassembler" +
                         ".png"), 5, 5, 140,
                 75
         );
     }
 
-    @Nonnull
     @Override
-    public String getUid() {
-        return BlockBaseMachine3.aqua_assembler.getName();
+    public RecipeType<AquaHandler> getRecipeType() {
+        return jeiInform.recipeType;
     }
 
     @Nonnull
     @Override
-    public String getTitle() {
-        return Localization.translate(new ItemStack(IUItem.basemachine2, 1, 35).getUnlocalizedName());
+    public String getTitles() {
+        return Localization.translate(ItemStackHelper.fromData(IUItem.basemachine2, 1, 35).getDescriptionId());
     }
 
-    @Nonnull
-    @Override
-    public String getModName() {
-        return Constants.MOD_NAME;
-    }
 
     @Nonnull
     @Override
@@ -57,9 +63,8 @@ public class AquaCategory extends Gui implements IRecipeCategory<AquaWrapper> {
         return bg;
     }
 
-
     @Override
-    public void drawExtras(@Nonnull final Minecraft mc) {
+    public void draw(AquaHandler recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics stack, double mouseX, double mouseY) {
         progress++;
         energy++;
         int energylevel = (int) Math.min(51.0F * energy / 100, 51.0F);
@@ -69,38 +74,35 @@ public class AquaCategory extends Gui implements IRecipeCategory<AquaWrapper> {
             progress = 0;
         }
 
-        mc.getTextureManager().bindTexture(getTexture());
+        bindTexture(getTexture());
 
 
-        drawTexturedModalRect(
+        drawTexturedModalRect(stack,
                 25 + 1, 12 + 51 - energylevel, 179, 2 + 51 - energylevel,
                 5, energylevel
         );
 
 
-        drawTexturedModalRect(+66 - 5, +34 - 5, 177, 60, xScale, 18);
-
-
+        drawTexturedModalRect(stack, +66 - 5, +34 - 5, 177, 60, xScale, 18);
+        drawSplitString(stack,
+                Localization.translate("iu.need_info") + ModUtils.getString(recipe.getNeed()) + Localization.translate("iu.need_info_matter"),
+                79,
+                54,
+                150 - 69,
+                ModUtils.convertRGBcolorToInt(0, 0, 0)
+        );
     }
 
     @Override
-    public void setRecipe(
-            final IRecipeLayout layout,
-            final AquaWrapper recipes,
-            @Nonnull final IIngredients ingredients
-    ) {
-        IGuiItemStackGroup isg = layout.getItemStacks();
-        isg.init(0, true, 38, 18);
+    public void setRecipe(IRecipeLayoutBuilder builder, AquaHandler recipe, IFocusGroup focuses) {
+        JeiIngredientHelper.addInputSlot(builder, RecipeIngredientRole.INPUT, 39, 19, recipe, 0, recipe.getInput());
 
-        isg.set(0, recipes.getInput());
-
-
-        isg.init(2, false, 104, 28);
-        isg.set(2, recipes.getOutput());
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 105, 30).addItemStack(recipe.getOutput());
     }
 
+
     protected ResourceLocation getTexture() {
-        return new ResourceLocation(Constants.MOD_ID, "textures/gui/guiwaterassembler.png");
+        return ResourceLocation.tryBuild(Constants.MOD_ID, "textures/gui/guiwaterassembler.png");
     }
 
 

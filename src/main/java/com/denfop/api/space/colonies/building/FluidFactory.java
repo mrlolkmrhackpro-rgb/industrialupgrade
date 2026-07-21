@@ -11,8 +11,9 @@ import com.denfop.api.space.colonies.enums.EnumMiningFactory;
 import com.denfop.api.space.colonies.enums.EnumTypeBuilding;
 import com.denfop.network.packet.CustomPacketBuffer;
 import com.denfop.world.WorldBaseGen;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,9 +27,8 @@ public class FluidFactory extends Building implements IColonyMiningFactory {
         super(colonie);
         this.type = type;
         this.people = 0;
-        if (!simulate) {
+        if (!simulate)
             this.getColony().addBuilding(this);
-        }
     }
 
     public FluidFactory(CustomPacketBuffer packetBuffer, Colony colonie) {
@@ -39,7 +39,7 @@ public class FluidFactory extends Building implements IColonyMiningFactory {
         this.getColony().addBuilding(this);
     }
 
-    public FluidFactory(final NBTTagCompound tag, final IColony colonie) {
+    public FluidFactory(final CompoundTag tag, final IColony colonie) {
         super(colonie);
         this.type = EnumMiningFactory.getID(tag.getByte("id"));
         this.people = tag.getByte("people");
@@ -65,33 +65,29 @@ public class FluidFactory extends Building implements IColonyMiningFactory {
         if (storageList.isEmpty() || this.getColony().getEnergy() < this.getEnergy()) {
             return;
         }
-        if (this.getColony().getTick() % 2 != 0) {
+        if (this.getColony().getTick() % 2 != 0)
             return;
-        }
         if (WorldBaseGen.random.nextInt(100) < this.type.getChance()) {
             for (IStorage storage : storageList) {
                 if (storage.work()) {
-                    List<DataItem<FluidStack>> fluidStacks = SpaceNet.instance
-                            .getColonieNet()
-                            .getFluidsFromBody(getColony().getBody());
+                    List<DataItem<FluidStack>> fluidStacks = SpaceNet.instance.getColonieNet().getFluidsFromBody(getColony().getBody());
                     if (fluidStacks.isEmpty()) {
                         return;
                     }
-                    fluidStacks = fluidStacks.stream().filter(fluidStackDataItem -> fluidStackDataItem.getLevel() <= this
-                            .getColony()
-                            .getLevel()).collect(Collectors.toList());
+                    fluidStacks = fluidStacks.stream().filter(fluidStackDataItem -> fluidStackDataItem.getLevel() <= this.getColony().getLevel()).collect(Collectors.toList());
                     if (fluidStacks.isEmpty()) {
                         return;
                     }
                     FluidStack fluidStack = fluidStacks.get(WorldBaseGen.random.nextInt(fluidStacks.size())).getElement();
-
-                    int amount = (int) ((WorldBaseGen.random.nextInt(type.getMaxValue() / 2) + (type.getMaxValue() / 2)) * this
-                            .getColony()
-                            .getPercentEntertainment());
-                    fluidStack = new FluidStack(fluidStack.getFluid(), amount);
-                    if (storage.canAddFluidStack(fluidStack)) {
-                        this.getColony().useEnergy(this.getEnergy());
-                        return;
+                    int amount = (int) ((WorldBaseGen.random.nextInt(type.getMaxValue() / 2) + (type.getMaxValue() / 2)) * this.getColony().getPercentEntertainment());
+                    amount = Math.min(amount, this.getColony().getAvailableFluid());
+                    if (amount != 0) {
+                        this.getColony().removeAvailableFluid(amount);
+                        fluidStack = new FluidStack(fluidStack.getFluid(), amount);
+                        if (storage.canAddFluidStack(fluidStack)) {
+                            this.getColony().useEnergy(this.getEnergy());
+                            return;
+                        }
                     }
                 }
             }
@@ -109,10 +105,10 @@ public class FluidFactory extends Building implements IColonyMiningFactory {
     }
 
     @Override
-    public NBTTagCompound writeTag(final NBTTagCompound tag) {
-        super.writeTag(tag);
-        tag.setByte("id", (byte) this.type.ordinal());
-        tag.setByte("people", people);
+    public CompoundTag writeTag(final CompoundTag tag, HolderLookup.Provider p_323640_) {
+        super.writeTag(tag, p_323640_);
+        tag.putByte("id", (byte) this.type.ordinal());
+        tag.putByte("people", people);
         return tag;
     }
 

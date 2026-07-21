@@ -1,12 +1,12 @@
 {
-  "parent" : "block/cube",
-  "textures" : {
-    "particle" : "industrialupgrade:blocks/Blockgenbase",
-    "down" : "industrialupgrade:blocks/blockgentop",
-    "up" : "industrialupgrade:blocks/blockgentop",
-    "north" : "industrialupgrade:blocks/Blockgenbase",
-    "east" : "industrialupgrade:blocks/Blockgenbase",
-    "south" : "industrialupgrade:blocks/Blockgenbase",
-    "west" : "industrialupgrade:blocks/Blockgenbase"
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "industrialupgrade:block/blockneutrongen_side",
+    "down": "industrialupgrade:block/blockneutrongen_top",
+    "up": "industrialupgrade:block/blockneutrongen_top",
+    "north": "industrialupgrade:block/blockneutrongen_side",
+    "east": "industrialupgrade:block/blockneutrongen_side",
+    "south": "industrialupgrade:block/blockneutrongen_side",
+    "west": "industrialupgrade:block/blockneutrongen_side"
   }
 }

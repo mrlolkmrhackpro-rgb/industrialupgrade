@@ -5,17 +5,17 @@ import com.denfop.api.space.SpaceNet;
 import com.denfop.api.space.research.api.IResearchTable;
 import com.denfop.api.space.research.api.IRocketLaunchPad;
 import com.denfop.api.space.research.event.ResearchTableLoadEvent;
-import com.denfop.api.space.research.event.ResearchTableReLoadEvent;
 import com.denfop.api.space.research.event.ResearchTableUnLoadEvent;
 import com.denfop.api.space.research.event.RocketPadLoadEvent;
-import com.denfop.api.space.research.event.RocketPadReLoadEvent;
 import com.denfop.api.space.research.event.RocketPadUnLoadEvent;
 import com.denfop.events.WorldSavedDataIU;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 
 import java.util.Map;
 import java.util.UUID;
@@ -23,53 +23,33 @@ import java.util.UUID;
 public class EventHandlerPlanet {
 
     public static WorldSavedDataIU data;
+    private static volatile boolean serverStopping;
     private final boolean load;
-    public int tick;
+    int tick = 0;
 
     public EventHandlerPlanet() {
         this.load = false;
     }
 
     @SubscribeEvent
-    public void tick(final TickEvent.ServerTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
-            if (tick % 20 == 0) {
-                SpaceNet.instance.getFakeSpaceSystem().working();
-                SpaceNet.instance.getColonieNet().working();
-            }
-            tick++;
-        }
-
-
-    }
-    @SubscribeEvent
-    public void reLoad(final RocketPadReLoadEvent event) {
-        if (event.getWorld().isRemote) {
+    public void tick(final ServerTickEvent.Post event) {
+        if (serverStopping) {
             return;
         }
-        final Map<UUID, IRocketLaunchPad> map = SpaceNet.instance
-                .getFakeSpaceSystem()
-                .getRocketPadMap();
-        map.replace(event.table.getPlayer(), event.table);
 
-
-    }
-    @SubscribeEvent
-    public void reLoad(final ResearchTableReLoadEvent event) {
-        if (event.getWorld().isRemote) {
-            return;
+        tick++;
+        if (tick % 20 == 0) {
+            SpaceNet.instance.getFakeSpaceSystem().working();
+            SpaceNet.instance.getColonieNet().working();
         }
-        final Map<UUID, IResearchTable> map = SpaceNet.instance
-                .getFakeSpaceSystem()
-                .getResearchTableMap();
-        map.replace(event.table.getPlayer(), event.table);
 
 
     }
+
 
     @SubscribeEvent
     public void load(final ResearchTableLoadEvent event) {
-        if (event.getWorld().isRemote) {
+        if (event.getLevel().isClientSide()) {
             return;
         }
         final Map<UUID, IResearchTable> map = SpaceNet.instance
@@ -83,7 +63,7 @@ public class EventHandlerPlanet {
 
     @SubscribeEvent
     public void unLoad(final ResearchTableUnLoadEvent event) {
-        if (event.getWorld().isRemote) {
+        if (event.getLevel().isClientSide()) {
             return;
         }
         final Map<UUID, IResearchTable> map = SpaceNet.instance
@@ -95,7 +75,7 @@ public class EventHandlerPlanet {
 
     @SubscribeEvent
     public void loadRocketPad(final RocketPadLoadEvent event) {
-        if (event.getWorld().isRemote) {
+        if (event.getLevel().isClientSide()) {
             return;
         }
         final Map<UUID, IRocketLaunchPad> map = SpaceNet.instance
@@ -109,7 +89,7 @@ public class EventHandlerPlanet {
 
     @SubscribeEvent
     public void unLoadRocketPad(final RocketPadUnLoadEvent event) {
-        if (event.getWorld().isRemote) {
+        if (event.getLevel().isClientSide()) {
             return;
         }
         final Map<UUID, IRocketLaunchPad> map = SpaceNet.instance
@@ -119,21 +99,36 @@ public class EventHandlerPlanet {
 
     }
 
+
     @SubscribeEvent
-    public void onSave(WorldEvent.Save event) {
-        if (FMLCommonHandler
-                .instance()
-                .getEffectiveSide() == Side.SERVER && data != null && event.getWorld().provider.getDimension() == 0) {
+    public void onServerStopping(ServerStoppingEvent event) {
+        serverStopping = true;
+    }
+
+    @SubscribeEvent
+    public void onServerStopped(ServerStoppedEvent event) {
+        serverStopping = false;
+        data = null;
+    }
+
+    @SubscribeEvent
+    public void onSave(LevelEvent.Save event) {
+        if (event.getLevel() instanceof ServerLevel serverLevel
+                && serverLevel.dimension() == Level.OVERWORLD
+                && data != null) {
             data.setDirty(true);
         }
     }
 
     @SubscribeEvent
-    public void onUnload(WorldEvent.Unload event) {
-        if (FMLCommonHandler
-                .instance()
-                .getEffectiveSide() == Side.SERVER && data != null && event.getWorld().provider.getDimension() == 0) {
-            data.setDirty(true);
+    public void onUnload(LevelEvent.Unload event) {
+        if (event.getLevel() instanceof ServerLevel serverLevel
+                && serverLevel.dimension() == Level.OVERWORLD) {
+            if (SpaceNet.instance != null && SpaceNet.instance.getFakeSpaceSystem() != null) {
+                SpaceNet.instance.getFakeSpaceSystem().getResearchTableMap().clear();
+                SpaceNet.instance.getFakeSpaceSystem().getRocketPadMap().clear();
+            }
+            data = null;
         }
     }
 

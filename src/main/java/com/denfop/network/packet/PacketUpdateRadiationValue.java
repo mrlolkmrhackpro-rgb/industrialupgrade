@@ -1,42 +1,53 @@
 package com.denfop.network.packet;
 
 import com.denfop.IUCore;
-import com.denfop.api.radiationsystem.Radiation;
-import com.denfop.api.radiationsystem.RadiationSystem;
+import com.denfop.api.pollution.client.PollutionClientRenderRefresh;
+import com.denfop.api.pollution.radiation.Radiation;
+import com.denfop.api.pollution.radiation.RadiationSystem;
 import com.denfop.network.DecoderHandler;
 import com.denfop.network.EncoderHandler;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ChunkPos;
 
 import java.io.IOException;
 
 public class PacketUpdateRadiationValue implements IPacket {
 
+    private CustomPacketBuffer buffer;
+
     public PacketUpdateRadiationValue() {
     }
 
-    ;
-
-    public PacketUpdateRadiationValue(ChunkPos pos, double radiation) {
+    public PacketUpdateRadiationValue(ChunkPos pos, double radiation, ServerLevel serverLevel) {
         Radiation radiation1 = RadiationSystem.rad_system.getMap().get(pos);
         if (radiation1 == null) {
             radiation1 = new Radiation(pos);
-            ;
             RadiationSystem.rad_system.addRadiation(radiation1);
         }
         radiation1.addRadiation(radiation);
-        CustomPacketBuffer buffer = new CustomPacketBuffer(64);
+
+        CustomPacketBuffer buffer = new CustomPacketBuffer(64, serverLevel.registryAccess());
         try {
             buffer.writeByte(this.getId());
             EncoderHandler.encode(buffer, radiation1);
-
-
         } catch (IOException var5) {
             throw new RuntimeException(var5);
         }
 
         buffer.flip();
-        IUCore.network.getServer().sendPacket(buffer);
+        this.buffer = buffer;
+        IUCore.network.getServer().sendPacket(this, buffer);
+    }
+
+    @Override
+    public CustomPacketBuffer getPacketBuffer() {
+        return buffer;
+    }
+
+    @Override
+    public void setPacketBuffer(CustomPacketBuffer customPacketBuffer) {
+        buffer = customPacketBuffer;
     }
 
     @Override
@@ -45,7 +56,7 @@ public class PacketUpdateRadiationValue implements IPacket {
     }
 
     @Override
-    public void readPacket(final CustomPacketBuffer customPacketBuffer, final EntityPlayer entityPlayer) {
+    public void readPacket(final CustomPacketBuffer customPacketBuffer, final Player entityPlayer) {
         try {
             Radiation radiation = (Radiation) DecoderHandler.decode(customPacketBuffer);
             Radiation radiation1 = RadiationSystem.rad_system.getMap().get(radiation.getPos());
@@ -60,6 +71,8 @@ public class PacketUpdateRadiationValue implements IPacket {
                 radiation1.setCoef(radiation.getCoef());
                 radiation1.setLevel(radiation.getLevel());
             }
+
+            PollutionClientRenderRefresh.queueSingleChunkRadiationUpdated(radiation.getPos());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -69,5 +82,4 @@ public class PacketUpdateRadiationValue implements IPacket {
     public EnumTypePacket getPacketType() {
         return EnumTypePacket.SERVER;
     }
-
 }

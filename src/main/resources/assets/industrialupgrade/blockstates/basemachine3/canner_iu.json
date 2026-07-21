@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=canner_iu": {
+      "model": "industrialupgrade:block/basemachine/canner"
+    },
+    "facing=south,type=canner_iu": {
+      "model": "industrialupgrade:block/basemachine/canner",
+      "y": 180
+    },
+    "facing=west,type=canner_iu": {
+      "model": "industrialupgrade:block/basemachine/canner",
+      "y": 270
+    },
+    "facing=east,type=canner_iu": {
+      "model": "industrialupgrade:block/basemachine/canner",
+      "y": 90
+    },
+    "facing=north,type=canner_iu_active": {
+      "model": "industrialupgrade:block/basemachine/canner_active"
+    },
+    "facing=south,type=canner_iu_active": {
+      "model": "industrialupgrade:block/basemachine/canner_active",
+      "y": 180
+    },
+    "facing=west,type=canner_iu_active": {
+      "model": "industrialupgrade:block/basemachine/canner_active",
+      "y": 270
+    },
+    "facing=east,type=canner_iu_active": {
+      "model": "industrialupgrade:block/basemachine/canner_active",
+      "y": 90
+    }
+  }
+}

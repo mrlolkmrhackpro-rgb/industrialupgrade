@@ -1,19 +1,18 @@
 package com.denfop.componets;
 
-import com.denfop.api.sytem.EnergyType;
+import com.denfop.api.otherenergies.common.EnergyType;
+import com.denfop.blockentity.base.BlockEntityInventory;
 import com.denfop.blocks.FluidName;
-import com.denfop.effects.SteamParticle;
-import com.denfop.tiles.base.TileEntityInventory;
+import com.denfop.effects.EffectsRegister;
 import com.denfop.utils.ModUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,93 +20,110 @@ import java.util.Set;
 
 public class ComponentSteamEnergy extends ComponentBaseEnergy {
 
+    public static int speedGeneration = 1;
     FluidTank fluidTank;
 
-    public ComponentSteamEnergy(EnergyType type, TileEntityInventory parent, double capacity) {
+    public ComponentSteamEnergy(EnergyType type, BlockEntityInventory parent, double capacity) {
         this(type, parent, capacity, Collections.emptySet(), Collections.emptySet(), 1);
     }
 
     public ComponentSteamEnergy(
-            EnergyType type, TileEntityInventory parent,
+            EnergyType type, BlockEntityInventory parent,
             double capacity,
-            Set<EnumFacing> sinkDirections,
-            Set<EnumFacing> sourceDirections,
+            Set<Direction> sinkDirections,
+            Set<Direction> sourceDirections,
             int tier
     ) {
         this(type, parent, capacity, sinkDirections, sourceDirections, tier, tier, false);
     }
 
     public ComponentSteamEnergy(
-            EnergyType type, TileEntityInventory parent,
+            EnergyType type, BlockEntityInventory parent,
             double capacity,
-            Set<EnumFacing> sinkDirections,
-            Set<EnumFacing> sourceDirections,
+            Set<Direction> sinkDirections,
+            Set<Direction> sourceDirections,
             int sinkTier,
             int sourceTier,
             boolean fullEnergy
     ) {
-        super(type, parent, capacity, sinkDirections, sourceDirections, sinkTier, sourceTier, fullEnergy);
+        super(type, parent, capacity, sinkDirections, sourceDirections, sinkTier, sourceTier);
     }
 
     public ComponentSteamEnergy(
-            EnergyType type, TileEntityInventory parent,
+            EnergyType type, BlockEntityInventory parent,
             double capacity,
-            List<EnumFacing> sinkDirections,
-            List<EnumFacing> sourceDirections,
+            List<Direction> sinkDirections,
+            List<Direction> sourceDirections,
             int sinkTier,
             int sourceTier,
             boolean fullEnergy
     ) {
-        super(type, parent, capacity, sinkDirections, sourceDirections, sinkTier, sourceTier, fullEnergy);
+        super(type, parent, capacity, sinkDirections, sourceDirections, sinkTier, sourceTier);
     }
 
-    public static ComponentSteamEnergy asBasicSink(TileEntityInventory parent, double capacity) {
+    public static ComponentSteamEnergy asBasicSink(BlockEntityInventory parent, double capacity) {
         return asBasicSink(parent, capacity, 1);
     }
 
-    public static ComponentSteamEnergy asBasicSink(TileEntityInventory parent, double capacity, int tier) {
+    public static ComponentSteamEnergy asBasicSink(BlockEntityInventory parent, double capacity, int tier) {
         return new ComponentSteamEnergy(EnergyType.STEAM, parent, capacity, ModUtils.allFacings, Collections.emptySet(), tier);
     }
 
-    public static ComponentSteamEnergy asBasicSource(TileEntityInventory parent, double capacity) {
+    public static ComponentSteamEnergy asBasicSource(BlockEntityInventory parent, double capacity) {
         return asBasicSource(parent, capacity, 1);
     }
 
-    public static ComponentSteamEnergy asBasicSource(TileEntityInventory parent, double capacity, int tier) {
+    public static ComponentSteamEnergy asBasicSource(BlockEntityInventory parent, double capacity, int tier) {
         return new ComponentSteamEnergy(EnergyType.STEAM, parent, capacity, Collections.emptySet(), ModUtils.allFacings, tier);
     }
 
     @Override
-    public void onPlaced(final ItemStack stack, final EntityLivingBase placer, final EnumFacing facing) {
+    public void onPlaced(ItemStack stack, LivingEntity placer, Direction facing) {
         super.onPlaced(stack, placer, facing);
-        final NBTTagCompound nbt = ModUtils.nbt(stack);
-        final NBTTagCompound nbt1 = nbt.getCompoundTag("steam");
-        this.addEnergy(nbt1.getDouble("energy"));
     }
 
     @Override
-    public List<ItemStack> getAuxDrops(List<ItemStack> ret) {
-        if (ret.get(0).isItemEqual(this.getParent().getPickBlock(null, null))) {
-            final NBTTagCompound nbt = ModUtils.nbt(ret.get(0));
-            final NBTTagCompound nbt1 = new NBTTagCompound();
-            nbt1.setDouble("energy", this.storage);
-            nbt.setTag("steam", nbt1);
-        }
-        return ret;
+    @OnlyIn(Dist.CLIENT)
+    public void updateEntityClient() {
+        super.updateEntityClient();
+        if (this.parent.getActive() && this.parent.getWorld().getGameTime() % 4 == 0) {
+            double x = this.parent.getBlockPos().getX();
+            double y = this.parent.getBlockPos().getY() + 1.0;
+            double z = this.parent.getBlockPos().getZ();
 
+            this.parent.getLevel().addParticle(
+                    EffectsRegister.STEAM_ASH.get(),
+                    x, y, z,
+                    0.0, 0.1, 0.0
+            );
+        }
     }
 
-    public void setFluidTank(final FluidTank fluidTank) {
-        this.fluidTank = fluidTank;
+    @Override
+    public boolean isServer() {
+        return true;
+    }
+
+    @Override
+    public void updateEntityServer() {
+        super.updateEntityServer();
+        if (this.delegate != null) {
+            if (fluidTank.getFluid().getAmount() != this.buffer.storage && (this.buffer.storage > fluidTank.getFluid().getAmount())) {
+                fluidTank.fill(new FluidStack(FluidName.fluidsteam.getInstance().get(), (int) this.buffer.storage - fluidTank.getFluid().getAmount()), IFluidHandler.FluidAction.EXECUTE);
+            }
+            if (fluidTank.getFluid().getAmount() != this.buffer.storage && (this.buffer.storage < fluidTank.getFluid().getAmount())) {
+                fluidTank.drain(fluidTank.getFluid().getAmount() - (int) this.buffer.storage, IFluidHandler.FluidAction.EXECUTE);
+            }
+        }
     }
 
     @Override
     public double addEnergy(final double amount) {
         super.addEnergy(amount);
-        if (fluidTank.getFluid() == null && amount >= 1) {
-            fluidTank.fill(new FluidStack(FluidName.fluidsteam.getInstance(), (int) this.storage), true);
-        } else if (fluidTank.getFluid() != null) {
-            fluidTank.getFluid().amount = (int) this.storage;
+        if (fluidTank.getFluid().isEmpty() && amount >= 1) {
+            fluidTank.fill(new FluidStack(FluidName.fluidsteam.getInstance().get(), (int) this.buffer.storage), IFluidHandler.FluidAction.EXECUTE);
+        } else if (!fluidTank.getFluid().isEmpty()) {
+            fluidTank.getFluid().setAmount((int) this.buffer.storage);
         }
         return amount;
     }
@@ -118,29 +134,22 @@ public class ComponentSteamEnergy extends ComponentBaseEnergy {
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public void updateEntityClient() {
-        super.updateEntityClient();
-        if (this.parent.getActive() && this.parent.getWorld().getWorldTime() % 4 == 0) {
-            Minecraft.getMinecraft().effectRenderer.addEffect(new SteamParticle(
-                    this.parent.getWorld(),
-                    this.parent.getPos().getX(),
-                    this.parent.getPos().getY() + 1,
-                    this.parent.getPos().getZ()
-            ));
-        }
-    }
-
-    @Override
     public boolean useEnergy(final double amount) {
         super.useEnergy(amount);
-        if (fluidTank.getFluid() != null) {
-            fluidTank.getFluid().amount = (int) this.storage;
-            if (fluidTank.getFluid().amount == 0) {
-                fluidTank.setFluid(null);
+        if (!fluidTank.getFluid().isEmpty()) {
+            fluidTank.getFluid().setAmount((int) this.buffer.storage);
+            if (fluidTank.getFluid().getAmount() == 0) {
+                fluidTank.setFluid(FluidStack.EMPTY);
             }
         }
         return true;
     }
 
+    public FluidTank getFluidTank() {
+        return fluidTank;
+    }
+
+    public void setFluidTank(final FluidTank fluidTank) {
+        this.fluidTank = fluidTank;
+    }
 }

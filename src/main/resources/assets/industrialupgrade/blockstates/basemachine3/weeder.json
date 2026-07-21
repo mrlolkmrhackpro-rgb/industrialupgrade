@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=weeder": {
+      "model": "industrialupgrade:block/basemachine/weeder"
+    },
+    "facing=south,type=weeder": {
+      "model": "industrialupgrade:block/basemachine/weeder",
+      "y": 180
+    },
+    "facing=west,type=weeder": {
+      "model": "industrialupgrade:block/basemachine/weeder",
+      "y": 270
+    },
+    "facing=east,type=weeder": {
+      "model": "industrialupgrade:block/basemachine/weeder",
+      "y": 90
+    },
+    "facing=north,type=weeder_active": {
+      "model": "industrialupgrade:block/basemachine/weeder"
+    },
+    "facing=south,type=weeder_active": {
+      "model": "industrialupgrade:block/basemachine/weeder",
+      "y": 180
+    },
+    "facing=west,type=weeder_active": {
+      "model": "industrialupgrade:block/basemachine/weeder",
+      "y": 270
+    },
+    "facing=east,type=weeder_active": {
+      "model": "industrialupgrade:block/basemachine/weeder",
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=exp_chargepad": {
+      "model": "industrialupgrade:block/basemachine/exp_chargepad"
+    },
+    "facing=south,type=exp_chargepad": {
+      "model": "industrialupgrade:block/basemachine/exp_chargepad",
+      "y": 180
+    },
+    "facing=west,type=exp_chargepad": {
+      "model": "industrialupgrade:block/basemachine/exp_chargepad",
+      "y": 270
+    },
+    "facing=east,type=exp_chargepad": {
+      "model": "industrialupgrade:block/basemachine/exp_chargepad",
+      "y": 90
+    },
+    "facing=north,type=exp_chargepad_active": {
+      "model": "industrialupgrade:block/basemachine/exp_chargepad_active"
+    },
+    "facing=south,type=exp_chargepad_active": {
+      "model": "industrialupgrade:block/basemachine/exp_chargepad_active",
+      "y": 180
+    },
+    "facing=west,type=exp_chargepad_active": {
+      "model": "industrialupgrade:block/basemachine/exp_chargepad_active",
+      "y": 270
+    },
+    "facing=east,type=exp_chargepad_active": {
+      "model": "industrialupgrade:block/basemachine/exp_chargepad_active",
+      "y": 90
+    }
+  }
+}

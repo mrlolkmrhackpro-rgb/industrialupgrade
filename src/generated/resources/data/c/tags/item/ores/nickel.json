@@ -1,0 +1,8 @@
+{
+  "values": [
+    "industrialupgrade:baseore/nickel",
+    "industrialupgrade:blockspace4/titan_nickel_ore",
+    "industrialupgrade:asteroidore1/asteroid_nickel_ore",
+    "industrialupgrade:deepore/deep_nickel_ore"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=bio_cutting": {
+      "model": "industrialupgrade:block/basemachine/bio_cutting"
+    },
+    "facing=south,type=bio_cutting": {
+      "model": "industrialupgrade:block/basemachine/bio_cutting",
+      "y": 180
+    },
+    "facing=west,type=bio_cutting": {
+      "model": "industrialupgrade:block/basemachine/bio_cutting",
+      "y": 270
+    },
+    "facing=east,type=bio_cutting": {
+      "model": "industrialupgrade:block/basemachine/bio_cutting",
+      "y": 90
+    },
+    "facing=north,type=bio_cutting_active": {
+      "model": "industrialupgrade:block/basemachine/bio_cutting_active"
+    },
+    "facing=south,type=bio_cutting_active": {
+      "model": "industrialupgrade:block/basemachine/bio_cutting_active",
+      "y": 180
+    },
+    "facing=west,type=bio_cutting_active": {
+      "model": "industrialupgrade:block/basemachine/bio_cutting_active",
+      "y": 270
+    },
+    "facing=east,type=bio_cutting_active": {
+      "model": "industrialupgrade:block/basemachine/bio_cutting_active",
+      "y": 90
+    }
+  }
+}

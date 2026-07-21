@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=quarry_pipe": {
+      "model": "industrialupgrade:block/basemachine/quarry_pipe"
+    },
+    "facing=south,type=quarry_pipe": {
+      "model": "industrialupgrade:block/basemachine/quarry_pipe",
+      "y": 180
+    },
+    "facing=west,type=quarry_pipe": {
+      "model": "industrialupgrade:block/basemachine/quarry_pipe",
+      "y": 270
+    },
+    "facing=east,type=quarry_pipe": {
+      "model": "industrialupgrade:block/basemachine/quarry_pipe",
+      "y": 90
+    },
+    "facing=north,type=quarry_pipe_active": {
+      "model": "industrialupgrade:block/basemachine/quarry_pipe"
+    },
+    "facing=south,type=quarry_pipe_active": {
+      "model": "industrialupgrade:block/basemachine/quarry_pipe",
+      "y": 180
+    },
+    "facing=west,type=quarry_pipe_active": {
+      "model": "industrialupgrade:block/basemachine/quarry_pipe",
+      "y": 270
+    },
+    "facing=east,type=quarry_pipe_active": {
+      "model": "industrialupgrade:block/basemachine/quarry_pipe",
+      "y": 90
+    }
+  }
+}

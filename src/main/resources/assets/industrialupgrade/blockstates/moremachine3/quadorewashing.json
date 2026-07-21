@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=quadorewashing": {
+      "model": "industrialupgrade:block/moremachine3/quadorewashing"
+    },
+    "facing=south,type=quadorewashing": {
+      "model": "industrialupgrade:block/moremachine3/quadorewashing",
+      "y": 180
+    },
+    "facing=west,type=quadorewashing": {
+      "model": "industrialupgrade:block/moremachine3/quadorewashing",
+      "y": 270
+    },
+    "facing=east,type=quadorewashing": {
+      "model": "industrialupgrade:block/moremachine3/quadorewashing",
+      "y": 90
+    },
+    "facing=north,type=quadorewashing_active": {
+      "model": "industrialupgrade:block/moremachine3/quadorewashing_active"
+    },
+    "facing=south,type=quadorewashing_active": {
+      "model": "industrialupgrade:block/moremachine3/quadorewashing_active",
+      "y": 180
+    },
+    "facing=west,type=quadorewashing_active": {
+      "model": "industrialupgrade:block/moremachine3/quadorewashing_active",
+      "y": 270
+    },
+    "facing=east,type=quadorewashing_active": {
+      "model": "industrialupgrade:block/moremachine3/quadorewashing_active",
+      "y": 90
+    }
+  }
+}

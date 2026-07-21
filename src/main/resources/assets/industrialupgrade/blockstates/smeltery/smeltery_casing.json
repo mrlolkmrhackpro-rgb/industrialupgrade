@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=smeltery_casing": {
+      "model": "industrialupgrade:block/smeltery/smeltery_casing"
+    },
+    "facing=south,type=smeltery_casing": {
+      "model": "industrialupgrade:block/smeltery/smeltery_casing",
+      "y": 180
+    },
+    "facing=west,type=smeltery_casing": {
+      "model": "industrialupgrade:block/smeltery/smeltery_casing",
+      "y": 270
+    },
+    "facing=east,type=smeltery_casing": {
+      "model": "industrialupgrade:block/smeltery/smeltery_casing",
+      "y": 90
+    },
+    "facing=north,type=smeltery_casing_active": {
+      "model": "industrialupgrade:block/smeltery/smeltery_casing"
+    },
+    "facing=south,type=smeltery_casing_active": {
+      "model": "industrialupgrade:block/smeltery/smeltery_casing",
+      "y": 180
+    },
+    "facing=west,type=smeltery_casing_active": {
+      "model": "industrialupgrade:block/smeltery/smeltery_casing",
+      "y": 270
+    },
+    "facing=east,type=smeltery_casing_active": {
+      "model": "industrialupgrade:block/smeltery/smeltery_casing",
+      "y": 90
+    }
+  }
+}

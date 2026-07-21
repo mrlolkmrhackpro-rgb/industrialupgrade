@@ -1,16 +1,14 @@
 package com.denfop.network.packet;
 
-import com.denfop.api.recipe.BaseMachineRecipe;
-import com.denfop.api.space.fakebody.FakeAsteroid;
-import com.denfop.api.space.fakebody.FakePlanet;
-import com.denfop.api.space.fakebody.FakeSatellite;
-import com.denfop.api.tesseract.Channel;
+
+import com.denfop.api.recipe.*;
+import com.denfop.api.vein.common.VeinBase;
 import com.denfop.componets.AbstractComponent;
-import com.denfop.invslot.Inventory;
-import com.denfop.recipe.IInputItemStack;
-import com.denfop.tiles.base.DataOre;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.Vec3d;
+import com.denfop.inventory.Inventory;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -26,44 +24,47 @@ public enum EncodedType {
     Double(Double.class),
     Boolean(Boolean.class),
     Character(Character.class),
+    network_object(INetworkObject.class),
     String(String.class),
     Enum(Enum.class),
     UUID(java.util.UUID.class),
-    Block(net.minecraft.block.Block.class),
-    Item(net.minecraft.item.Item.class),
-    TileEntity(net.minecraft.tileentity.TileEntity.class, false),
-    ItemStack(net.minecraft.item.ItemStack.class),
-    World(net.minecraft.world.World.class, false),
-    NBTTagCompound(net.minecraft.nbt.NBTTagCompound.class),
-    ResourceLocation(net.minecraft.util.ResourceLocation.class),
+    Block(net.minecraft.world.level.block.Block.class),
+    Item(net.minecraft.world.item.Item.class),
+    TileEntity(BlockEntity.class, false),
+    ItemStack(net.minecraft.world.item.ItemStack.class),
+    World(Level.class, false),
+    NBTTagCompound(CompoundTag.class),
+    ResourceLocation(net.minecraft.resources.ResourceLocation.class),
     GameProfile(com.mojang.authlib.GameProfile.class),
-    Potion(net.minecraft.potion.Potion.class),
-    Enchantment(net.minecraft.enchantment.Enchantment.class),
-    BlockPos(net.minecraft.util.math.BlockPos.class),
-    ChunkPos(net.minecraft.util.math.ChunkPos.class),
-    Vec3(Vec3d.class),
-    Fluid(net.minecraftforge.fluids.Fluid.class),
-    Vein(com.denfop.api.vein.Vein.class),
+    Potion(net.minecraft.world.item.alchemy.Potion.class),
+    Enchantment(net.minecraft.world.item.enchantment.Enchantment.class),
+    BlockPos(net.minecraft.core.BlockPos.class),
+    ChunkPos(net.minecraft.world.level.ChunkPos.class),
+    Vec3(net.minecraft.world.phys.Vec3.class),
+    Fluid(net.minecraft.world.level.material.Fluid.class),
+    Vein(VeinBase.class),
     MachineRecipe(BaseMachineRecipe.class),
-    Input(IInputItemStack.class),
-    FluidStack(net.minecraftforge.fluids.FluidStack.class),
-    FluidTank(net.minecraftforge.fluids.FluidTank.class),
+    FluidStack(net.neoforged.neoforge.fluids.FluidStack.class),
+    FluidTank(net.neoforged.neoforge.fluids.capability.templates.FluidTank.class),
     InvSlot(Inventory.class),
-    FAKE_PLANET(FakePlanet.class),
-    FAKE_SATELLITE(FakeSatellite.class),
-    FAKE_ASTEROID(FakeAsteroid.class),
+    tuple(Tuple.class),
+    DataComponentPatch(net.minecraft.core.component.DataComponentPatch.class),
+    BaseRecipe(BaseMachineRecipe.class),
+    BaseFluidRecipe(BaseFluidMachineRecipe.class),
+    recipeOutput(RecipeOutput.class),
+    inputStack(IInput.class),
+    inputFluidStack(IInputFluid.class),
+    //    FAKE_PLANET(FakePlanet.class),
+    //   FAKE_SATELLITE(FakeSatellite.class),
+    //   FAKE_ASTEROID(FakeAsteroid.class),
     Component(AbstractComponent.class, false),
 
-    Radiation(com.denfop.api.radiationsystem.Radiation.class),
+    Radiation(com.denfop.api.pollution.radiation.Radiation.class),
     Collection(java.util.Collection.class),
-    BaseLevelSystem(com.denfop.api.research.main.BaseLevelSystem.class),
-    BaseResearch(com.denfop.api.research.main.BaseResearch.class),
+    //   BaseLevelSystem(com.denfop.api.research.main.BaseLevelSystem.class),
+    //   BaseResearch(com.denfop.api.research.main.BaseResearch.class),
     RecipeInfo(com.denfop.api.recipe.RecipeInfo.class),
-    PlayerStreakInfo(com.denfop.render.streak.PlayerStreakInfo.class),
-    DataOre(DataOre.class),
-    channel(Channel.class),
-    network_object(INetworkObject.class),
-    player(EntityPlayer.class),
+    DataOre(com.denfop.blockentity.base.DataOre.class),
     Object(Object.class);
 
     public static final EncodedType[] types = values();
@@ -77,7 +78,7 @@ public enum EncodedType {
             }
         }
 
-        if (types.length > 255) {
+        if (types.length > 127) {
             throw new RuntimeException("too many types");
         }
     }

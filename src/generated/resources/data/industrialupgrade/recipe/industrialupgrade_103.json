@@ -1,0 +1,28 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:compresscarbon"
+    },
+    "B": {
+      "tag": "c:doubleplate/vitalium"
+    },
+    "C": {
+      "item": "industrialupgrade:module_schedule"
+    },
+    "F": {
+      "tag": "c:doubleplate/alcled"
+    }
+  },
+  "pattern": [
+    "AAA",
+    "BCB",
+    " F "
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:additionmodule/charger"
+  },
+  "show_notification": false
+}

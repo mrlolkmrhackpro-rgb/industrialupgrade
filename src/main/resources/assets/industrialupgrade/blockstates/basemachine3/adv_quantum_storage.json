@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=adv_quantum_storage": {
+      "model": "industrialupgrade:block/basemachine/adv_quantum_storage"
+    },
+    "facing=south,type=adv_quantum_storage": {
+      "model": "industrialupgrade:block/basemachine/adv_quantum_storage",
+      "y": 180
+    },
+    "facing=west,type=adv_quantum_storage": {
+      "model": "industrialupgrade:block/basemachine/adv_quantum_storage",
+      "y": 270
+    },
+    "facing=east,type=adv_quantum_storage": {
+      "model": "industrialupgrade:block/basemachine/adv_quantum_storage",
+      "y": 90
+    },
+    "facing=north,type=adv_quantum_storage_active": {
+      "model": "industrialupgrade:block/basemachine/adv_quantum_storage"
+    },
+    "facing=south,type=adv_quantum_storage_active": {
+      "model": "industrialupgrade:block/basemachine/adv_quantum_storage",
+      "y": 180
+    },
+    "facing=west,type=adv_quantum_storage_active": {
+      "model": "industrialupgrade:block/basemachine/adv_quantum_storage",
+      "y": 270
+    },
+    "facing=east,type=adv_quantum_storage_active": {
+      "model": "industrialupgrade:block/basemachine/adv_quantum_storage",
+      "y": 90
+    }
+  }
+}

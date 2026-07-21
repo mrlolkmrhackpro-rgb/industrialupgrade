@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=gearing": {
+      "model": "industrialupgrade:block/moremachine3/gearing"
+    },
+    "facing=south,type=gearing": {
+      "model": "industrialupgrade:block/moremachine3/gearing",
+      "y": 180
+    },
+    "facing=west,type=gearing": {
+      "model": "industrialupgrade:block/moremachine3/gearing",
+      "y": 270
+    },
+    "facing=east,type=gearing": {
+      "model": "industrialupgrade:block/moremachine3/gearing",
+      "y": 90
+    },
+    "facing=north,type=gearing_active": {
+      "model": "industrialupgrade:block/moremachine3/gearing_active"
+    },
+    "facing=south,type=gearing_active": {
+      "model": "industrialupgrade:block/moremachine3/gearing_active",
+      "y": 180
+    },
+    "facing=west,type=gearing_active": {
+      "model": "industrialupgrade:block/moremachine3/gearing_active",
+      "y": 270
+    },
+    "facing=east,type=gearing_active": {
+      "model": "industrialupgrade:block/moremachine3/gearing_active",
+      "y": 90
+    }
+  }
+}

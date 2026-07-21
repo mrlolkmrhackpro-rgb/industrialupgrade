@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=steamboiler": {
+      "model": "industrialupgrade:block/basemachine/steamboiler"
+    },
+    "facing=south,type=steamboiler": {
+      "model": "industrialupgrade:block/basemachine/steamboiler",
+      "y": 180
+    },
+    "facing=west,type=steamboiler": {
+      "model": "industrialupgrade:block/basemachine/steamboiler",
+      "y": 270
+    },
+    "facing=east,type=steamboiler": {
+      "model": "industrialupgrade:block/basemachine/steamboiler",
+      "y": 90
+    },
+    "facing=north,type=steamboiler_active": {
+      "model": "industrialupgrade:block/basemachine/steamboiler_active"
+    },
+    "facing=south,type=steamboiler_active": {
+      "model": "industrialupgrade:block/basemachine/steamboiler_active",
+      "y": 180
+    },
+    "facing=west,type=steamboiler_active": {
+      "model": "industrialupgrade:block/basemachine/steamboiler_active",
+      "y": 270
+    },
+    "facing=east,type=steamboiler_active": {
+      "model": "industrialupgrade:block/basemachine/steamboiler_active",
+      "y": 90
+    }
+  }
+}

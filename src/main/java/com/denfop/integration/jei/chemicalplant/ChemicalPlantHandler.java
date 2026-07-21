@@ -2,7 +2,7 @@ package com.denfop.integration.jei.chemicalplant;
 
 
 import com.denfop.blocks.FluidName;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +43,8 @@ public class ChemicalPlantHandler {
 
     public static void initRecipes() {
         addRecipe(
-                new FluidStack(FluidName.fluidHelium.getInstance(), 2),
-                new FluidStack(FluidName.fluidcryogen.getInstance(), 10)
+                new FluidStack(FluidName.fluidhelium.getInstance().get(), 2),
+                new FluidStack(FluidName.fluidcryogen.getInstance().get(), 10)
         );
     }
 

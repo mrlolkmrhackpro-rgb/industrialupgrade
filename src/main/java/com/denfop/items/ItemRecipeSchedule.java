@@ -1,93 +1,80 @@
 package com.denfop.items;
 
-import com.denfop.Constants;
 import com.denfop.IUCore;
-import com.denfop.Localization;
-import com.denfop.api.IModelRegister;
 import com.denfop.api.Recipes;
-import com.denfop.api.recipe.BaseMachineRecipe;
-import com.denfop.api.recipe.IBaseRecipe;
-import com.denfop.api.recipe.IInput;
-import com.denfop.api.recipe.IRecipeInputStack;
-import com.denfop.api.recipe.RecipeArrayList;
-import com.denfop.api.recipe.RecipeInputStack;
-import com.denfop.items.bags.BagsDescription;
-import com.denfop.register.Register;
-import com.denfop.utils.ModUtils;
-import net.minecraft.client.renderer.block.model.ModelBakery;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.jetbrains.annotations.Nullable;
-import org.lwjgl.input.Keyboard;
+import com.denfop.api.recipe.*;
+import com.denfop.datacomponent.DataComponentsInit;
+import com.denfop.tabs.IItemTab;
+import com.denfop.utils.Keyboard;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
+import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 
-public class ItemRecipeSchedule extends Item implements IModelRegister {
+public class ItemRecipeSchedule extends Item implements IItemTab, IProperties {
 
     private final String name;
 
     public ItemRecipeSchedule() {
-        super();
-        this.setMaxStackSize(1);
-        this.canRepair = false;
+        super(new Properties().stacksTo(1).setNoRepair());
         this.name = "recipe_schedule";
-        this.setCreativeTab(IUCore.IUTab);
-        Register.registerItem((Item) this, IUCore.getIdentifier(name)).setUnlocalizedName(name);
-        IUCore.proxy.addIModelRegister(this);
+        IUCore.proxy.addProperties(this);
     }
 
-    @SideOnly(Side.CLIENT)
-    public static ModelResourceLocation getModelLocation(String name) {
-        final String loc = Constants.MOD_ID +
-                ':' +
-                name;
-
-        return new ModelResourceLocation(loc, null);
+    @Override
+    public String[] properties() {
+        return new String[]{"mode"};
     }
 
-    @SideOnly(Side.CLIENT)
-    public static void registerModel(Item item, int meta, String name) {
 
-        ModelLoader.setCustomMeshDefinition(item, stack -> {
-            final NBTTagCompound nbt = ModUtils.nbt(stack);
-            return getModelLocation(name + (nbt.getBoolean("mode") ? "" : "_black"));
-
-        });
-        String[] mode = {"", "_black"};
-        for (final String s : mode) {
-            ModelBakery.registerItemVariants(item, getModelLocation(name + s));
-        }
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public float getItemProperty(ItemStack itemStack, ClientLevel level, LivingEntity entity, int p174679, String property) {
+        return itemStack.getOrDefault(DataComponentsInit.BLACK_LIST, false) ? 1 : 0;
     }
 
     public List<ItemStack> getItems(ItemStack stack) {
-        List<ItemStack> list = new ArrayList<>();
-        final NBTTagCompound nbt = ModUtils.nbt(stack);
-        for (int i = 0; i < 9; i++) {
-            final NBTTagCompound tag = nbt.getCompoundTag("recipe_" + i);
-            ItemStack stack1 = new ItemStack(tag);
-            if (!stack1.isEmpty()) {
-                list.add(stack1);
+
+        return stack.getOrDefault(DataComponentsInit.LIST_STACK, Collections.emptyList());
+    }
+
+
+    @Override
+    public void appendHoverText(
+            ItemStack stack,
+            @Nullable TooltipContext world,
+            List<Component> tooltip,
+            TooltipFlag flag
+    ) {
+        if (!Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+            tooltip.add(Component.translatable("press.lshift"));
+        } else {
+
+            for (ItemStack description : getItems(stack)) {
+                tooltip.add(Component.literal(ChatFormatting.GREEN + com.denfop.utils.ModUtils.cleanComponentString(description.getHoverName().getString())));
             }
         }
-        return list;
+    }
+
+    public RecipeArrayList<IRecipeInputStack> getInputs(HolderLookup.Provider provider, IBaseRecipe baseRecipe, ItemStack stack) {
+        return getInputs(baseRecipe, stack);
     }
 
     public RecipeArrayList<IRecipeInputStack> getInputs(IBaseRecipe baseRecipe, ItemStack stack) {
-        final NBTTagCompound nbt = ModUtils.nbt(stack);
         final List<ItemStack> items = this.getItems(stack);
         final List<BaseMachineRecipe> recipe_list = Recipes.recipes.getRecipeList(baseRecipe.getName());
-        if (nbt.getBoolean("mode")) {
+        if (stack.getOrDefault(DataComponentsInit.BLACK_LIST, false)) {
             if (items.isEmpty()) {
                 return new RecipeArrayList<>();
             }
@@ -97,7 +84,7 @@ public class ItemRecipeSchedule extends Item implements IModelRegister {
                 cycle:
                 for (ItemStack output_schedule : items) {
                     for (ItemStack output : baseMachineRecipe.output.items) {
-                        if (output.isItemEqual(output_schedule)) {
+                        if (output.is(output_schedule.getItem())) {
                             find = true;
                             break cycle;
                         }
@@ -119,7 +106,7 @@ public class ItemRecipeSchedule extends Item implements IModelRegister {
                 cycle:
                 for (ItemStack output_schedule : items) {
                     for (ItemStack output : baseMachineRecipe.output.items) {
-                        if (!output.isItemEqual(output_schedule)) {
+                        if (!output.is(output_schedule.getItem())) {
                             find = true;
                             break cycle;
                         }
@@ -137,6 +124,11 @@ public class ItemRecipeSchedule extends Item implements IModelRegister {
     }
 
     @Override
+    public CreativeModeTab getItemCategory() {
+        return IUCore.ItemTab;
+    }
+
+  /*  @Override
     @SideOnly(Side.CLIENT)
     public void addInformation(
             final ItemStack stack,
@@ -163,97 +155,7 @@ public class ItemRecipeSchedule extends Item implements IModelRegister {
             }
         }
         super.addInformation(stack, worldIn, tooltip, flagIn);
-    }
+    }*/
 
-    @Override
-    public void registerModels() {
-        registerModel(this, 0, this.name);
-    }
-
-    public HashMap<Integer, RecipeArrayList<IRecipeInputStack>> getInputsMap(IBaseRecipe baseRecipe, ItemStack stack) {
-        final NBTTagCompound nbt = ModUtils.nbt(stack);
-        final List<ItemStack> items = this.getItems(stack);
-        final List<BaseMachineRecipe> recipe_list = Recipes.recipes.getRecipeList(baseRecipe.getName());
-        if (nbt.getBoolean("mode")) {
-            if (items.isEmpty()) {
-                return new HashMap<>();
-            }
-            List<BaseMachineRecipe> recipeArrayList = new LinkedList<>();
-            for (BaseMachineRecipe baseMachineRecipe : recipe_list) {
-                cycle:
-                for (ItemStack output_schedule : items) {
-                    for (ItemStack output : baseMachineRecipe.output.items) {
-                        if (output.isItemEqual(output_schedule)) {
-                            recipeArrayList.add(baseMachineRecipe);
-                            break cycle;
-                        }
-                    }
-                }
-            }
-            HashMap<Integer, RecipeArrayList<IRecipeInputStack>> map = new HashMap<>();
-            for (BaseMachineRecipe baseMachineRecipe : recipeArrayList) {
-                final IInput input = baseMachineRecipe.input;
-                for (int i = 0; i < input.getInputs().size(); i++) {
-                    final RecipeArrayList<IRecipeInputStack> list = map.get(i);
-                    if (list == null) {
-                        RecipeArrayList<IRecipeInputStack> inputStackList = new RecipeArrayList<>();
-                        inputStackList.add(new RecipeInputStack(input.getInputs().get(i)));
-                        map.put(i, inputStackList);
-                    } else {
-                        list.add(new RecipeInputStack(input.getInputs().get(i)));
-                    }
-                }
-            }
-            return map;
-        } else {
-            if (items.isEmpty()) {
-                HashMap<Integer, RecipeArrayList<IRecipeInputStack>> map = new HashMap<>();
-                for (BaseMachineRecipe baseMachineRecipe : recipe_list) {
-                    final IInput input = baseMachineRecipe.input;
-                    for (int i = 0; i < input.getInputs().size(); i++) {
-                        final RecipeArrayList<IRecipeInputStack> list = map.get(i);
-                        if (list == null) {
-                            RecipeArrayList<IRecipeInputStack> inputStackList = new RecipeArrayList<>();
-                            inputStackList.add(new RecipeInputStack(input.getInputs().get(i)));
-                            map.put(i, inputStackList);
-                        } else {
-                            list.add(new RecipeInputStack(input.getInputs().get(i)));
-                        }
-                    }
-                }
-                return map;
-            }
-            HashMap<Integer, RecipeArrayList<IRecipeInputStack>> map = new HashMap<>();
-            List<BaseMachineRecipe> recipeArrayList = new LinkedList<>();
-
-            for (BaseMachineRecipe baseMachineRecipe : recipe_list) {
-                cycle:
-                for (ItemStack output_schedule : items) {
-                    for (ItemStack output : baseMachineRecipe.output.items) {
-                        if (!output.isItemEqual(output_schedule)) {
-                            recipeArrayList.add(baseMachineRecipe);
-                            break cycle;
-                        }
-                    }
-                }
-            }
-            for (BaseMachineRecipe baseMachineRecipe : recipeArrayList) {
-                final IInput input = baseMachineRecipe.input;
-                for (int i = 0; i < input.getInputs().size(); i++) {
-                    final RecipeArrayList<IRecipeInputStack> list = map.get(i);
-                    if (list == null) {
-                        RecipeArrayList<IRecipeInputStack> inputStackList = new RecipeArrayList<>();
-                        inputStackList.add(new RecipeInputStack(input.getInputs().get(i)));
-                        map.put(i, inputStackList);
-                    } else {
-                        list.add(new RecipeInputStack(input.getInputs().get(i)));
-                    }
-                }
-            }
-            return map;
-
-
-        }
-    }
 
 }

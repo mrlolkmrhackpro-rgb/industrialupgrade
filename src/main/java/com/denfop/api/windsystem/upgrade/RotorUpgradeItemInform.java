@@ -1,13 +1,29 @@
 package com.denfop.api.windsystem.upgrade;
 
-import com.denfop.Localization;
+import com.denfop.utils.Localization;
 import com.denfop.utils.ModUtils;
-import net.minecraft.util.text.TextFormatting;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 
 public class RotorUpgradeItemInform {
 
+    public static final Codec<RotorUpgradeItemInform> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.STRING.xmap(EnumInfoRotorUpgradeModules::valueOf, EnumInfoRotorUpgradeModules::name).fieldOf("upgrade").forGetter(obj -> obj.upgrade),
+            Codec.INT.fieldOf("number").forGetter(obj -> obj.number)
+    ).apply(instance, RotorUpgradeItemInform::new));
+    public static final StreamCodec<FriendlyByteBuf, RotorUpgradeItemInform> STREAM_CODEC = StreamCodec.of(
+            (buf, value) -> {
+                buf.writeEnum(value.upgrade);
+                buf.writeInt(value.number);
+            },
+            buf -> new RotorUpgradeItemInform(buf.readEnum(EnumInfoRotorUpgradeModules.class), buf.readInt())
+    );
     public final EnumInfoRotorUpgradeModules upgrade;
-    public final int number;
+    public int number;
+
 
     public RotorUpgradeItemInform(EnumInfoRotorUpgradeModules modules, int number) {
         this.upgrade = modules;
@@ -31,34 +47,34 @@ public class RotorUpgradeItemInform {
             case STRENGTH_I:
             case STRENGTH_II:
             case STRENGTH_III:
-                return TextFormatting.YELLOW + Localization.translate("wind.strength_info") + TextFormatting.GREEN + ModUtils.getString(
+                return ChatFormatting.YELLOW + Localization.translate("wind.strength_info") + ChatFormatting.GREEN + ModUtils.getString(
                         (this.upgrade.getCoef() * this.number) * 100) + "%";
             case POWER_I:
             case POWER_II:
             case POWER_III:
-                return TextFormatting.AQUA + Localization.translate("wind.power_info") + TextFormatting.GREEN + ModUtils.getString(
+                return ChatFormatting.AQUA + Localization.translate("wind.power_info") + ChatFormatting.GREEN + ModUtils.getString(
                         this.upgrade.getCoef() * this.number * 100) + "%";
             case EFFICIENCY_I:
             case EFFICIENCY_II:
             case EFFICIENCY_III:
-                return TextFormatting.GOLD + Localization.translate("wind.efficiency_info") + TextFormatting.GREEN + ModUtils.getString(
+                return ChatFormatting.GOLD + Localization.translate("wind.efficiency_info") + ChatFormatting.GREEN + ModUtils.getString(
                         this.upgrade.getCoef() * this.number * 100) + "%";
             case AUTO:
-                return TextFormatting.LIGHT_PURPLE + Localization.translate("wind.auto_info");
+                return ChatFormatting.LIGHT_PURPLE + Localization.translate("wind.auto_info");
             case MIN:
-                return TextFormatting.RED + Localization.translate("wind.min_info");
+                return ChatFormatting.RED + Localization.translate("wind.min_info");
             case WIND_I:
             case WIND_II:
             case WIND_III:
-                return TextFormatting.BLUE + Localization.translate("wind.wind_speed_info") + TextFormatting.GREEN + (int) this.upgrade.getCoef() + " m/s";
+                return ChatFormatting.BLUE + Localization.translate("wind.wind_speed_info") + ChatFormatting.GREEN + (int) this.upgrade.getCoef() + " m/s";
             case WIND_POWER_II:
             case WIND_POWER_I:
             case WIND_POWER_III:
-                return TextFormatting.DARK_AQUA + Localization.translate("wind.wind_power_info") + TextFormatting.GREEN + (int) this.upgrade.getCoef();
+                return ChatFormatting.DARK_AQUA + Localization.translate("wind.wind_power_info") + ChatFormatting.GREEN + (int) this.upgrade.getCoef();
             case REPAIR_II:
             case REPAIR_I:
             case REPAIR_III:
-                return TextFormatting.DARK_PURPLE + Localization.translate("wind.rotor_repair_info") + TextFormatting.GREEN + (int) this.upgrade.getCoef() + " " + Localization.translate(
+                return ChatFormatting.DARK_PURPLE + Localization.translate("wind.rotor_repair_info") + ChatFormatting.GREEN + (int) this.upgrade.getCoef() + " " + Localization.translate(
                         "iu.seconds");
 
         }

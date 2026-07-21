@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=rolling": {
+      "model": "industrialupgrade:block/moremachine2/rolling"
+    },
+    "facing=south,type=rolling": {
+      "model": "industrialupgrade:block/moremachine2/rolling",
+      "y": 180
+    },
+    "facing=west,type=rolling": {
+      "model": "industrialupgrade:block/moremachine2/rolling",
+      "y": 270
+    },
+    "facing=east,type=rolling": {
+      "model": "industrialupgrade:block/moremachine2/rolling",
+      "y": 90
+    },
+    "facing=north,type=rolling_active": {
+      "model": "industrialupgrade:block/moremachine2/rolling_active"
+    },
+    "facing=south,type=rolling_active": {
+      "model": "industrialupgrade:block/moremachine2/rolling_active",
+      "y": 180
+    },
+    "facing=west,type=rolling_active": {
+      "model": "industrialupgrade:block/moremachine2/rolling_active",
+      "y": 270
+    },
+    "facing=east,type=rolling_active": {
+      "model": "industrialupgrade:block/moremachine2/rolling_active",
+      "y": 90
+    }
+  }
+}

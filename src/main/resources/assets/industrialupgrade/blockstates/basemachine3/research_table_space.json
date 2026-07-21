@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=research_table_space": {
+      "model": "industrialupgrade:block/basemachine/research_table_space"
+    },
+    "facing=south,type=research_table_space": {
+      "model": "industrialupgrade:block/basemachine/research_table_space",
+      "y": 180
+    },
+    "facing=west,type=research_table_space": {
+      "model": "industrialupgrade:block/basemachine/research_table_space",
+      "y": 270
+    },
+    "facing=east,type=research_table_space": {
+      "model": "industrialupgrade:block/basemachine/research_table_space",
+      "y": 90
+    },
+    "facing=north,type=research_table_space_active": {
+      "model": "industrialupgrade:block/basemachine/research_table_space"
+    },
+    "facing=south,type=research_table_space_active": {
+      "model": "industrialupgrade:block/basemachine/research_table_space",
+      "y": 180
+    },
+    "facing=west,type=research_table_space_active": {
+      "model": "industrialupgrade:block/basemachine/research_table_space",
+      "y": 270
+    },
+    "facing=east,type=research_table_space_active": {
+      "model": "industrialupgrade:block/basemachine/research_table_space",
+      "y": 90
+    }
+  }
+}

@@ -1,40 +1,62 @@
 package com.denfop.world;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.gen.feature.WorldGenerator;
+import com.denfop.blocks.FluidName;
+import com.mojang.serialization.Codec;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
+import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.neoforged.neoforge.common.Tags;
 
-import javax.annotation.Nonnull;
-import java.util.Random;
 
-public class WorldGenOil extends WorldGenerator {
+public class WorldGenOil extends Feature<NoneFeatureConfiguration> {
 
-    private final Block block;
-    private final Block spreadBlock;
 
-    public WorldGenOil(Block block, Block spreadBlock) {
-        this.block = block;
-        this.spreadBlock = spreadBlock;
+    final FluidName[] fluids = new FluidName[]{FluidName.fluidpetroleum, FluidName.fluidsweet_medium_oil,
+            FluidName.fluidsweet_heavy_oil, FluidName.fluidsour_light_oil, FluidName.fluidsour_medium_oil,
+            FluidName.fluidsour_heavy_oil};
+    private BlockState spreadBlock;
+    ;
+
+    public WorldGenOil(Codec<NoneFeatureConfiguration> codec) {
+        super(codec);
     }
 
 
     @Override
-    public boolean generate(@Nonnull final World world, @Nonnull final Random rand, final BlockPos pos) {
-        int x = pos.getX() - 8;
-        int z = pos.getZ() - 8;
-        int y = pos.getY();
-        final IBlockState block_state = world.getBlockState(pos);
-        while (y > 40 && block_state.getMaterial() == Material.AIR) {
-            y--;
-        }
-        if (y <= 40) {
+    public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
+        if (context.random().nextInt(100) + 1 <= 90)
+            return false;
+        FluidName fluidName = fluids[context.random().nextInt(fluids.length)];
+        this.spreadBlock = fluidName.getInstance().get().getSource().defaultFluidState().createLegacyBlock();
+
+        BlockPos pos = context.origin();
+        int y = context.level().getHeight(Heightmap.Types.WORLD_SURFACE_WG, context.origin().getX(), context.origin().getZ());
+
+        Holder<Biome> holder = context.level().getBiome(new BlockPos(context.origin().getX(), y, context.origin().getZ()));
+        if (!holder.is(Tags.Biomes.IS_DESERT)) {
             return false;
         }
-
+        RandomSource rand = context.random();
+        WorldGenLevel world = context.level();
+        int x = pos.getX();
+        int z = pos.getZ();
+        y = context.random().nextInt(context.random().nextInt(context.random().nextInt(112) + 8) + 8) + 60;
+        BlockState block_state = world.getBlockState(pos);
+        while (y > 40 && block_state.isAir()) {
+            y--;
+            block_state = world.getBlockState(new BlockPos(x, y, z));
+        }
+        if (y <= 40)
+            return false;
         y -= 4;
         boolean[] arrayOfBoolean = new boolean[2048];
         int i = rand.nextInt(4) + 4;
@@ -79,15 +101,14 @@ public class WorldGenOil extends WorldGenerator {
                             || m > 0 && arrayOfBoolean[i1 - 1]) ? 1 : 0;
 
                     if (n != 0) {
-                        final IBlockState block_state1 = world.getBlockState(new BlockPos(x + j, y + m, z + k));
-                        Material localMaterial = block_state1.getMaterial();
+                        final BlockState block_state1 = world.getBlockState(new BlockPos(x + j, y + m, z + k));
 
 
-                        if (m >= 4 && localMaterial.isLiquid()) {
+                        if (m >= 4 && block_state1.liquid()) {
                             return false;
                         }
-                        if (m < 4 && !localMaterial.isSolid() && block_state1
-                                .getBlock() != this.block) {
+                        if (m < 4 && !block_state1.isSolid() && block_state1
+                                .getBlock() != this.spreadBlock.getBlock()) {
                             return false;
                         }
                     }
@@ -100,20 +121,20 @@ public class WorldGenOil extends WorldGenerator {
                     boolean need = arrayOfBoolean[(j * 16 + k) * 8 + m];
                     if (need) {
 
-                        world.setBlockState(new BlockPos(x + j, y + m, z + k), m >= 4 ? Blocks.AIR.getDefaultState() :
-                                this.block.getDefaultState(), 2);
+                        world.setBlock(new BlockPos(x + j, y + m, z + k), m >= 4 ? Blocks.AIR.defaultBlockState() :
+                                this.spreadBlock, 2);
 
                     }
                     if (m >= 4) {
-                        IBlockState block_states = null;
+                        BlockState block_states = null;
                         if (need) {
                             block_states = world.getBlockState(new BlockPos(x + j, y + m - 1, z + k));
                         }
                         if (need
                                 && (block_states.getBlock() == Blocks.DIRT || block_states
                                 .getBlock() == Blocks.WATER)
-                                && world.getSkylightSubtracted() > 0) {
-                            world.setBlockState(new BlockPos(x + j, y + m - 1, z + k), Blocks.GRASS.getDefaultState());
+                                && world.getBrightness(LightLayer.SKY, new BlockPos(x + k, y + m - 1, z + k)) > 0) {
+                            world.setBlock(new BlockPos(x + j, y + m - 1, z + k), Blocks.GRASS_BLOCK.defaultBlockState(), 2);
                         }
                     }
                 }
@@ -121,5 +142,4 @@ public class WorldGenOil extends WorldGenerator {
         }
         return true;
     }
-
 }

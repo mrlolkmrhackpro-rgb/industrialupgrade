@@ -5,23 +5,25 @@ import com.denfop.api.space.IBody;
 import com.denfop.api.space.SpaceNet;
 import com.denfop.network.DecoderHandler;
 import com.denfop.network.EncoderHandler;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Player;
 
 import java.io.IOException;
 import java.util.UUID;
 
 public class PacketSendResourceToEarth implements IPacket {
 
-    public PacketSendResourceToEarth() {
-    }
+    private CustomPacketBuffer buffer;
 
     ;
 
-    public PacketSendResourceToEarth(EntityPlayer player, IBody iBody) {
-        CustomPacketBuffer customPacketBuffer = new CustomPacketBuffer();
+    public PacketSendResourceToEarth() {
+    }
+
+    public PacketSendResourceToEarth(Player player, IBody iBody) {
+        CustomPacketBuffer customPacketBuffer = new CustomPacketBuffer(player.registryAccess());
         customPacketBuffer.writeByte(getId());
         try {
-            EncoderHandler.encode(customPacketBuffer, player.getUniqueID());
+            EncoderHandler.encode(customPacketBuffer, player.getUUID());
             customPacketBuffer.writeBoolean(iBody != null);
             if (iBody != null) {
                 customPacketBuffer.writeString(iBody.getName());
@@ -29,19 +31,31 @@ public class PacketSendResourceToEarth implements IPacket {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        IUCore.network.getClient().sendPacket(customPacketBuffer);
+
+        this.buffer = customPacketBuffer;
+        IUCore.network.getClient().sendPacket(this, customPacketBuffer);
     }
 
     @Override
-    public void readPacket(final CustomPacketBuffer customPacketBuffer, final EntityPlayer entityPlayer) {
+    public CustomPacketBuffer getPacketBuffer() {
+        return buffer;
+    }
+
+    @Override
+    public void setPacketBuffer(CustomPacketBuffer customPacketBuffer) {
+        buffer = customPacketBuffer;
+    }
+
+    @Override
+    public void readPacket(final CustomPacketBuffer customPacketBuffer, final Player entityPlayer) {
         try {
             UUID uuid = (UUID) DecoderHandler.decode(customPacketBuffer);
-            if (entityPlayer.getUniqueID().equals(uuid)) {
+            if (entityPlayer.getUUID().equals(uuid)) {
                 boolean hasBody = customPacketBuffer.readBoolean();
                 if (hasBody) {
                     String body = customPacketBuffer.readString();
                     IBody body1 = SpaceNet.instance.getBodyFromName(body);
-                    SpaceNet.instance.getColonieNet().sendResourceToPlanet(entityPlayer.getUniqueID(), body1);
+                    SpaceNet.instance.getColonieNet().sendResourceToPlanet(entityPlayer.getUUID(), body1);
                 }
             }
         } catch (IOException e) {

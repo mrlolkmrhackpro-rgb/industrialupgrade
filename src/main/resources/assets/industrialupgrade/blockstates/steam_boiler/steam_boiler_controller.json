@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=steam_boiler_controller": {
+      "model": "industrialupgrade:block/steam_boiler/steam_boiler_controller"
+    },
+    "facing=south,type=steam_boiler_controller": {
+      "model": "industrialupgrade:block/steam_boiler/steam_boiler_controller",
+      "y": 180
+    },
+    "facing=west,type=steam_boiler_controller": {
+      "model": "industrialupgrade:block/steam_boiler/steam_boiler_controller",
+      "y": 270
+    },
+    "facing=east,type=steam_boiler_controller": {
+      "model": "industrialupgrade:block/steam_boiler/steam_boiler_controller",
+      "y": 90
+    },
+    "facing=north,type=steam_boiler_controller_active": {
+      "model": "industrialupgrade:block/steam_boiler/steam_boiler_controller_active"
+    },
+    "facing=south,type=steam_boiler_controller_active": {
+      "model": "industrialupgrade:block/steam_boiler/steam_boiler_controller_active",
+      "y": 180
+    },
+    "facing=west,type=steam_boiler_controller_active": {
+      "model": "industrialupgrade:block/steam_boiler/steam_boiler_controller_active",
+      "y": 270
+    },
+    "facing=east,type=steam_boiler_controller_active": {
+      "model": "industrialupgrade:block/steam_boiler/steam_boiler_controller_active",
+      "y": 90
+    }
+  }
+}

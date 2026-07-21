@@ -1,37 +1,30 @@
 package com.denfop.render.streak;
 
 import com.denfop.Constants;
-import com.denfop.IUCore;
 import com.denfop.IUItem;
+import com.denfop.screen.ScreenIndustrialUpgrade;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.client.event.RenderPlayerEvent.Post;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.client.event.RenderPlayerEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.denfop.IUCore.mapStreakInfo;
+
 public class EventSpectralSuitEffect {
 
-    public static final ResourceLocation texture = new ResourceLocation(Constants.TEXTURES_ITEMS + "effect.png");
+    public static final ResourceLocation texture = ResourceLocation.parse(Constants.TEXTURES_ITEMS + "effect.png");
+    private static final Map<String, ArrayList<StreakLocation>> playerLoc = new HashMap<>();
 
-    private static final Map<String, ArrayList<EventSpectralSuitEffect.StreakLocation>> playerLoc = new HashMap();
     public final int[] red = {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 240, 222, 186, 150, 124, 96, 67, 40, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 34, 56, 78, 102, 121, 145, 176, 201, 218, 230, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
     public final int[] green = {0, 24, 36, 54, 72, 96, 120, 145, 172, 192, 216, 234, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 234, 214, 195, 176, 153, 137, 112, 94, 86, 55, 31, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     public final int[] blue = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 32, 45, 68, 78, 103, 118, 138, 151, 178, 205, 221, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 240, 228, 208, 186, 165, 149, 132, 115, 102, 97, 76, 53, 32, 15, 0};
@@ -39,395 +32,189 @@ public class EventSpectralSuitEffect {
     public EventSpectralSuitEffect() {
     }
 
-    public static ArrayList<EventSpectralSuitEffect.StreakLocation> getPlayerStreakLocationInfo(EntityPlayer player) {
-        ArrayList<EventSpectralSuitEffect.StreakLocation> loc = playerLoc.computeIfAbsent(
-                player.getName(),
+    public static ArrayList<StreakLocation> getPlayerStreakLocationInfo(Player player) {
+        ArrayList<StreakLocation> loc = playerLoc.computeIfAbsent(
+                player.getName().getString(),
                 k -> new ArrayList<>()
         );
 
-        if (loc.size() < 20) {
-            for (int i = 0; i < 20 - loc.size(); ++i) {
-                loc.add(0, new EventSpectralSuitEffect.StreakLocation(player));
+        if (loc.size() < 40) {
+            for (int i = 0; i < 40 - loc.size(); ++i) {
+                loc.add(0, new StreakLocation(player));
             }
-        } else if (loc.size() > 20) {
+        } else if (loc.size() > 40) {
             loc.remove(0);
         }
 
         return loc;
     }
 
-    @SubscribeEvent
-    public void onRenderWorldLast(RenderWorldLastEvent event) {
-
-        this.render(event.getPartialTicks());
+    public static float clamp(float num, float min, float max) {
+        if (num < min) {
+            return min;
+        }
+        return Math.min(num, max);
     }
 
-    public void render(float partialTicks) {
-        Minecraft mc = Minecraft.getMinecraft();
-        if (mc.player == null) {
+    @net.neoforged.bus.api.SubscribeEvent
+    public void onRenderPlayer(RenderPlayerEvent.Post event) {
+        this.render(event.getEntity(), event.getPartialTick(), event.getPoseStack());
+    }
+
+    public void render(Player player, float partialTicks, PoseStack poseStack) {
+        Minecraft mc = Minecraft.getInstance();
+
+        if (player == null || mc.level == null) {
             return;
         }
-        PlayerStreakInfo playerStreak1 = IUCore.mapStreakInfo.get(mc.player.getName());
+
+        PlayerStreakInfo playerStreak1 = mapStreakInfo.get(player.getName().getString());
         boolean needRender = true;
         if (playerStreak1 != null) {
-            needRender = playerStreak1.isRenderPlayer();
+            needRender = isRenderStreak(player);
         }
-        if (needRender) {
-            for (EntityPlayer player : mc.world.playerEntities) {
-                if (this.isRenderStreak(player) && !player.getName().equals(mc.player.getName())) {
-                    ArrayList<EventSpectralSuitEffect.StreakLocation> loc = getPlayerStreakLocationInfo(player);
-                    GL11.glPushMatrix();
-                    GL11.glDisable(2884);
-                    GL11.glDisable(3008);
-                    GL11.glEnable(3042);
-                    GL11.glBlendFunc(770, 771);
-                    GL11.glShadeModel(7425);
-                    float startGrad = 5.0F - partialTicks;
-                    float endGrad = 20.0F - partialTicks;
 
-                    for (int i = loc.size() - 2; i >= 0; --i) {
-                        int start = i;
-                        EventSpectralSuitEffect.StreakLocation infoStart = loc.get(i);
-                        float startAlpha = (float) i < endGrad
-                                ? MathHelper.clamp(0.8F * (float) i / endGrad, 0.0F, 0.8F)
-                                : ((float) i > (float) (loc.size() - 2) - startGrad
-                                        ? MathHelper.clamp(0.8F * (float) (loc.size() - 2 - i) / startGrad, 0.0F, 0.8F)
-                                        : 0.8F);
-                        if (player.world.getWorldTime() - infoStart.lastTick > 40L) {
-                            break;
-                        }
-
-                        EventSpectralSuitEffect.StreakLocation infoEnd = null;
-                        double grad = 500.0D;
-                        --i;
-
-                        double grad1;
-                        label76:
-                        while (true) {
-                            while (true) {
-                                if (i < 0) {
-                                    break label76;
-                                }
-
-                                EventSpectralSuitEffect.StreakLocation infoPoint = loc.get(i);
-                                if (infoStart.isSprinting && loc.size() - 2 - i < 6) {
-                                    infoEnd = infoPoint;
-                                    --start;
-                                    --i;
-                                    break label76;
-                                }
-
-                                if (infoPoint.hasSameCoords(infoStart)) {
-                                    --start;
-                                    --i;
-                                } else {
-                                    grad1 = infoPoint.posZ - infoStart.posZ / (infoPoint.posX - infoStart.posX);
-                                    if (grad == grad1 && infoPoint.posY == infoStart.posY) {
-                                        infoEnd = infoPoint;
-                                        --start;
-                                        --i;
-                                    } else {
-                                        if (grad != 500.0D) {
-                                            break label76;
-                                        }
-
-                                        grad = grad1;
-                                        infoEnd = infoPoint;
-                                        --i;
-                                    }
-                                }
-                            }
-                        }
-
-                        if (infoEnd != null) {
-                            i += 2;
-                            float endAlpha = (float) i < endGrad
-                                    ? MathHelper.clamp(0.8F * (float) (i - 1) / endGrad, 0.0F, 0.8F)
-                                    : ((float) i > (float) (loc.size() - 1) - startGrad
-                                            ? MathHelper.clamp(0.8F * (float) (loc.size() - 1 - i) / startGrad, 0.0F, 0.8F)
-                                            : 0.8F);
-                            grad1 = infoStart.posX - mc.getRenderManager().renderPosX;
-                            double posY = infoStart.posY - mc.getRenderManager().renderPosY;
-                            double posZ = infoStart.posZ - mc.getRenderManager().renderPosZ;
-                            double nextPosX = infoEnd.posX - mc.getRenderManager().renderPosX;
-                            double nextPosY = infoEnd.posY - mc.getRenderManager().renderPosY;
-                            double nextPosZ = infoEnd.posZ - mc.getRenderManager().renderPosZ;
-                            Tessellator tessellator = Tessellator.getInstance();
-                            GL11.glPushMatrix();
-                            GL11.glTranslated(grad1, posY, posZ);
-                            int ii = 15728880;
-                            int j = ii % 65536;
-                            int k = ii / 65536;
-                            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j, (float) k);
-                            RenderHelper.disableStandardItemLighting();
-                            GL11.glDisable(2896);
-                            PlayerStreakInfo playerStreak = IUCore.mapStreakInfo.get(player.getName());
-                            if (playerStreak == null) {
-                                playerStreak = new PlayerStreakInfo(new RGB((short) 0, (short) 0, (short) 0), false, true, true);
-                                IUCore.mapStreakInfo.put(player.getName(), playerStreak);
-                            }
-                            double red = playerStreak.getRgb().getRed();
-                            double green = playerStreak.getRgb().getGreen();
-                            double blue = playerStreak.getRgb().getBlue();
-                            boolean rgb = playerStreak.isRainbow();
-
-
-                            if (rgb) {
-                                red = this.red[(int) (player.getEntityWorld().provider.getWorldTime() % this.red.length)];
-                                green = this.green[(int) (player.getEntityWorld().provider.getWorldTime() % this.red.length)];
-                                blue = this.blue[(int) (player.getEntityWorld().provider.getWorldTime() % this.red.length)];
-                            }
-                            Color color = new Color((float) (red / 255), (float) (green / 255), (float) (blue / 255), startAlpha);
-                            mc.renderEngine.bindTexture(texture);
-                            BufferBuilder buffer = tessellator.getBuffer();
-                            buffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-                            buffer.pos(0.0D, 0.0D, 0.0D).tex(infoStart.startU, 1.0D).color(
-                                    color.getRed(),
-                                    color.getGreen(),
-                                    color.getBlue(),
-                                    (int) (255.0F * startAlpha)
-                            ).endVertex();
-                            buffer.pos(0.0D, 0.0F + infoStart.height, 0.0D).tex(infoStart.startU, 0.0D).color(
-                                    color.getRed(),
-                                    color.getGreen(),
-                                    color.getBlue(),
-                                    (int) (255.0F * startAlpha)
-                            ).endVertex();
-                            double endTex = infoEnd.startU - (double) start + (double) i;
-                            if (endTex > infoStart.startU) {
-                                --endTex;
-                            }
-
-                            double distX = infoStart.posX - infoEnd.posX;
-                            double distZ = infoStart.posZ - infoEnd.posZ;
-
-                            for (double scales = Math.sqrt(distX * distX + distZ * distZ) / (double) infoStart.height; scales > 1.0D; --scales) {
-                                ++endTex;
-                            }
-
-                            buffer
-                                    .pos(nextPosX - grad1, nextPosY - posY + (double) infoEnd.height, nextPosZ - posZ)
-                                    .tex(endTex, 0.0D)
-                                    .color(color.getRed(), color.getGreen(), color.getBlue(), (int) (255.0F * endAlpha))
-                                    .endVertex();
-                            buffer.pos(nextPosX - grad1, nextPosY - posY, nextPosZ - posZ).tex(endTex, 1.0D).color(
-                                    color.getRed(),
-                                    color.getGreen(),
-                                    color.getBlue(),
-                                    (int) (255.0F * endAlpha)
-                            ).endVertex();
-                            tessellator.draw();
-                            GL11.glEnable(2896);
-                            RenderHelper.enableStandardItemLighting();
-                            GL11.glPopMatrix();
-                        }
-                    }
-
-                    GL11.glShadeModel(7424);
-                    GL11.glDisable(3042);
-                    GL11.glEnable(3008);
-                    GL11.glEnable(2884);
-                    GL11.glPopMatrix();
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public void onRenderPlayer(Post event) {
-        final EntityPlayer player = event.getEntityPlayer();
-        final float partialTicks = event.getPartialRenderTick();
-        Minecraft mc = Minecraft.getMinecraft();
-        if (mc.player == null) {
+        if (!needRender || !this.isRenderStreak(player)) {
             return;
         }
-        PlayerStreakInfo playerStreak1 = IUCore.mapStreakInfo.get(mc.player.getName());
-        boolean needRender = true;
-        if (playerStreak1 != null) {
-            needRender = playerStreak1.isRender();
+
+        ArrayList<StreakLocation> loc = getPlayerStreakLocationInfo(player);
+        if (loc.size() < 2) {
+            return;
         }
-        if (needRender && this.isRenderStreak(player) && player.getName().equals(mc.player.getName())) {
-            ArrayList<EventSpectralSuitEffect.StreakLocation> loc = getPlayerStreakLocationInfo(player);
-            GL11.glPushMatrix();
-            GL11.glDisable(2884);
-            GL11.glDisable(3008);
-            GL11.glEnable(3042);
-            GL11.glBlendFunc(770, 771);
-            GL11.glShadeModel(7425);
-            float startGrad = 5.0F - partialTicks;
-            float endGrad = 20.0F - partialTicks;
 
-            for (int i = loc.size() - 2; i >= 0; --i) {
-                int start = i;
-                EventSpectralSuitEffect.StreakLocation infoStart = loc.get(i);
-                float startAlpha = (float) i < endGrad
-                        ? MathHelper.clamp(0.8F * (float) i / endGrad, 0.0F, 0.8F)
-                        : ((float) i > (float) (loc.size() - 2) - startGrad
-                                ? MathHelper.clamp(0.8F * (float) (loc.size() - 2 - i) / startGrad, 0.0F, 0.8F)
-                                : 0.8F);
-                if (player.world.getWorldTime() - infoStart.lastTick > 40L) {
-                    break;
-                }
+        poseStack.pushPose();
 
-                EventSpectralSuitEffect.StreakLocation infoEnd = null;
-                double grad = 500.0D;
-                --i;
+        float startGrad = 5.0F - partialTicks;
+        float endGrad = 40.0F - partialTicks;
 
-                double grad1;
-                label76:
-                while (true) {
-                    while (true) {
-                        if (i < 0) {
-                            break label76;
-                        }
+        PlayerStreakInfo playerStreak = mapStreakInfo.get(player.getName().getString());
+        if (playerStreak == null) {
+            playerStreak = new PlayerStreakInfo(new RGB((short) 0, (short) 0, (short) 0), false);
+            mapStreakInfo.put(player.getName().getString(), playerStreak);
+        }
 
-                        EventSpectralSuitEffect.StreakLocation infoPoint = loc.get(i);
-                        if (infoStart.isSprinting && loc.size() - 2 - i < 6) {
-                            infoEnd = infoPoint;
-                            --start;
-                            --i;
-                            break label76;
-                        }
+        double red = playerStreak.getRgb().getRed() / 255d;
+        double green = playerStreak.getRgb().getGreen() / 255d;
+        double blue = playerStreak.getRgb().getBlue() / 255d;
+        boolean rgb = playerStreak.isRainbow();
+        if (rgb) {
+            long worldTime = mc.level.getGameTime();
+            red = this.red[(int) (worldTime % this.red.length)] / 255f;
+            green = this.green[(int) (worldTime % this.green.length)] / 255f;
+            blue = this.blue[(int) (worldTime % this.blue.length)] / 255f;
+        }
 
-                        if (infoPoint.hasSameCoords(infoStart)) {
-                            --start;
-                            --i;
-                        } else {
-                            grad1 = infoPoint.posZ - infoStart.posZ / (infoPoint.posX - infoStart.posX);
-                            if (grad == grad1 && infoPoint.posY == infoStart.posY) {
-                                infoEnd = infoPoint;
-                                --start;
-                                --i;
-                            } else {
-                                if (grad != 500.0D) {
-                                    break label76;
-                                }
+        int colorR = (int) (red * 255.0D);
+        int colorG = (int) (green * 255.0D);
+        int colorB = (int) (blue * 255.0D);
 
-                                grad = grad1;
-                                infoEnd = infoPoint;
-                                --i;
-                            }
-                        }
-                    }
-                }
+        ScreenIndustrialUpgrade.bindTexture(texture);
 
-                if (infoEnd != null) {
-                    i += 2;
-                    float endAlpha = (float) i < endGrad
-                            ? MathHelper.clamp(0.8F * (float) (i - 1) / endGrad, 0.0F, 0.8F)
-                            : ((float) i > (float) (loc.size() - 1) - startGrad
-                                    ? MathHelper.clamp(0.8F * (float) (loc.size() - 1 - i) / startGrad, 0.0F, 0.8F)
-                                    : 0.8F);
-                    grad1 = infoStart.posX - mc.getRenderManager().renderPosX;
-                    double posY = infoStart.posY - mc.getRenderManager().renderPosY;
-                    double posZ = infoStart.posZ - mc.getRenderManager().renderPosZ;
-                    double nextPosX = infoEnd.posX - mc.getRenderManager().renderPosX;
-                    double nextPosY = infoEnd.posY - mc.getRenderManager().renderPosY;
-                    double nextPosZ = infoEnd.posZ - mc.getRenderManager().renderPosZ;
-                    Tessellator tessellator = Tessellator.getInstance();
-                    GL11.glPushMatrix();
-                    GL11.glTranslated(grad1, posY, posZ);
-                    int ii = 15728880;
-                    int j = ii % 65536;
-                    int k = ii / 65536;
-                    OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j, (float) k);
-                    RenderHelper.disableStandardItemLighting();
-                    GL11.glDisable(2896);
-                    PlayerStreakInfo playerStreak = IUCore.mapStreakInfo.get(player.getName());
-                    if (playerStreak == null) {
-                        playerStreak = new PlayerStreakInfo(new RGB((short) 0, (short) 0, (short) 0), false, true, true);
-                        IUCore.mapStreakInfo.put(player.getName(), playerStreak);
-                    }
-                    double red = playerStreak.getRgb().getRed();
-                    double green = playerStreak.getRgb().getGreen();
-                    double blue = playerStreak.getRgb().getBlue();
-                    boolean rgb = playerStreak.isRainbow();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.disableCull();
+        RenderSystem.enableDepthTest();
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        RenderSystem.setShaderColor(1, 1, 1, 1);
 
+        BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        PoseStack.Pose pose = poseStack.last();
 
-                    if (rgb) {
-                        red = this.red[(int) (player.getEntityWorld().provider.getWorldTime() % this.red.length)];
-                        green = this.green[(int) (player.getEntityWorld().provider.getWorldTime() % this.red.length)];
-                        blue = this.blue[(int) (player.getEntityWorld().provider.getWorldTime() % this.red.length)];
-                    }
-                    Color color = new Color((float) (red / 255), (float) (green / 255), (float) (blue / 255), startAlpha);
-                    mc.renderEngine.bindTexture(texture);
-                    BufferBuilder buffer = tessellator.getBuffer();
-                    buffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-                    buffer.pos(0.0D, 0.0D, 0.0D).tex(infoStart.startU, 1.0D).color(
-                            color.getRed(),
-                            color.getGreen(),
-                            color.getBlue(),
-                            (int) (255.0F * startAlpha)
-                    ).endVertex();
-                    buffer.pos(0.0D, 0.0F + infoStart.height, 0.0D).tex(infoStart.startU, 0.0D).color(
-                            color.getRed(),
-                            color.getGreen(),
-                            color.getBlue(),
-                            (int) (255.0F * startAlpha)
-                    ).endVertex();
-                    double endTex = infoEnd.startU - (double) start + (double) i;
-                    if (endTex > infoStart.startU) {
-                        --endTex;
-                    }
+        double camX = mc.gameRenderer.getMainCamera().getPosition().x;
+        double camY = mc.gameRenderer.getMainCamera().getPosition().y;
+        double camZ = mc.gameRenderer.getMainCamera().getPosition().z;
 
-                    double distX = infoStart.posX - infoEnd.posX;
-                    double distZ = infoStart.posZ - infoEnd.posZ;
+        for (int i = 0; i < loc.size() - 1; i++) {
+            StreakLocation infoStart = loc.get(i);
+            StreakLocation infoEnd = loc.get(i + 1);
 
-                    for (double scales = Math.sqrt(distX * distX + distZ * distZ) / (double) infoStart.height; scales > 1.0D; --scales) {
-                        ++endTex;
-                    }
-
-                    buffer
-                            .pos(nextPosX - grad1, nextPosY - posY + (double) infoEnd.height, nextPosZ - posZ)
-                            .tex(endTex, 0.0D)
-                            .color(color.getRed(), color.getGreen(), color.getBlue(), (int) (255.0F * endAlpha))
-                            .endVertex();
-                    buffer.pos(nextPosX - grad1, nextPosY - posY, nextPosZ - posZ).tex(endTex, 1.0D).color(
-                            color.getRed(),
-                            color.getGreen(),
-                            color.getBlue(),
-                            (int) (255.0F * endAlpha)
-                    ).endVertex();
-                    tessellator.draw();
-                    GL11.glEnable(2896);
-                    RenderHelper.enableStandardItemLighting();
-                    GL11.glPopMatrix();
-                }
+            if (mc.level.getGameTime() - infoStart.lastTick > 40L) {
+                continue;
             }
 
-            GL11.glShadeModel(7424);
-            GL11.glDisable(3042);
-            GL11.glEnable(3008);
-            GL11.glEnable(2884);
-            GL11.glPopMatrix();
+            float startAlpha = (float) i < endGrad
+                    ? clamp(0.8F * (float) i / endGrad, 0.0F, 0.8F)
+                    : ((float) i > (float) (loc.size() - 2) - startGrad
+                    ? clamp(0.8F * (float) (loc.size() - 2 - i) / startGrad, 0.0F, 0.8F)
+                    : 0.8F);
+
+            float endAlphaIndex = i + 1;
+            float endAlpha = endAlphaIndex < endGrad
+                    ? clamp(0.8F * endAlphaIndex / endGrad, 0.0F, 0.8F)
+                    : (endAlphaIndex > (float) (loc.size() - 1) - startGrad
+                    ? clamp(0.8F * ((float) (loc.size() - 1) - endAlphaIndex) / startGrad, 0.0F, 0.8F)
+                    : 0.8F);
+
+            int alphaStart = (int) (startAlpha * 255.0F);
+            int alphaEnd = (int) (endAlpha * 255.0F);
+
+            float x0 = (float) (infoStart.posX - camX);
+            float y0 = (float) (infoStart.posY - camY);
+            float z0 = (float) (infoStart.posZ - camZ);
+
+            float x1 = (float) (infoEnd.posX - camX);
+            float y1 = (float) (infoEnd.posY - camY);
+            float z1 = (float) (infoEnd.posZ - camZ);
+
+            buffer.addVertex(pose, x0, y0, z0)
+                    .setUv((float) infoStart.startU, 1.0f)
+                    .setColor(colorR, colorG, colorB, alphaStart);
+
+            buffer.addVertex(pose, x0, y0 + infoStart.height, z0)
+                    .setUv((float) infoStart.startU, 0.0f)
+                    .setColor(colorR, colorG, colorB, alphaStart);
+
+            buffer.addVertex(pose, x1, y1 + infoEnd.height, z1)
+                    .setUv((float) infoEnd.startU, 0.0f)
+                    .setColor(colorR, colorG, colorB, alphaEnd);
+
+            buffer.addVertex(pose, x1, y1, z1)
+                    .setUv((float) infoEnd.startU, 1.0f)
+                    .setColor(colorR, colorG, colorB, alphaEnd);
+        }
+
+        BufferUploader.drawWithShader(buffer.buildOrThrow());
+
+        RenderSystem.enableCull();
+        RenderSystem.disableBlend();
+        RenderSystem.disableDepthTest();
+        RenderSystem.setShaderColor(1, 1, 1, 1);
+
+        poseStack.popPose();
+    }
+
+    @net.neoforged.bus.api.SubscribeEvent
+    public void onPlayerTick(PlayerTickEvent.Post event) {
+        Player player = event.getEntity();
+
+        if (!player.level().isClientSide()) {
+            return;
+        }
+
+        if (this.isRenderStreak(player)) {
+            ArrayList<StreakLocation> loc = getPlayerStreakLocationInfo(player);
+            StreakLocation oldest = loc.get(0);
+            loc.remove(0);
+            loc.add(oldest);
+            oldest.update(player);
+
+            StreakLocation newest = loc.get(loc.size() - 2);
+            double distX = newest.posX - oldest.posX;
+            double distZ = newest.posZ - oldest.posZ;
+
+            newest.startU += Math.sqrt(distX * distX + distZ * distZ) / (double) newest.height;
+            while (oldest.startU > 1.0D) {
+                --oldest.startU;
+            }
         }
     }
 
-    @SubscribeEvent
-    public void onPlayerTick(PlayerTickEvent event) {
-        if (event.side == Side.CLIENT && event.phase == Phase.END) {
-            EntityPlayer player = event.player;
-            if (this.isRenderStreak(player)) {
-                ArrayList<EventSpectralSuitEffect.StreakLocation> loc = getPlayerStreakLocationInfo(player);
-                EventSpectralSuitEffect.StreakLocation oldest = loc.get(0);
-                loc.remove(0);
-                loc.add(oldest);
-                oldest.update(player);
-                EventSpectralSuitEffect.StreakLocation newest = loc.get(loc.size() - 2);
-                double distX = newest.posX - oldest.posX;
-                double distZ = newest.posZ - oldest.posZ;
-
-                for (newest.startU += Math.sqrt(distX * distX + distZ * distZ) / (double) newest.height; oldest.startU > 1.0D; --oldest.startU) {
-                }
-            }
-        }
-
-    }
-
-    private boolean isRenderStreak(EntityPlayer player) {
-        NonNullList<ItemStack> armors = player.inventory.armorInventory;
-
-        return armors.get(2).getItem() == IUItem.spectral_chestplate;
+    private boolean isRenderStreak(Player player) {
+        NonNullList<ItemStack> armors = player.getInventory().armor;
+        return Minecraft.getInstance().screen == null
+                && armors.size() > 2
+                && armors.get(2).getItem() == IUItem.spectral_chestplate.getItem();
     }
 
     public static class StreakLocation {
@@ -438,35 +225,32 @@ public class EventSpectralSuitEffect {
         public float renderYawOffset;
         public float rotationYawHead;
         public float rotationPitch;
-        public float limbSwing;
-        public float limbSwingAmount;
         public boolean isSprinting;
         public long lastTick;
         public float height;
         public double startU;
 
-        public StreakLocation(EntityPlayer player) {
+        public StreakLocation(Player player) {
             this.update(player);
         }
 
-        public void update(EntityPlayer player) {
-            this.posX = player.posX;
-            this.posY = player.getEntityBoundingBox().minY;
-            this.posZ = player.posZ;
-            this.renderYawOffset = player.renderYawOffset;
-            this.rotationYawHead = player.rotationYawHead;
-            this.rotationPitch = player.rotationPitch;
-            this.limbSwing = player.limbSwing;
-            this.limbSwingAmount = player.limbSwingAmount;
+        public void update(Player player) {
+            this.posX = player.getX();
+            this.posY = player.getBoundingBox().minY;
+            this.posZ = player.getZ();
+            this.renderYawOffset = player.yBodyRot;
+            this.rotationYawHead = player.getYRot();
+            this.rotationPitch = player.getXRot();
             this.isSprinting = player.isSprinting();
-            this.lastTick = player.world.getWorldTime();
-            this.height = player.height;
+            this.lastTick = player.level().getGameTime();
+            this.height = (float) (player.getBbHeight() * 2.0F);
         }
 
-        public boolean hasSameCoords(EventSpectralSuitEffect.StreakLocation loc) {
-            return loc.posX == this.posX && loc.posY == this.posY && loc.posZ == this.posZ && loc.height == this.height;
+        public boolean hasSameCoords(StreakLocation loc) {
+            return loc.posX == this.posX
+                    && loc.posY == this.posY
+                    && loc.posZ == this.posZ
+                    && loc.height == this.height;
         }
-
     }
-
 }

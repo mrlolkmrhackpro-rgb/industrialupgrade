@@ -1,0 +1,9 @@
+{
+  "values": [
+    "industrialupgrade:baseore/chromium",
+    "industrialupgrade:blockspace3/mercury_chromium_ore",
+    "industrialupgrade:blockspace4/rhea_chromium",
+    "industrialupgrade:asteroidore/asteroid_chromium_ore",
+    "industrialupgrade:deepore/deep_chromium_ore"
+  ]
+}

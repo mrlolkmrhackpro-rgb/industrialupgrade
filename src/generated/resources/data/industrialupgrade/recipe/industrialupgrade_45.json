@@ -1,0 +1,28 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:crafting_elements/crafting_320_element"
+    },
+    "B": {
+      "item": "industrialupgrade:wiring/glass_1"
+    },
+    "C": {
+      "tag": "c:plates/zeliber"
+    },
+    "D": {
+      "item": "industrialupgrade:medium_current_converter_to_low"
+    }
+  },
+  "pattern": [
+    "AAA",
+    "BDB",
+    "C C"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:high_current_converter_to_low"
+  },
+  "show_notification": false
+}

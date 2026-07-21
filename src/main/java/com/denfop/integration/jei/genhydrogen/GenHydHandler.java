@@ -2,8 +2,8 @@ package com.denfop.integration.jei.genhydrogen;
 
 
 import com.denfop.blocks.FluidName;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +52,7 @@ public class GenHydHandler {
 
     public static void initRecipes() {
 
-        addRecipe(10000, new FluidStack(FluidName.fluidhyd.getInstance(), 1000));
+        addRecipe(10000, new FluidStack(FluidName.fluidhydrogen.getInstance().get(), 1000));
 
 
     }

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=quad_extruder": {
+      "model": "industrialupgrade:block/moremachine2/quad_extruder"
+    },
+    "facing=south,type=quad_extruder": {
+      "model": "industrialupgrade:block/moremachine2/quad_extruder",
+      "y": 180
+    },
+    "facing=west,type=quad_extruder": {
+      "model": "industrialupgrade:block/moremachine2/quad_extruder",
+      "y": 270
+    },
+    "facing=east,type=quad_extruder": {
+      "model": "industrialupgrade:block/moremachine2/quad_extruder",
+      "y": 90
+    },
+    "facing=north,type=quad_extruder_active": {
+      "model": "industrialupgrade:block/moremachine2/quad_extruder_active"
+    },
+    "facing=south,type=quad_extruder_active": {
+      "model": "industrialupgrade:block/moremachine2/quad_extruder_active",
+      "y": 180
+    },
+    "facing=west,type=quad_extruder_active": {
+      "model": "industrialupgrade:block/moremachine2/quad_extruder_active",
+      "y": 270
+    },
+    "facing=east,type=quad_extruder_active": {
+      "model": "industrialupgrade:block/moremachine2/quad_extruder_active",
+      "y": 90
+    }
+  }
+}

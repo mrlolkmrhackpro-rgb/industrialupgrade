@@ -1,0 +1,28 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "industrialupgrade:graphene_plate"
+    },
+    "B": {
+      "item": "industrialupgrade:wiring/gold"
+    },
+    "C": {
+      "item": "industrialupgrade:polonium_palladium_composite"
+    },
+    "D": {
+      "item": "industrialupgrade:voltage_sensor_for_mechanism"
+    }
+  },
+  "pattern": [
+    "AAA",
+    "BDB",
+    "C C"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:medium_current_converter_to_low"
+  },
+  "show_notification": false
+}

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=photonic_extractor": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_extractor"
+    },
+    "facing=south,type=photonic_extractor": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_extractor",
+      "y": 180
+    },
+    "facing=west,type=photonic_extractor": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_extractor",
+      "y": 270
+    },
+    "facing=east,type=photonic_extractor": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_extractor",
+      "y": 90
+    },
+    "facing=north,type=photonic_extractor_active": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_extractor_active"
+    },
+    "facing=south,type=photonic_extractor_active": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_extractor_active",
+      "y": 180
+    },
+    "facing=west,type=photonic_extractor_active": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_extractor_active",
+      "y": 270
+    },
+    "facing=east,type=photonic_extractor_active": {
+      "model": "industrialupgrade:block/photonicmachine/photonic_extractor_active",
+      "y": 90
+    }
+  }
+}

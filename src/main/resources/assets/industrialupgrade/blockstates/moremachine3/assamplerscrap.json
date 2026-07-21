@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=assamplerscrap": {
+      "model": "industrialupgrade:block/moremachine3/assamplerscrap"
+    },
+    "facing=south,type=assamplerscrap": {
+      "model": "industrialupgrade:block/moremachine3/assamplerscrap",
+      "y": 180
+    },
+    "facing=west,type=assamplerscrap": {
+      "model": "industrialupgrade:block/moremachine3/assamplerscrap",
+      "y": 270
+    },
+    "facing=east,type=assamplerscrap": {
+      "model": "industrialupgrade:block/moremachine3/assamplerscrap",
+      "y": 90
+    },
+    "facing=north,type=assamplerscrap_active": {
+      "model": "industrialupgrade:block/moremachine3/assamplerscrap_active"
+    },
+    "facing=south,type=assamplerscrap_active": {
+      "model": "industrialupgrade:block/moremachine3/assamplerscrap_active",
+      "y": 180
+    },
+    "facing=west,type=assamplerscrap_active": {
+      "model": "industrialupgrade:block/moremachine3/assamplerscrap_active",
+      "y": 270
+    },
+    "facing=east,type=assamplerscrap_active": {
+      "model": "industrialupgrade:block/moremachine3/assamplerscrap_active",
+      "y": 90
+    }
+  }
+}

@@ -2,23 +2,22 @@ package com.denfop.network.packet;
 
 import com.denfop.IUCore;
 import com.denfop.api.guidebook.GuideBookCore;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-public class PacketUpdateInformationAboutQuestsPlayer implements IPacket{
-    public PacketUpdateInformationAboutQuestsPlayer(){
+public class PacketUpdateInformationAboutQuestsPlayer implements IPacket {
+    private CustomPacketBuffer buffer;
+
+    public PacketUpdateInformationAboutQuestsPlayer() {
 
     }
-    public PacketUpdateInformationAboutQuestsPlayer(Map<String, List<String>> map, EntityPlayer player) {
-        final CustomPacketBuffer buffer = new CustomPacketBuffer();
+
+    public PacketUpdateInformationAboutQuestsPlayer(Map<String, List<String>> map, Player player) {
+        final CustomPacketBuffer buffer = new CustomPacketBuffer(player.registryAccess());
         buffer.writeByte(this.getId());
-        buffer.writeUniqueId(player.getUniqueID());
+        buffer.writeUUID(player.getUUID());
         buffer.writeVarInt(map.size());
         for (Map.Entry<String, List<String>> entry : map.entrySet()) {
             buffer.writeString(entry.getKey());
@@ -28,16 +27,28 @@ public class PacketUpdateInformationAboutQuestsPlayer implements IPacket{
                 buffer.writeString(str);
             }
         }
-        IUCore.network.getServer().sendPacket(buffer, (EntityPlayerMP) player);
+        this.buffer = buffer;
+        IUCore.network.getServer().sendPacket(this, buffer, (ServerPlayer) player);
     }
+
+    @Override
+    public CustomPacketBuffer getPacketBuffer() {
+        return buffer;
+    }
+
+    @Override
+    public void setPacketBuffer(CustomPacketBuffer customPacketBuffer) {
+        buffer = customPacketBuffer;
+    }
+
     @Override
     public byte getId() {
         return 70;
     }
 
     @Override
-    public void readPacket(final CustomPacketBuffer customPacketBuffer, final EntityPlayer entityPlayer) {
-        final UUID uuid = customPacketBuffer.readUniqueId();
+    public void readPacket(final CustomPacketBuffer customPacketBuffer, final Player entityPlayer) {
+        final UUID uuid = customPacketBuffer.readUUID();
         int mapSize = customPacketBuffer.readVarInt();
         Map<String, List<String>> map = new HashMap<>();
         for (int i = 0; i < mapSize; i++) {
@@ -49,7 +60,7 @@ public class PacketUpdateInformationAboutQuestsPlayer implements IPacket{
             }
             map.put(key, list);
         }
-        GuideBookCore.instance.setData(uuid,map);
+        GuideBookCore.instance.setData(uuid, map);
     }
 
     @Override

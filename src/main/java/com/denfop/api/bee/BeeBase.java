@@ -1,40 +1,42 @@
 package com.denfop.api.bee;
 
-import com.denfop.api.agriculture.ICrop;
+import com.denfop.api.crop.ICrop;
 import com.denfop.network.packet.CustomPacketBuffer;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.phys.AABB;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class BeeBase implements IBee {
+public class BeeBase implements Bee {
 
     private final int weatherResistance;
     private final int maxSwarm;
     private final ICrop cropFlower;
     private final int id;
-    private final List<Biome> biomes = new ArrayList<>();
+    private final List<ResourceKey<Biome>> biomes = new ArrayList<>();
     private final int offspring;
-    private final AxisAlignedBB sizeTerritory;
+    private final AABB sizeTerritory;
     private final int tickLifecycles;
     private final double maxMortalityRate;
     private final int tickBirthRate;
     private final List<Product> products = new ArrayList<>();
     private final String name;
-    private List<IBee> unCompatibleBees;
+    private List<Bee> unCompatibleBees;
     private boolean sun;
     private boolean night;
     private int chance;
 
     public BeeBase(
             String name, int id, int maxSwarm,
-            int tickBirthRate, int tickLifecycles, AxisAlignedBB sizeTerritory, int offspring,
+            int tickBirthRate, int tickLifecycles, AABB sizeTerritory, int offspring,
             int chance, boolean sun, boolean night, ICrop cropFlower,
-            List<IBee> unCompatibleBees, int defaultWeatherResistance, double maxMortalityRate
+            List<Bee> unCompatibleBees, int defaultWeatherResistance, double maxMortalityRate
     ) {
         this.name = name;
         this.maxSwarm = maxSwarm;
@@ -77,9 +79,8 @@ public class BeeBase implements IBee {
                 weatherResistance,
                 maxMortalityRate
         );
-        for (Biome biome : biomes) {
+        for (ResourceKey<Biome> biome : biomes)
             bee.addBiome(biome);
-        }
         return bee;
     }
 
@@ -91,12 +92,12 @@ public class BeeBase implements IBee {
 
 
     @Override
-    public List<IBee> getUnCompatibleBees() {
+    public List<Bee> getUnCompatibleBees() {
         return unCompatibleBees;
     }
 
     @Override
-    public void setUnCompatibleBees(final List<IBee> bees) {
+    public void setUnCompatibleBees(final List<Bee> bees) {
         this.unCompatibleBees = bees;
     }
 
@@ -133,18 +134,25 @@ public class BeeBase implements IBee {
 
 
     @Override
-    public List<Biome> getBiomes() {
+    public List<ResourceKey<Biome>> getBiomes() {
         return biomes;
     }
 
 
     @Override
-    public boolean canWorkInBiome(Biome biomeName) {
+    public boolean canWorkInBiome(ResourceKey<Biome> biomeName) {
         return biomes.contains(biomeName);
     }
 
+    public boolean canWorkInBiome(Biome biomeName, Level level) {
+        ResourceKey<Biome> biomeKey = level.registryAccess()
+                .registryOrThrow(Registries.BIOME)
+                .getResourceKey(biomeName).get();
+        return biomes.contains(biomeKey);
+    }
+
     @Override
-    public void addBiome(Biome biomeName) {
+    public void addBiome(ResourceKey<Biome> biomeName) {
         biomes.add(biomeName);
     }
 
@@ -156,7 +164,7 @@ public class BeeBase implements IBee {
 
 
     @Override
-    public AxisAlignedBB getSizeTerritory() {
+    public AABB getSizeTerritory() {
         return sizeTerritory;
     }
 
@@ -220,7 +228,8 @@ public class BeeBase implements IBee {
             Product finalTarget = target;
             List<Product> others = products.stream()
                     .filter(p -> p != finalTarget)
-                    .sorted(Comparator.comparingDouble(Product::getChance).reversed()).collect(Collectors.toList());
+                    .sorted(Comparator.comparingDouble(Product::getChance).reversed())
+                    .toList();
 
             for (Product other : others) {
                 if (toReduce <= 0) break;
@@ -259,7 +268,7 @@ public class BeeBase implements IBee {
     public void readPacket(CustomPacketBuffer buffer) { /* Implementation logic */ }
 
     @Override
-    public CustomPacketBuffer writePacket() {
+    public CustomPacketBuffer writePacket(CustomPacketBuffer o) {
         return null;
     }
 

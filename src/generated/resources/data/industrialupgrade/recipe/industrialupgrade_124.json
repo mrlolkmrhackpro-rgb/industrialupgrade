@@ -1,0 +1,22 @@
+{
+  "type": "industrialupgrade:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "minecraft:paper"
+    },
+    "C": {
+      "item": "industrialupgrade:module_schedule"
+    }
+  },
+  "pattern": [
+    "A A",
+    " C ",
+    "A A"
+  ],
+  "result": {
+    "count": 1,
+    "id": "industrialupgrade:quarrymodules/whitemodule"
+  },
+  "show_notification": false
+}

@@ -1,0 +1,8 @@
+{
+  "values": [
+    "industrialupgrade:baseore/vanadium",
+    "industrialupgrade:blockspace4/rhea_vanadium_ore",
+    "industrialupgrade:asteroidore3/asteroid_vanadium_ore",
+    "industrialupgrade:deepore/deep_vanadium_ore"
+  ]
+}

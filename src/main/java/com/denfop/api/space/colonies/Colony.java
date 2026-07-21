@@ -4,31 +4,17 @@ import com.denfop.api.space.IBody;
 import com.denfop.api.space.SpaceNet;
 import com.denfop.api.space.colonies.api.IColony;
 import com.denfop.api.space.colonies.api.IColonyBuilding;
-import com.denfop.api.space.colonies.api.building.IBuildingHouse;
-import com.denfop.api.space.colonies.api.building.IColonyMiningFactory;
-import com.denfop.api.space.colonies.api.building.IColonyStorage;
-import com.denfop.api.space.colonies.api.building.IEntertainment;
-import com.denfop.api.space.colonies.api.building.IFactory;
-import com.denfop.api.space.colonies.api.building.IGenerator;
-import com.denfop.api.space.colonies.api.building.IOxygenFactory;
-import com.denfop.api.space.colonies.api.building.IProtectionBuilding;
-import com.denfop.api.space.colonies.api.building.IStorage;
-import com.denfop.api.space.colonies.building.ColonyEntertainment;
-import com.denfop.api.space.colonies.building.ColonyHouse;
-import com.denfop.api.space.colonies.building.ColonyPanelFactory;
-import com.denfop.api.space.colonies.building.Factory;
-import com.denfop.api.space.colonies.building.FluidFactory;
-import com.denfop.api.space.colonies.building.ItemFactory;
-import com.denfop.api.space.colonies.building.OxygenFactory;
-import com.denfop.api.space.colonies.building.ProtectionBuilding;
-import com.denfop.api.space.colonies.building.StorageBuilding;
+import com.denfop.api.space.colonies.api.building.*;
+import com.denfop.api.space.colonies.building.*;
 import com.denfop.api.space.colonies.enums.EnumHouses;
 import com.denfop.api.space.colonies.enums.EnumProblems;
 import com.denfop.network.packet.CustomPacketBuffer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -39,6 +25,9 @@ public class Colony implements IColony {
 
     private final IBody body;
     byte tick = 0;
+    short availableItem = 0;
+    short availableFluid = 0;
+    byte seconds = 60;
     private UUID fakeplayer;
     private List<IColonyBuilding> list;
     private List<IBuildingHouse> buildingHouseList;
@@ -78,7 +67,7 @@ public class Colony implements IColony {
     private byte timeResetOxygen;
     private boolean auto;
     private byte timeWork = 0;
-    private short timeToSend = 300;
+    private short timeToSend = 0;
 
     public Colony(IBody body, UUID player) {
         this.body = body;
@@ -115,7 +104,7 @@ public class Colony implements IColony {
         this.body = SpaceNet.instance.getBodyFromName(packetBuffer.readString());
         this.level = packetBuffer.readShort();
         this.experience = packetBuffer.readInt();
-        this.fakeplayer = packetBuffer.readUniqueId();
+        this.fakeplayer = packetBuffer.readUUID();
         this.energy = packetBuffer.readInt();
         this.oxygen = packetBuffer.readInt();
         this.food = packetBuffer.readInt();
@@ -171,7 +160,7 @@ public class Colony implements IColony {
         }
     }
 
-    public Colony(NBTTagCompound tag, UUID fakeplayer) {
+    public Colony(CompoundTag tag, UUID fakeplayer, HolderLookup.Provider p_323640_) {
         this.body = SpaceNet.instance.getBodyFromName(tag.getString("name"));
         this.fakeplayer = fakeplayer;
         this.enumProblemsList = new LinkedList<>();
@@ -184,17 +173,17 @@ public class Colony implements IColony {
         this.entertainments = new LinkedList<>();
         this.protections = new LinkedList<>();
         this.colonyStorages = new LinkedList<>();
-        NBTTagList list1 = tag.getTagList("building", 10);
+        ListTag list1 = tag.getList("building", 10);
         list = new LinkedList<>();
-        for (int i = 0; i < list1.tagCount(); i++) {
-            NBTTagCompound nbt = list1.getCompoundTagAt(i);
+        for (int i = 0; i < list1.size(); i++) {
+            CompoundTag nbt = list1.getCompound(i);
             byte type = nbt.getByte("type");
             switch (type) {
                 case 5:
                     new OxygenFactory(nbt, this);
                     break;
                 case 7:
-                    new StorageBuilding(nbt, this);
+                    new StorageBuilding(nbt, p_323640_, this);
                     break;
                 case 0:
                     new ColonyHouse(nbt, this);
@@ -220,13 +209,13 @@ public class Colony implements IColony {
             }
         }
         this.list = new ArrayList<>(list);
-        this.energy = tag.getInteger("energy");
-        this.oxygen = tag.getInteger("oxygen");
-        this.food = tag.getInteger("food");
+        this.energy = tag.getInt("energy");
+        this.oxygen = tag.getInt("oxygen");
+        this.food = tag.getInt("food");
         this.needWorkers = tag.getShort("needWorkers");
-        this.workers = tag.getInteger("workers");
+        this.workers = tag.getInt("workers");
         this.level = tag.getShort("level");
-        this.experience = tag.getInteger("experience");
+        this.experience = tag.getInt("experience");
         this.toDelete = tag.getByte("toDelete");
         this.auto = tag.getBoolean("auto");
         this.timeToSend = tag.getShort("timeToSend");
@@ -234,12 +223,12 @@ public class Colony implements IColony {
     }
 
     @Override
-    public CustomPacketBuffer writePacket() {
-        CustomPacketBuffer customPacketBuffer = new CustomPacketBuffer();
+    public CustomPacketBuffer writePacket(RegistryAccess registryAccess) {
+        CustomPacketBuffer customPacketBuffer = new CustomPacketBuffer(registryAccess);
         customPacketBuffer.writeString(body.getName());
         customPacketBuffer.writeShort(this.level);
         customPacketBuffer.writeInt(this.experience);
-        customPacketBuffer.writeUniqueId(fakeplayer);
+        customPacketBuffer.writeUUID(fakeplayer);
         customPacketBuffer.writeInt(energy);
         customPacketBuffer.writeInt(oxygen);
         customPacketBuffer.writeInt(food);
@@ -256,9 +245,8 @@ public class Colony implements IColony {
         customPacketBuffer.writeInt(entertainment);
         customPacketBuffer.writeBoolean(auto);
         customPacketBuffer.writeByte(this.enumProblemsList.size());
-        for (EnumProblems problems : enumProblemsList) {
+        for (EnumProblems problems : enumProblemsList)
             customPacketBuffer.writeByte((byte) problems.ordinal());
-        }
         for (IColonyBuilding building : list) {
             building.writePacket(customPacketBuffer);
         }
@@ -371,6 +359,40 @@ public class Colony implements IColony {
     }
 
     @Override
+    public short getMaxAvailableFluid() {
+        return (short) ((short) (Math.abs(this.level) / 2) * 50);
+    }
+
+    @Override
+    public short getMaxAvailableItem() {
+        return (short) (Math.abs(this.level) / 2);
+    }
+
+    @Override
+    public short getAvailableFluid() {
+        return availableFluid;
+    }
+
+    @Override
+    public short getAvailableItem() {
+        return availableItem;
+    }
+
+    @Override
+    public void removeAvailableFluid(int amount) {
+        availableFluid -= amount;
+        if (availableFluid < 0)
+            availableFluid = 0;
+    }
+
+    @Override
+    public void removeAvailableItem(int amount) {
+        availableItem -= amount;
+        if (availableItem < 0)
+            availableItem = 0;
+    }
+
+    @Override
     public void update() {
         if (!this.enumProblemsList.isEmpty()) {
             if (toDelete > 0 && this.workers == 0) {
@@ -384,18 +406,25 @@ public class Colony implements IColony {
                 toDelete = 120;
                 this.tick = 0;
             }
-            if (this.level < 100 && this.tick == 10) {
-                this.tick = 0;
-                this.experience += this.workers;
-                if (this.experience >= this.getMaxExperience()) {
-                    this.level++;
-                    this.experience = 0;
-                }
+
+        }
+        if (this.level < 100 && this.tick == 10) {
+            this.tick = 0;
+            this.experience += this.workers;
+            if (this.experience >= this.getMaxExperience()) {
+                this.level++;
+                this.experience = 0;
             }
         }
         tick++;
         if (this.tick > 10) {
             this.tick = 0;
+        }
+        seconds--;
+        if (seconds < 0) {
+            this.availableItem = this.getMaxAvailableItem();
+            this.availableFluid = this.getMaxAvailableFluid();
+            seconds = 60;
         }
         if (this.auto) {
             this.timeToSend--;
@@ -542,7 +571,7 @@ public class Colony implements IColony {
             if (this.needWorkers > 0) {
                 this.enumProblemsList.add(EnumProblems.WORKERS);
             }
-            return;
+
         }
         entertainment = 0;
         protection = 0;
@@ -568,12 +597,10 @@ public class Colony implements IColony {
     }
 
     public double getPercentEntertainment() {
-        if (level < 7) {
+        if (level < 7)
             return 1;
-        }
-        if (this.entertainment == 0) {
+        if (this.entertainment == 0)
             return 0.8;
-        }
         return Math.min(1.5, Math.max(0.8, (this.entertainment) * 1D / this.workers));
     }
 
@@ -710,23 +737,23 @@ public class Colony implements IColony {
 
 
     @Override
-    public NBTTagCompound writeNBT(final NBTTagCompound tag) {
-        tag.setString("name", this.body.getName());
-        tag.setInteger("workers", (short) this.workers);
-        tag.setShort("needWorkers", this.needWorkers);
-        tag.setInteger("energy", this.energy);
-        tag.setInteger("food", this.food);
-        tag.setInteger("oxygen", this.oxygen);
-        tag.setByte("toDelete", toDelete);
-        tag.setShort("level", level);
-        tag.setBoolean("auto", auto);
-        tag.setShort("timeToSend", timeToSend);
-        tag.setInteger("experience", experience);
-        NBTTagList tagList = new NBTTagList();
+    public CompoundTag writeNBT(final CompoundTag tag, HolderLookup.Provider p_323640_) {
+        tag.putString("name", this.body.getName());
+        tag.putInt("workers", (short) this.workers);
+        tag.putShort("needWorkers", this.needWorkers);
+        tag.putInt("energy", this.energy);
+        tag.putInt("food", this.food);
+        tag.putInt("oxygen", this.oxygen);
+        tag.putByte("toDelete", toDelete);
+        tag.putShort("level", level);
+        tag.putBoolean("auto", auto);
+        tag.putShort("timeToSend", timeToSend);
+        tag.putInt("experience", experience);
+        ListTag tagList = new ListTag();
         for (IColonyBuilding iColonyBuilding : this.list) {
-            tagList.appendTag(iColonyBuilding.writeTag(new NBTTagCompound()));
+            tagList.add(iColonyBuilding.writeTag(new CompoundTag(), p_323640_));
         }
-        tag.setTag("building", tagList);
+        tag.put("building", tagList);
         return tag;
     }
 

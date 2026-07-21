@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=doubleorewashing": {
+      "model": "industrialupgrade:block/moremachine3/doubleorewashing"
+    },
+    "facing=south,type=doubleorewashing": {
+      "model": "industrialupgrade:block/moremachine3/doubleorewashing",
+      "y": 180
+    },
+    "facing=west,type=doubleorewashing": {
+      "model": "industrialupgrade:block/moremachine3/doubleorewashing",
+      "y": 270
+    },
+    "facing=east,type=doubleorewashing": {
+      "model": "industrialupgrade:block/moremachine3/doubleorewashing",
+      "y": 90
+    },
+    "facing=north,type=doubleorewashing_active": {
+      "model": "industrialupgrade:block/moremachine3/doubleorewashing_active"
+    },
+    "facing=south,type=doubleorewashing_active": {
+      "model": "industrialupgrade:block/moremachine3/doubleorewashing_active",
+      "y": 180
+    },
+    "facing=west,type=doubleorewashing_active": {
+      "model": "industrialupgrade:block/moremachine3/doubleorewashing_active",
+      "y": 270
+    },
+    "facing=east,type=doubleorewashing_active": {
+      "model": "industrialupgrade:block/moremachine3/doubleorewashing_active",
+      "y": 90
+    }
+  }
+}

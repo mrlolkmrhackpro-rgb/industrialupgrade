@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=geothermal_waste": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_waste"
+    },
+    "facing=south,type=geothermal_waste": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_waste",
+      "y": 180
+    },
+    "facing=west,type=geothermal_waste": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_waste",
+      "y": 270
+    },
+    "facing=east,type=geothermal_waste": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_waste",
+      "y": 90
+    },
+    "facing=north,type=geothermal_waste_active": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_waste"
+    },
+    "facing=south,type=geothermal_waste_active": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_waste",
+      "y": 180
+    },
+    "facing=west,type=geothermal_waste_active": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_waste",
+      "y": 270
+    },
+    "facing=east,type=geothermal_waste_active": {
+      "model": "industrialupgrade:block/geothermalpump/geothermal_waste",
+      "y": 90
+    }
+  }
+}

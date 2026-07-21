@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=compressor_5": {
+      "model": "industrialupgrade:block/compressor_5"
+    },
+    "facing=south,type=compressor_5": {
+      "model": "industrialupgrade:block/compressor_5",
+      "y": 180
+    },
+    "facing=west,type=compressor_5": {
+      "model": "industrialupgrade:block/compressor_5",
+      "y": 270
+    },
+    "facing=east,type=compressor_5": {
+      "model": "industrialupgrade:block/compressor_5",
+      "y": 90
+    },
+    "facing=north,type=compressor_5_active": {
+      "model": "industrialupgrade:block/compressor_5"
+    },
+    "facing=south,type=compressor_5_active": {
+      "model": "industrialupgrade:block/compressor_5",
+      "y": 180
+    },
+    "facing=west,type=compressor_5_active": {
+      "model": "industrialupgrade:block/compressor_5",
+      "y": 270
+    },
+    "facing=east,type=compressor_5_active": {
+      "model": "industrialupgrade:block/compressor_5",
+      "y": 90
+    }
+  }
+}

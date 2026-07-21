@@ -1,9 +1,9 @@
 package com.denfop.integration.jei.watergenerator;
 
 
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
+import com.denfop.componets.Fluids;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class GenWaterHandler {
     }
 
     public static void initRecipes() {
-        addRecipe(40000, new FluidStack(FluidRegistry.WATER, 1000));
+        addRecipe(40000, new FluidStack(Fluids.WATER, 1000));
     }
 
 

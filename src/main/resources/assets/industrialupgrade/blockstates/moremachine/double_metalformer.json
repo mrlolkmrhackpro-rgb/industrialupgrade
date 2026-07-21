@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=double_metalformer": {
+      "model": "industrialupgrade:block/moremachine/double_metalformer"
+    },
+    "facing=south,type=double_metalformer": {
+      "model": "industrialupgrade:block/moremachine/double_metalformer",
+      "y": 180
+    },
+    "facing=west,type=double_metalformer": {
+      "model": "industrialupgrade:block/moremachine/double_metalformer",
+      "y": 270
+    },
+    "facing=east,type=double_metalformer": {
+      "model": "industrialupgrade:block/moremachine/double_metalformer",
+      "y": 90
+    },
+    "facing=north,type=double_metalformer_active": {
+      "model": "industrialupgrade:block/moremachine/double_metalformer_active"
+    },
+    "facing=south,type=double_metalformer_active": {
+      "model": "industrialupgrade:block/moremachine/double_metalformer_active",
+      "y": 180
+    },
+    "facing=west,type=double_metalformer_active": {
+      "model": "industrialupgrade:block/moremachine/double_metalformer_active",
+      "y": 270
+    },
+    "facing=east,type=double_metalformer_active": {
+      "model": "industrialupgrade:block/moremachine/double_metalformer_active",
+      "y": 90
+    }
+  }
+}

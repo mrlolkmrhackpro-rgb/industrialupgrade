@@ -2,21 +2,36 @@ package com.denfop.network.packet;
 
 import com.denfop.IUCore;
 import com.denfop.render.streak.PlayerStreakInfo;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.world.entity.player.Player;
 
 public class PacketColorPicker implements IPacket {
+
+    private CustomPacketBuffer buffer;
 
     public PacketColorPicker() {
 
     }
 
-    public PacketColorPicker(PlayerStreakInfo playerStreakInfo, String nick) {
-        CustomPacketBuffer buffer = new CustomPacketBuffer();
+    public PacketColorPicker(PlayerStreakInfo playerStreakInfo, String nick, RegistryAccess registryAccess) {
+        CustomPacketBuffer buffer = new CustomPacketBuffer(Minecraft.getInstance().player.registryAccess());
         buffer.writeByte(this.getId());
         buffer.writeString(nick);
-        buffer.writeBytes(playerStreakInfo.writePacket());
+        buffer.writeBytes(playerStreakInfo.writePacket(buffer.registryAccess()));
         buffer.flip();
-        IUCore.network.getClient().sendPacket(buffer);
+        this.buffer = buffer;
+        IUCore.network.getClient().sendPacket(this, buffer);
+    }
+
+    @Override
+    public CustomPacketBuffer getPacketBuffer() {
+        return buffer;
+    }
+
+    @Override
+    public void setPacketBuffer(CustomPacketBuffer customPacketBuffer) {
+        buffer = customPacketBuffer;
     }
 
     @Override
@@ -25,7 +40,7 @@ public class PacketColorPicker implements IPacket {
     }
 
     @Override
-    public void readPacket(final CustomPacketBuffer is, final EntityPlayer entityPlayer) {
+    public void readPacket(final CustomPacketBuffer is, final Player entityPlayer) {
         final String nick = is.readString();
         PlayerStreakInfo playerStreakInfo = new PlayerStreakInfo(is);
         IUCore.mapStreakInfo.remove(nick);

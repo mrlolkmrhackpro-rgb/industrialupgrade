@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=teleporter_iu": {
+      "model": "industrialupgrade:block/basemachine/teleporter"
+    },
+    "facing=south,type=teleporter_iu": {
+      "model": "industrialupgrade:block/basemachine/teleporter",
+      "y": 180
+    },
+    "facing=west,type=teleporter_iu": {
+      "model": "industrialupgrade:block/basemachine/teleporter",
+      "y": 270
+    },
+    "facing=east,type=teleporter_iu": {
+      "model": "industrialupgrade:block/basemachine/teleporter",
+      "y": 90
+    },
+    "facing=north,type=teleporter_iu_active": {
+      "model": "industrialupgrade:block/basemachine/teleporter_active"
+    },
+    "facing=south,type=teleporter_iu_active": {
+      "model": "industrialupgrade:block/basemachine/teleporter_active",
+      "y": 180
+    },
+    "facing=west,type=teleporter_iu_active": {
+      "model": "industrialupgrade:block/basemachine/teleporter_active",
+      "y": 270
+    },
+    "facing=east,type=teleporter_iu_active": {
+      "model": "industrialupgrade:block/basemachine/teleporter_active",
+      "y": 90
+    }
+  }
+}

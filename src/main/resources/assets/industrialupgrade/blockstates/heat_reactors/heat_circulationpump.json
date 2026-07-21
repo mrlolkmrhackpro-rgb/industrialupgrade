@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=heat_circulationpump": {
+      "model": "industrialupgrade:block/heat_reactor/heat_circulationpump"
+    },
+    "facing=south,type=heat_circulationpump": {
+      "model": "industrialupgrade:block/heat_reactor/heat_circulationpump",
+      "y": 180
+    },
+    "facing=west,type=heat_circulationpump": {
+      "model": "industrialupgrade:block/heat_reactor/heat_circulationpump",
+      "y": 270
+    },
+    "facing=east,type=heat_circulationpump": {
+      "model": "industrialupgrade:block/heat_reactor/heat_circulationpump",
+      "y": 90
+    },
+    "facing=north,type=heat_circulationpump_active": {
+      "model": "industrialupgrade:block/heat_reactor/heat_circulationpump"
+    },
+    "facing=south,type=heat_circulationpump_active": {
+      "model": "industrialupgrade:block/heat_reactor/heat_circulationpump",
+      "y": 180
+    },
+    "facing=west,type=heat_circulationpump_active": {
+      "model": "industrialupgrade:block/heat_reactor/heat_circulationpump",
+      "y": 270
+    },
+    "facing=east,type=heat_circulationpump_active": {
+      "model": "industrialupgrade:block/heat_reactor/heat_circulationpump",
+      "y": 90
+    }
+  }
+}

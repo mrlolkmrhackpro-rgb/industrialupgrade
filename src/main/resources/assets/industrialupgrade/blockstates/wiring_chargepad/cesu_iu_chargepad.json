@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=cesu_iu_chargepad": {
+      "model": "industrialupgrade:block/chargepad/chargepad_cesu"
+    },
+    "facing=south,type=cesu_iu_chargepad": {
+      "model": "industrialupgrade:block/chargepad/chargepad_cesu",
+      "y": 180
+    },
+    "facing=west,type=cesu_iu_chargepad": {
+      "model": "industrialupgrade:block/chargepad/chargepad_cesu",
+      "y": 270
+    },
+    "facing=east,type=cesu_iu_chargepad": {
+      "model": "industrialupgrade:block/chargepad/chargepad_cesu",
+      "y": 90
+    },
+    "facing=north,type=cesu_iu_chargepad_active": {
+      "model": "industrialupgrade:block/chargepad/chargepad_cesu_active"
+    },
+    "facing=south,type=cesu_iu_chargepad_active": {
+      "model": "industrialupgrade:block/chargepad/chargepad_cesu_active",
+      "y": 180
+    },
+    "facing=west,type=cesu_iu_chargepad_active": {
+      "model": "industrialupgrade:block/chargepad/chargepad_cesu_active",
+      "y": 270
+    },
+    "facing=east,type=cesu_iu_chargepad_active": {
+      "model": "industrialupgrade:block/chargepad/chargepad_cesu_active",
+      "y": 90
+    }
+  }
+}
